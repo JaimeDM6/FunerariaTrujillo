@@ -1,30 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="820.0" prefWidth="250.0" style="-fx-background-color: #F2EBE1; -fx-border-color: transparent #D6CCBD transparent transparent; -fx-border-width: 1;" xmlns="[http://javafx.com/javafx/26](http://javafx.com/javafx/26)" xmlns:fx="[http://javafx.com/fxml/1](http://javafx.com/fxml/1)">
+<VBox fx:controller="com.tartanga.funerariatrujillo.SidebarController" prefHeight="820.0" prefWidth="250.0" style="-fx-background-color: #EDE7D9; -fx-border-color: transparent #D6CCBD transparent transparent; -fx-border-width: 1;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <VBox spacing="2.0">
             <children>
                 <Label text="Funeraria Trujillo" textFill="#2e1a0e">
                     <font>
-                        <Font name="System Bold" size="17.0"/>
+                        <Font name="Inter 18pt Bold" size="17.0"/>
                     </font>
                 </Label>
                 <Label text="Gestión de servicios" textFill="#7a5230">
                     <font>
-                        <Font size="12.0"/>
+                        <Font name="Inter 18pt Regular" size="12.0"/>
                     </font>
                 </Label>
             </children>
@@ -32,50 +30,114 @@
                 <Insets bottom="30.0" left="25.0" right="20.0" top="30.0"/>
             </padding>
         </VBox>
+        
         <VBox spacing="4.0">
             <padding>
                 <Insets left="10.0" right="10.0"/>
             </padding>
             <children>
-                <Button alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" fx:id="btnEmpresa" text="Empresa" textFill="#4a3120">
+                <Button alignment="CENTER_LEFT" fx:id="btnClientes" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #E6D9BE; -fx-background-radius: 4; -fx-border-color: transparent transparent transparent #C68E17; -fx-border-width: 0 0 0 3; -fx-cursor: hand;" text="Clientes" textFill="#2E1A0E">
                     <graphic>
-                        <SVGPath content="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="#7a5230" scaleX="0.7" scaleY="0.7"/>
+                        <SVGPath content="M11.2508 14.25V12.75C11.2508 11.9544 10.9347 11.1913 10.3721 10.6287C9.80944 10.0661 9.04631 9.75 8.2506 9.75H3.75024C2.95453 9.75 2.1914 10.0661 1.62875 10.6287C1.0661 11.1913 0.75 11.9544 0.75 12.75V14.25M11.2508 0.845947C11.8942 1.01272 12.464 1.3884 12.8707 1.91399C13.2775 2.43959 13.4982 3.08536 13.4982 3.74995C13.4982 4.41453 13.2775 5.0603 12.8707 5.5859C12.464 6.1115 11.8942 6.48717 11.2508 6.65395M15.7512 14.2499V12.7499C15.7507 12.0852 15.5294 11.4395 15.1222 10.9141C14.7149 10.3888 14.1447 10.0136 13.501 9.84741M9.00066 3.75C9.00066 5.40685 7.65741 6.75 6.00042 6.75C4.34343 6.75 3.00018 5.40685 3.00018 3.75C3.00018 2.09315 4.34343 0.75 6.00042 0.75C7.65741 0.75 9.00066 2.09315 9.00066 3.75Z" fill="TRANSPARENT" stroke="#2E1A0E" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
                     </graphic>
                     <font>
-                        <Font size="14.0"/>
-                    </font>
-                    <padding>
-                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
-                    </padding>
-                </Button>
-                <Button alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #E6D9BE; -fx-background-radius: 4; -fx-border-color: transparent transparent transparent #C68E17; -fx-border-width: 0 0 0 3; -fx-cursor: hand;" fx:id="btnClientes" text="Clientes" textFill="#2e1a0e">
-                    <graphic>
-                        <SVGPath content="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#2e1a0e" scaleX="0.7" scaleY="0.7"/>
-                    </graphic>
-                    <font>
-                        <Font name="System Bold" size="14.0"/>
+                        <Font name="Inter 18pt Bold" size="14.0"/>
                     </font>
                     <padding>
                         <Insets bottom="10.0" left="12.0" right="10.0" top="10.0"/>
                     </padding>
                 </Button>
-                <Button alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" fx:id="btnDifuntos" text="Difuntos" textFill="#4a3120">
+
+                <Button alignment="CENTER_LEFT" fx:id="btnDifuntos" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Difuntos" textFill="#4A3120">
                     <graphic>
-                        <SVGPath content="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#7a5230" scaleX="0.7" scaleY="0.7"/>
+                        <SVGPath content="M9 0.750009C7.02265 0.741424 5.12262 1.51742 3.71663 2.9078C2.31064 4.29819 1.51349 6.18944 1.5 8.16676C1.49955 9.21921 1.72535 10.2595 2.16207 11.217C2.5988 12.1746 3.23626 13.0271 4.03125 13.7168V14.832C4.03443 15.4757 4.29287 16.0918 4.74987 16.5452C5.20686 16.9985 5.82505 17.252 6.46875 17.25H11.5312C12.1748 17.252 12.7929 16.9986 13.2499 16.5454C13.7068 16.0923 13.9654 15.4763 13.9687 14.8328V13.7175C14.7638 13.0278 15.4014 12.1751 15.8381 11.2174C16.2748 10.2597 16.5006 9.21934 16.5 8.16676C16.4865 6.18944 15.6894 4.29819 14.2834 2.9078C12.8774 1.51742 10.9773 0.741424 9 0.750009ZM12.75 12.7778C12.6614 12.848 12.5897 12.9374 12.5405 13.0392C12.4913 13.141 12.4657 13.2527 12.4657 13.3658V14.8328C12.4626 15.078 12.3626 15.3121 12.1875 15.4839C12.0124 15.6558 11.7765 15.7514 11.5312 15.75H11.25V13.5C11.25 13.3011 11.171 13.1103 11.0303 12.9697C10.8897 12.829 10.6989 12.75 10.5 12.75C10.3011 12.75 10.1103 12.829 9.96967 12.9697C9.82902 13.1103 9.75 13.3011 9.75 13.5V15.75H8.25V13.5C8.25 13.3011 8.17098 13.1103 8.03033 12.9697C7.88968 12.829 7.69891 12.75 7.5 12.75C7.30109 12.75 7.11032 12.829 6.96967 12.9697C6.82902 13.1103 6.75 13.3011 6.75 13.5V15.75H6.46875C6.22294 15.7522 5.98627 15.6569 5.81056 15.485C5.63485 15.3131 5.53441 15.0786 5.53125 14.8328V13.3658C5.53163 13.2529 5.50654 13.1414 5.45784 13.0396C5.40914 12.9378 5.3381 12.8483 5.25 12.7778C4.54979 12.2302 3.98334 11.5305 3.59352 10.7316C3.2037 9.93274 3.00074 9.05566 3 8.16676C3 6.57546 3.63214 5.04934 4.75736 3.92412C5.88258 2.7989 7.4087 2.16676 9 2.16676C10.5913 2.16676 12.1174 2.7989 13.2426 3.92412C14.3679 5.04934 15 6.57546 15 8.16676C14.9993 9.05566 14.7963 9.93274 14.4065 10.7316C14.0167 11.5305 13.4502 12.2302 12.75 12.7778ZM8.25 9.75001C8.25 10.0467 8.16203 10.3367 7.9972 10.5834C7.83238 10.83 7.59811 11.0223 7.32403 11.1358C7.04994 11.2494 6.74834 11.2791 6.45737 11.2212C6.16639 11.1633 5.89912 11.0204 5.68934 10.8107C5.47956 10.6009 5.3367 10.3336 5.27882 10.0426C5.22094 9.75167 5.25065 9.45007 5.36418 9.17598C5.47771 8.90189 5.66997 8.66763 5.91665 8.5028C6.16332 8.33798 6.45333 8.25001 6.75 8.25001C7.14783 8.25001 7.52936 8.40804 7.81066 8.68935C8.09196 8.97065 8.25 9.35218 8.25 9.75001ZM12.75 9.75001C12.75 10.0467 12.662 10.3367 12.4972 10.5834C12.3324 10.83 12.0981 11.0223 11.824 11.1358C11.5499 11.2494 11.2483 11.2791 10.9574 11.2212C10.6664 11.1633 10.3991 11.0204 10.1893 10.8107C9.97956 10.6009 9.8367 10.3336 9.77882 10.0426C9.72094 9.75167 9.75065 9.45007 9.86418 9.17598C9.97771 8.90189 10.17 8.66763 10.4166 8.5028C10.6633 8.33798 10.9533 8.25001 11.25 8.25001C11.6478 8.25001 12.0294 8.40804 12.3107 8.68935C12.592 8.97065 12.75 9.35218 12.75 9.75001Z" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
                     </graphic>
                     <font>
-                        <Font size="14.0"/>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
                     </font>
                     <padding>
                         <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
                     </padding>
                 </Button>
-                <Button alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" fx:id="btnServicios" text="Servicios" textFill="#4a3120">
+                
+                <Button alignment="CENTER_LEFT" fx:id="btnTrabajadores" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Trabajadores" textFill="#4A3120">
                     <graphic>
-                        <SVGPath content="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill="#7a5230" scaleX="0.7" scaleY="0.7"/>
+                        <SVGPath content="M10.5 0V1.50012M10.5 1.50012H4.5M10.5 1.50012H12.75C13.5784 1.50012 14.25 2.17175 14.25 3.00024V13.5011C14.25 14.3296 13.5784 15.0012 12.75 15.0012H11.9363M11.9363 15.0012C11.9363 13.8076 11.4622 12.6629 10.6183 11.819C9.77435 10.975 8.62975 10.5008 7.43628 10.5008C6.24281 10.5008 5.09821 10.975 4.2543 11.819C3.41039 12.6629 2.93628 13.8076 2.93628 15.0012M11.9363 15.0012H2.93628M2.93628 15.0012H2.25C1.42157 15.0012 0.75 14.3296 0.75 13.5011V3.00024C0.75 2.17175 1.42157 1.50012 2.25 1.50012H4.5M4.5 0V1.50012M10.5 7.5006C10.5 9.15759 9.15685 10.5008 7.5 10.5008C5.84315 10.5008 4.5 9.15759 4.5 7.5006C4.5 5.84361 5.84315 4.50036 7.5 4.50036C9.15685 4.50036 10.5 5.84361 10.5 7.5006Z" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
                     </graphic>
                     <font>
-                        <Font size="14.0"/>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnServicios" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Servicios" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M0.75 0.75H0.7575M0.75 6.0006H0.7575M0.75 11.2512H0.7575M4.5 0.75H14.25M4.5 6.0006H14.25M4.5 11.2512H14.25" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnFeretros" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Féretros" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M9 5.25V7.5M9 7.5V12.75M9 7.5H6.75M9 7.5H11.25M6.75 2.25H11.25L15 6L11.25 15.75H6.75L3 6L6.75 2.25Z" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnUrnas" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Urnas" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M3.75 0.75V4.97434C3.75 5.29236 3.546 5.57064 3.26025 5.7109C3.08603 5.79679 2.91817 5.89357 2.75756 6.00042M3.75 0.75H3M3.75 0.75H6.75M2.75756 6.00042C2.22315 6.35596 1.76902 6.82305 1.42788 7.37206C0.984214 8.08607 0.749385 8.91008 0.75 9.75072C0.754501 12.751 3 15.0011 4.5 15.7512M2.75756 6.00042H2.25C1.85218 6.00042 1.47064 5.84237 1.18934 5.56104C0.908035 5.27972 0.75 4.89816 0.75 4.5003C0.75 4.10244 0.908035 3.72088 1.18934 3.43955C1.47064 3.15823 1.85218 3.00018 2.25 3.00018H3.75M2.75756 6.00042H2.76M4.5 15.7512H6M4.5 15.7512H0.75M6.75 0.75V3.00018M6.75 0.75H7.5M6.75 3.00018V4.97434C6.75 5.29236 6.954 5.57064 7.239 5.7109C7.41329 5.79678 7.58122 5.89356 7.74189 6.00042M6.75 3.00018H8.25C8.64782 3.00018 9.02936 3.15823 9.31066 3.43955C9.59196 3.72088 9.75 4.10244 9.75 4.5003C9.75 4.89816 9.59196 5.27972 9.31066 5.56104C9.02936 5.84237 8.64782 6.00042 8.25 6.00042H7.74189M7.74189 6.00042C8.27637 6.35589 8.73057 6.82294 9.0718 7.37192C9.5156 8.08594 9.75055 8.91 9.75 9.75072C9.75 12.751 7.5 15.0011 6 15.7512M7.74189 6.00042H7.74M6 15.7512H9.75" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnSalas" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Salas" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M7.50054 13.8284H3.75024M7.50054 13.8284V14.3678C7.50057 14.4817 7.52656 14.5941 7.57653 14.6965C7.62649 14.7989 7.69913 14.8886 7.78892 14.9587C7.87872 15.0288 7.9833 15.0776 8.09475 15.1012C8.20619 15.1249 8.32157 15.1229 8.43211 15.0953L13.501 13.8285M7.50054 13.8284V2.2498C7.50069 2.02193 7.55275 1.79634 7.65278 1.5916C7.75281 1.38686 7.89817 1.20759 8.07783 1.06741C8.25749 0.927236 8.46673 0.82983 8.68966 0.782589C8.91259 0.735349 9.14336 0.739516 9.36444 0.794774L12.3647 1.54479C12.6892 1.6259 12.9773 1.81316 13.1832 2.0768C13.3891 2.34043 13.501 2.66532 13.501 2.99982V13.8285M3.75024 13.8284H0.75M3.75024 13.8284V3.32818C3.75024 2.93034 3.90829 2.5488 4.18961 2.26749C4.47094 1.98618 4.8525 1.82815 5.25036 1.82815H7.50054M13.501 13.8285L15.7512 13.8284M9.75072 7.82827H9.75822" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnAsignaciones" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Asignaciones" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M0.75 14.25C0.749937 13.0953 1.08313 11.9651 1.70959 10.995C2.33604 10.0249 3.22915 9.25623 4.28173 8.78114C5.33431 8.30606 6.50164 8.14478 7.64362 8.31665C8.7856 8.48853 9.85372 8.98626 10.7198 9.75011M11.2508 12.7497L12.751 14.2497L15.7512 11.2497M10.5008 4.49991C10.5008 6.57092 8.82171 8.24982 6.75048 8.24982C4.67925 8.24982 3.00018 6.57092 3.00018 4.49991C3.00018 2.42889 4.67925 0.75 6.75048 0.75C8.82171 0.75 10.5008 2.42889 10.5008 4.49991Z" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
+                    </padding>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" fx:id="btnFichaServicio" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Ficha del servicio" textFill="#4A3120">
+                    <graphic>
+                        <SVGPath content="M8.24925 0.750002H2.24985C1.85206 0.750002 1.47057 0.90805 1.1893 1.18938C0.908019 1.4707 0.75 1.85227 0.75 2.25012V14.2511C0.75 14.6489 0.908019 15.0305 1.1893 15.3118C1.47057 15.5932 1.85206 15.7512 2.24985 15.7512H11.2489C11.6467 15.7512 12.0282 15.5932 12.3095 15.3118C12.5908 15.0305 12.7488 14.6489 12.7488 14.2511V5.25036M8.24925 0.750002C8.48664 0.749618 8.72176 0.796208 8.94108 0.88709C9.16039 0.977972 9.35956 1.11135 9.52712 1.27954L12.2178 3.97076C12.3865 4.1384 12.5202 4.3378 12.6113 4.55743C12.7025 4.77706 12.7492 5.01257 12.7488 5.25036M8.24925 0.750002V4.5003C8.24925 4.69923 8.32826 4.89001 8.4689 5.03067C8.60953 5.17134 8.80028 5.25036 8.99917 5.25036L12.7488 5.25036M5.24955 6.00042H3.7497M9.7491 9.00066H3.7497M9.7491 12.0009H3.7497" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
+                    </graphic>
+                    <font>
+                        <Font name="Inter 18pt Regular" size="14.0"/>
                     </font>
                     <padding>
                         <Insets bottom="10.0" left="15.0" right="10.0" top="10.0"/>
@@ -96,24 +158,23 @@
                         <StackPane>
                             <children>
                                 <Circle fill="#F5EDD6" radius="20.0" stroke="TRANSPARENT" strokeType="INSIDE"/>
-                                <Label text="MS" textFill="#c68e17">
+                                <Label text="MS" textFill="#C68E17">
                                     <font>
-                                        <Font name="System Bold" size="14.0"/>
+                                        <Font name="Inter 18pt Bold" size="14.0"/>
                                     </font>
                                 </Label>
                             </children>
                         </StackPane>
-                        
                         <VBox alignment="CENTER_LEFT">
                             <children>
-                                <Label text="Marta Sánchez" textFill="#2e1a0e">
+                                <Label text="Marta Sánchez" textFill="#2E1A0E">
                                     <font>
-                                        <Font name="System Bold" size="13.0"/>
+                                        <Font name="Inter 18pt Bold" size="13.0"/>
                                     </font>
                                 </Label>
-                                <Label text="Administración" textFill="#7a5230">
+                                <Label text="Administración" textFill="#7A5230">
                                     <font>
-                                        <Font size="11.0"/>
+                                        <Font name="Inter 18pt Regular" size="11.0"/>
                                     </font>
                                 </Label>
                             </children>
@@ -121,12 +182,12 @@
                     </children>
                 </HBox>
 
-                <Button alignment="CENTER_LEFT" graphicTextGap="10.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Cerrar sesión" textFill="#7a5230">
+                <Button alignment="CENTER_LEFT" fx:id="btnCerrarSesion" graphicTextGap="10.0" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" text="Cerrar sesión" textFill="#7A5230">
                     <graphic>
-                        <SVGPath content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="#7a5230" scaleX="0.65" scaleY="0.65"/>
+                        <SVGPath content="M9.41667 3.41667L12.75 6.75L9.41667 10.0833M12.75 6.75H4.75M4.75 12.75H2.08333C1.72971 12.75 1.39057 12.6095 1.14052 12.3595C0.890476 12.1094 0.75 11.7703 0.75 11.4167V2.08333C0.75 1.72971 0.890476 1.39057 1.14052 1.14052C1.39057 0.890476 1.72971 0.75 2.08333 0.75H4.75" fill="TRANSPARENT" stroke="#7A5230" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0"/>
                     </graphic>
                     <font>
-                        <Font size="13.0"/>
+                        <Font name="Inter 18pt Regular" size="13.0"/>
                     </font>
                     <padding>
                         <Insets left="0.0"/>

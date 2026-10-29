@@ -3,10 +3,6 @@ package com.tartanga.funerariatrujillo;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import javafx.fxml.Initializable;
-
 /**
  * FXML Controller class
  *
