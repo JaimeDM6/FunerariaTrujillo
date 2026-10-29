@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:controller="com.tartanga.funerariatrujillo.LoginController" stylesheets="@styles.css" fx:id="rootPane" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+    <bottom>
+        <Label maxWidth="1.7976931348623157E308" style="-fx-background-color: #F5EDD6; -fx-border-color: #E8A820 transparent transparent transparent; -fx-border-width: 1;" text="Acceso exclusivo para personal autorizado" textFill="#5c3a1e" BorderPane.alignment="CENTER_LEFT">
+            <padding>
+                <Insets bottom="8.0" left="20.0" right="20.0" top="8.0" />
+            </padding>
+            <font>
+                <Font name="Inter 18pt Regular" size="11.0" />
+            </font>
+        </Label>
+    </bottom>
+    <center>
+        <GridPane alignment="CENTER" hgap="60.0" maxWidth="1100.0">
+            <columnConstraints>
+                <ColumnConstraints minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+                <ColumnConstraints minWidth="10.0" percentWidth="50.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefWidth="100.0" spacing="15.0" GridPane.valignment="CENTER">
+                    <children>
+                        <ImageView fitHeight="150.0" fitWidth="390.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@images/Logo%20Horizontal.png" />
+                            </image>
+                            <VBox.margin>
+                                <Insets bottom="20.0" />
+                            </VBox.margin>
+                        </ImageView>
+                        <Label text="Entierros para cualquier bolsillo." textFill="#5c3a1e">
+                            <font>
+                                <Font name="Inter 24pt Regular" size="22.0" />
+                            </font>
+                        </Label>
+                        <Line endX="40.0" startX="-100.0" stroke="#e8a820" strokeWidth="2.0">
+                            <VBox.margin>
+                                <Insets bottom="10.0" top="5.0" />
+                            </VBox.margin>
+                        </Line>
+                        <Label maxWidth="400.0" text="Clientes, recepción de difuntos y asignación de servicios en un mismo espacio de trabajo." textFill="#7a5230" wrapText="true">
+                            <font>
+                                <Font name="Inter 18pt Regular" size="14.0" />
+                            </font>
+                        </Label>
+                        
+                        <HBox alignment="TOP_LEFT" spacing="12.0">
+                            <VBox.margin>
+                                <Insets top="10.0" />
+                            </VBox.margin>
+                            <children>
+                                <SVGPath content="M4.49963 8.25024L5.99948 9.75029L8.99918 6.75019M12.7488 9.0006C12.7488 12.7507 10.1241 14.6258 7.00437 15.7133C6.84101 15.7687 6.66356 15.766 6.50192 15.7058C3.37474 14.6258 0.75 12.7507 0.75 9.0006V3.75043C0.75 3.55152 0.82901 3.36074 0.969648 3.22009C1.11029 3.07943 1.30103 3.00041 1.49993 3.00041C2.99977 3.00041 4.87459 2.10038 6.17946 0.960344C6.33833 0.824589 6.54044 0.75 6.7494 0.75C6.95836 0.75 7.16047 0.824589 7.31934 0.960344C8.63171 2.10788 10.499 3.00041 11.9989 3.00041C12.1978 3.00041 12.3885 3.07943 12.5292 3.22009C12.6698 3.36074 12.7488 3.55152 12.7488 3.75043V9.0006Z" fill="transparent" stroke="#8B5E3C" strokeLineCap="ROUND" strokeWidth="1.5">
+                                    <HBox.margin>
+                                        <Insets top="2.0" />
+                                    </HBox.margin>
+                                </SVGPath>
+                                <Label maxWidth="350.0" text="La información de las familias debe tratarse con confidencialidad." textFill="#7a5230" wrapText="true">
+                                    <font>
+                                        <Font name="Inter 18pt Regular" size="13.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </VBox>
+
+                <VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="450.0" spacing="15.0" style="-fx-background-radius: 8; -fx-border-color: #C8B99A; -fx-background-color: #FFFDF7; -fx-border-radius: 8; -fx-border-width: 1;" GridPane.columnIndex="1" GridPane.valignment="CENTER">
+                    <children>
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label text="Iniciar sesión" textFill="#2e1a0e">
+                                    <font>
+                                        <Font name="Inter 24pt Bold" size="26.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Introduce tus credenciales para acceder." textFill="#7a5230">
+                                    <font>
+                                        <Font name="Inter 18pt Regular" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="10.0" />
+                            </VBox.margin>
+                        </VBox>
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Usuario" textFill="#2e1a0e">
+                                    <font>
+                                        <Font name="Inter 18pt Medium" size="12.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="txtUser" prefHeight="40.0" promptText="example" style="-fx-background-color: #FFFDF7; -fx-border-color: #C8B99A; -fx-border-radius: 4;">
+                                    <font>
+                                        <Font name="Inter 18pt Regular" size="14.0" />
+                                    </font>
+                           <padding>
+                              <Insets left="10.0" right="10.0" />
+                           </padding>
+                                </TextField>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Contraseña" textFill="#2e1a0e">
+                                    <font>
+                                        <Font name="Inter 18pt Medium" size="12.0" />
+                                    </font>
+                                </Label>
+                                <StackPane alignment="CENTER_RIGHT">
+                                    <children>
+                                        <PasswordField fx:id="txtPassword" prefHeight="40.0" promptText="••••••••••••" style="-fx-background-color: #FFFDF7; -fx-border-color: #C8B99A; -fx-border-radius: 4;">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="14.0" />
+                                            </font>
+                                 <padding>
+                                    <Insets left="10.0" right="35.0" />
+                                 </padding>
+                                        </PasswordField>
+                                        <SVGPath content="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#7a5230" scaleX="0.65" scaleY="0.65">
+                                            <StackPane.margin>
+                                                <Insets right="10.0" />
+                                            </StackPane.margin>
+                                        </SVGPath>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </VBox>
+
+                        <CheckBox fx:id="chkRememberUser" mnemonicParsing="false" text="Recordar mi usuario" textFill="#4a3120">
+                            <VBox.margin>
+                                <Insets bottom="10.0" top="5.0" />
+                            </VBox.margin>
+                            <font>
+                                <Font name="Inter 18pt Regular" size="12.0" />
+                            </font>
+                        </CheckBox>
+
+                        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="42.0" style="-fx-border-color: #A06A08; -fx-border-radius: 4;" text="Entrar" textFill="#2e1a0e">
+                            <font>
+                                <Font name="Inter 18pt Bold" size="14.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="15.0" />
+                            </VBox.margin>
+                        </Button>
+
+                        <Label text="¿Has olvidado tus credenciales? Contacta con soporte técnico." textFill="#7a5230" wrapText="true">
+                            <font>
+                                <Font name="Inter 18pt Regular" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <padding>
+                        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                    </padding>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            </padding>
+        </GridPane>
+    </center>
+</BorderPane>

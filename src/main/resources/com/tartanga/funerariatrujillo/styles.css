@@ -1,0 +1,30 @@
+.button {
+    -fx-background-color: #C68E17;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #DFAC3B; 
+}
+
+.button:pressed {
+    -fx-background-color: #A8760F;
+}
+
+.check-box .box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D6CCBD;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-width: 1.5;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #C68E17;
+    -fx-border-color: #C68E17;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #FFFFFF;
+}

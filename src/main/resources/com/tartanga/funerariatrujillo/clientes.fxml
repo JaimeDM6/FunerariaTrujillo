@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<HBox fx:controller="com.tartanga.funerariatrujillo.ClientesController" stylesheets="@styles.css" prefHeight="700" prefWidth="1000" spacing="0.0" style="-fx-background-color: #F5F0E8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+    </padding>
+    <children>
+        <StackPane HBox.hgrow="ALWAYS">
+            <HBox.margin>
+                <Insets right="20.0"/>
+            </HBox.margin>
+            <children>
+                
+                <VBox fx:id="vistaTabla" spacing="20.0">
+                    <children>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Gestión de clientes" textFill="#2e1a0e">
+                                    <font>
+                                        <Font name="System Bold" size="24.0"/>
+                                    </font>
+                                </Label>
+                                <Label text="Registra y consulta los datos de las personas responsables del servicio." textFill="#7a5230">
+                                    <font>
+                                        <Font size="14.0"/>
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <HBox spacing="10.0">
+                            <children>
+                                <HBox HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" prefHeight="40.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4;">
+                                    <children>
+                                        <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#7a5230" scaleX="0.8" scaleY="0.8">
+                                            <HBox.margin>
+                                                <Insets left="10.0" right="5.0"/>
+                                            </HBox.margin>
+                                        </SVGPath>
+                                        <TextField HBox.hgrow="ALWAYS" fx:id="txtBuscar" promptText="Buscar por nombre, teléfono o código" style="-fx-background-color: transparent;">
+                                            <font>
+                                                <Font size="14.0"/>
+                                            </font>
+                                        </TextField>
+                                    </children>
+                                </HBox>
+                                <Button fx:id="btnNuevoCliente" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Nuevo cliente" textFill="#2e1a0e">
+                                    <font>
+                                        <Font name="System Bold" size="14.0"/>
+                                    </font>
+                                    <graphic>
+                                        <SVGPath content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#2e1a0e" scaleX="0.7" scaleY="0.7"/>
+                                    </graphic>
+                                    <padding>
+                                        <Insets left="15.0" right="15.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <VBox VBox.vgrow="ALWAYS" spacing="5.0">
+                            <children>
+                                <TableView VBox.vgrow="ALWAYS" fx:id="tablaClientes" prefHeight="350.0" style="-fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;">
+                                    <columns>
+                                        <TableColumn fx:id="colNombre" prefWidth="250.0" text="Nombre y apellidos"/>
+                                        <TableColumn fx:id="colId" prefWidth="120.0" text="ID"/>
+                                        <TableColumn fx:id="colTelefono" prefWidth="150.0" text="Teléfono"/>
+                                        <TableColumn fx:id="colExpediente" prefWidth="150.0" text="Expediente"/>
+                                    </columns>
+                                </TableView>
+                                <Label fx:id="lblEstadoTabla" text="0 clientes" textFill="#7a5230">
+                                    <font>
+                                        <Font size="12.0"/>
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="vistaDetalles" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <children>
+                                <Button fx:id="btnVolver" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                                    <graphic>
+                                        <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#7a5230"/>
+                                    </graphic>
+                                </Button>
+                                <VBox>
+                                    <Label text="Ficha del cliente" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="22.0"/>
+                                        </font>
+                                    </Label>
+                                    <Label fx:id="lblIdDetalle" text="CL-0000" textFill="#7a5230"/>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnEditar" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F5EDD6; -fx-border-color: #E8A820; -fx-border-radius: 4; -fx-cursor: hand;" text="Editar datos" textFill="#5c3a1e">
+                                    <font>
+                                        <Font name="System Bold" size="13.0"/>
+                                    </font>
+                                </Button>
+                                <Button fx:id="btnGuardarEdicion" managed="false" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cambios" textFill="#2e1a0e" visible="false">
+                                    <font>
+                                        <Font name="System Bold" size="13.0"/>
+                                    </font>
+                                </Button>
+                            </children>
+                        </HBox>
+                        
+                        <VBox spacing="15.0">
+                            <children>
+                                <HBox spacing="20.0">
+                                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                                        <Label text="Nombre" textFill="#7a5230">
+                                            <font>
+                                                <Font size="12.0"/>
+                                            </font>
+                                        </Label>
+                                        <TextField editable="false" fx:id="txtDetalleNombre" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                                        <Label text="Apellidos" textFill="#7a5230">
+                                            <font>
+                                                <Font size="12.0"/>
+                                            </font>
+                                        </Label>
+                                        <TextField editable="false" fx:id="txtDetalleApellidos" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                    </VBox>
+                                </HBox>
+                                <HBox spacing="20.0">
+                                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                                        <Label text="Documento de identidad" textFill="#7a5230">
+                                            <font>
+                                                <Font size="12.0"/>
+                                            </font>
+                                        </Label>
+                                        <TextField editable="false" fx:id="txtDetalleDni" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                                        <Label text="Teléfono" textFill="#7a5230">
+                                            <font>
+                                                <Font size="12.0"/>
+                                            </font>
+                                        </Label>
+                                        <TextField editable="false" fx:id="txtDetalleTelefono" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                    </VBox>
+                                </HBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Correo electrónico" textFill="#7a5230">
+                                        <font>
+                                            <Font size="12.0"/>
+                                        </font>
+                                    </Label>
+                                    <TextField editable="false" fx:id="txtDetalleCorreo" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Dirección" textFill="#7a5230">
+                                        <font>
+                                            <Font size="12.0"/>
+                                        </font>
+                                    </Label>
+                                    <TextField editable="false" fx:id="txtDetalleDireccion" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;"/>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+
+        <VBox fx:id="panelFormularioNuevo" maxWidth="0.0" prefWidth="0.0" spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false">
+            <padding>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label text="Registrar cliente" textFill="#2e1a0e">
+                                <font>
+                                    <Font name="System Bold" size="18.0"/>
+                                </font>
+                            </Label>
+                            <TextFlow>
+                                <children>
+                                    <Text fill="#7a5230" text="Los campos con "/>
+                                    <Text fill="#d9534f" text="*"/>
+                                    <Text fill="#7a5230" text=" son obligatorios."/>
+                                </children>
+                            </TextFlow>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                        <graphic>
+                            <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#7a5230"/>
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Nombre y Apellidos *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoNombre" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Documento de identidad *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoDni" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Teléfono *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoTelefono" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Correo electrónico" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoCorreo" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cliente" textFill="#2e1a0e">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
+</HBox>

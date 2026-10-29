@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootLayout" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.MainController">
+    <left>
+        <fx:include fx:id="sidebar" source="sidebar.fxml"/>
+    </left>
+    <bottom>
+        <fx:include source="footer.fxml"/>
+    </bottom>
+    <center>
+        <StackPane BorderPane.alignment="CENTER" fx:id="contentArea" style="-fx-background-color: #F5F0E8;">
+            <!-- Aquí cargará el contenido dinámico -->
+        </StackPane>
+    </center>
+</BorderPane>

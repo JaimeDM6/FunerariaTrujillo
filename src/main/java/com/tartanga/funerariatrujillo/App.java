@@ -1,4 +1,4 @@
-package com.tartanga.funerariatrujillo2;
+package com.tartanga.funerariatrujillo;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import javafx.scene.image.Image;
 
 /**
  * JavaFX App
@@ -17,8 +18,10 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        scene = new Scene(loadFXML("login"), 1000, 700);
         stage.setScene(scene);
+        stage.setTitle("Funeraria Trujillo");
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("images/icon.png")));
         stage.show();
     }
 
@@ -34,5 +37,4 @@ public class App extends Application {
     public static void main(String[] args) {
         launch();
     }
-
 }
