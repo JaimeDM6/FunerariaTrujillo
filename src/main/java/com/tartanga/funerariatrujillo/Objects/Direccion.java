@@ -1,4 +1,4 @@
-package com.tartanga.funerariatrujillo;
+package com.tartanga.funerariatrujillo.Objects;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -46,18 +46,18 @@ public class Direccion implements Comparable<Direccion>, Serializable {
         this.ciudad = ciudad;
     }
 
-    public int getCodigo_postal() {
+    public int getCodigoPostal() {
         return codigo_postal;
     }
 
-    public void setCodigo_postal(int codigo_postal) {
+    public void setCodigoPostal(int codigo_postal) {
         this.codigo_postal = codigo_postal;
     }
 
     // toString()
     @Override
     public String toString() {
-        return ("Calle " + calle + ", " + codigo_postal + "(" + ciudad + ")");
+        return (calle + ", " + codigo_postal + " (" + ciudad + ")");
     }
 
     // hashCode

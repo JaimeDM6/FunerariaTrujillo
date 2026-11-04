@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="rootLayout" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.MainController">
+<BorderPane fx:id="rootLayout" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@styles.css" fx:controller="com.tartanga.funerariatrujillo.MainController">
     <left>
         <fx:include fx:id="sidebar" source="sidebar.fxml"/>
     </left>

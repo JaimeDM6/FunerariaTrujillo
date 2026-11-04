@@ -1,4 +1,4 @@
-package com.tartanga.funerariatrujillo;
+package com.tartanga.funerariatrujillo.Objects;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -8,25 +8,28 @@ public class Cliente implements Comparable<Cliente>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private String nombre;
     private String apellidos;
     private String dni;
     private String correo_electronico;
     private Direccion direccion;
-    private int telefono;
+    private String telefono;
     private Date fecha_registro;
 
     public Cliente() {
+        id = "";
         nombre = "";
         apellidos = "";
         dni = "";
         correo_electronico = "";
         direccion = new Direccion();
-        telefono = 0;
+        telefono = "";
         fecha_registro = new Date();
     }
 
     public Cliente(Cliente c) {
+        this.id = c.id;
         this.nombre = c.nombre;
         this.apellidos = c.apellidos;
         this.dni = c.dni;
@@ -36,7 +39,8 @@ public class Cliente implements Comparable<Cliente>, Serializable {
         this.fecha_registro = c.fecha_registro;
     }
 
-    public Cliente(String n, String a, String d, String c, Direccion di, int t, Date f) {
+    public Cliente(String i, String n, String a, String d, String c, Direccion di, String t, Date f) {
+        this.id = i;
         this.nombre = n;
         this.apellidos = a;
         this.dni = d;
@@ -47,6 +51,14 @@ public class Cliente implements Comparable<Cliente>, Serializable {
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -63,6 +75,10 @@ public class Cliente implements Comparable<Cliente>, Serializable {
         this.apellidos = apellidos;
     }
 
+    public String getNombreCompleto() {
+        return (this.nombre + " " + this.apellidos).trim();
+    }
+
     public String getDni() {
         return dni;
     }
@@ -71,27 +87,35 @@ public class Cliente implements Comparable<Cliente>, Serializable {
         this.dni = dni;
     }
 
-    public String getCorreo_electronico() {
+    public String getCorreoElectronico() {
         return correo_electronico;
     }
 
-    public void setCorreo_electronico(String correo_electronico) {
+    public void setCorreoElectronico(String correo_electronico) {
         this.correo_electronico = correo_electronico;
     }
 
-    public int getTelefono() {
+    public Direccion getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
 
-    public Date getFecha_registro() {
+    public Date getFechaRegistro() {
         return fecha_registro;
     }
 
-    public void setFecha_registro(Date fecha_registro) {
+    public void setFechaRegistro(Date fecha_registro) {
         this.fecha_registro = fecha_registro;
     }
 

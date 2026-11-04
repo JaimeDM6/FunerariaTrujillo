@@ -21,14 +21,7 @@
 
 <BorderPane fx:controller="com.tartanga.funerariatrujillo.LoginController" stylesheets="@styles.css" fx:id="rootPane" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
-        <Label maxWidth="1.7976931348623157E308" style="-fx-background-color: #F5EDD6; -fx-border-color: #E8A820 transparent transparent transparent; -fx-border-width: 1;" text="Acceso exclusivo para personal autorizado" textFill="#5c3a1e" BorderPane.alignment="CENTER_LEFT">
-            <padding>
-                <Insets bottom="8.0" left="20.0" right="20.0" top="8.0" />
-            </padding>
-            <font>
-                <Font name="Inter 18pt Regular" size="11.0" />
-            </font>
-        </Label>
+        <fx:include source="footer.fxml"/>
     </bottom>
     <center>
         <GridPane alignment="CENTER" hgap="60.0" maxWidth="1100.0">
@@ -120,9 +113,9 @@
                                     <font>
                                         <Font name="Inter 18pt Regular" size="14.0" />
                                     </font>
-                           <padding>
-                              <Insets left="10.0" right="10.0" />
-                           </padding>
+                                    <padding>
+                                        <Insets left="10.0" right="10.0" />
+                                    </padding>
                                 </TextField>
                             </children>
                         </VBox>
@@ -140,9 +133,9 @@
                                             <font>
                                                 <Font name="Inter 18pt Regular" size="14.0" />
                                             </font>
-                                 <padding>
-                                    <Insets left="10.0" right="35.0" />
-                                 </padding>
+                                            <padding>
+                                                <Insets left="10.0" right="35.0" />
+                                            </padding>
                                         </PasswordField>
                                         <SVGPath content="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="#7a5230" scaleX="0.65" scaleY="0.65">
                                             <StackPane.margin>
@@ -163,7 +156,7 @@
                             </font>
                         </CheckBox>
 
-                        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="42.0" style="-fx-border-color: #A06A08; -fx-border-radius: 4;" text="Entrar" textFill="#2e1a0e">
+                        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="42.0" text="Entrar" textFill="#2e1a0e">
                             <font>
                                 <Font name="Inter 18pt Bold" size="14.0" />
                             </font>

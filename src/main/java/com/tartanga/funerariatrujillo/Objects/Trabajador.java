@@ -1,4 +1,4 @@
-package com.tartanga.funerariatrujillo;
+package com.tartanga.funerariatrujillo.Objects;
 
 import java.io.Serializable;
 import java.util.Objects;

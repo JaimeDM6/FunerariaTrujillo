@@ -6,6 +6,7 @@
   <name>FunerariaTrujillo</name>
   <version>1.0</version>
   <build>
+    <directory>C:\Builds_NetBeans\FunerariaTrujillo\target</directory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -58,9 +59,6 @@
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>3.5.0</version>
-        <configuration>
-          <retryOnError>true</retryOnError>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>

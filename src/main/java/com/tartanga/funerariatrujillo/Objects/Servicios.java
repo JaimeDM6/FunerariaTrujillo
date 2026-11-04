@@ -1,32 +1,32 @@
-package com.tartanga.funerariatrujillo;
+package com.tartanga.funerariatrujillo.Objects;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Sala implements Comparable<Sala>, Serializable {
+public class Servicios implements Comparable<Servicios>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private String nombre;
     private String descripcion;
-    private int capacidad;
+    private Double precio;
 
-    public Sala() {
+    public Servicios() {
         nombre = "";
         descripcion = "";
-        capacidad = 0;
+        precio = 0.0;
     }
 
-    public Sala(Sala s) {
+    public Servicios(Servicios s) {
         this.nombre = s.nombre;
         this.descripcion = s.descripcion;
-        this.capacidad = s.capacidad;
+        this.precio = s.precio;
     }
 
-    public Sala(String n, String d, int c) {
+    public Servicios(String n, String d, Double p) {
         this.nombre = n;
         this.descripcion = d;
-        this.capacidad = c;
+        this.precio = p;
     }
 
     // Getters and Setters
@@ -46,24 +46,24 @@ public class Sala implements Comparable<Sala>, Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getCapacidad() {
-        return capacidad;
+    public Double getPrecio() {
+        return precio;
     }
 
-    public void setCapacidad(int capacidad) {
-        this.capacidad = capacidad;
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
 
     // toString()
     @Override
     public String toString() {
-        return ("Nombre: " + nombre + ", descripción: " + descripcion + ", capacidad: " + capacidad + " personas");
+        return ("Nombre " + nombre + ", descripción: " + descripcion + ", precio: " + precio + "€");
     }
 
     // hashCode
     @Override
     public int hashCode() {
-        return Objects.hash(nombre, descripcion, capacidad);
+        return Objects.hash(nombre, descripcion, precio);
     }
 
     // equals
@@ -81,13 +81,13 @@ public class Sala implements Comparable<Sala>, Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Sala other = (Sala) obj;
+        Servicios other = (Servicios) obj;
 
         return nombre.equals(other.nombre);
     }
 
     @Override
-    public int compareTo(Sala other) {
+    public int compareTo(Servicios other) {
         return this.nombre.compareTo(other.nombre);
     }
 }
