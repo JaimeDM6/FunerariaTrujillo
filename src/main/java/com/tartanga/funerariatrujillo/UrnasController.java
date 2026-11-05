@@ -3,26 +3,34 @@ package com.tartanga.funerariatrujillo;
 import com.tartanga.funerariatrujillo.DAO.UrnaDAO;
 import com.tartanga.funerariatrujillo.Objects.Urna;
 import com.tartanga.funerariatrujillo.Utils.Utils;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-
-import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.util.Callback;
+
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 public class UrnasController implements Initializable {
 
@@ -88,30 +96,61 @@ public class UrnasController implements Initializable {
         spacerLateral.setPrefWidth(0);
         spacerLateral.setMinWidth(0);
 
-        btnNuevaUrna.setOnAction(e -> openForm());
-        btnGuardarNuevo.setOnAction(e -> guardarNuevaUrna());
-        btnEliminar.setOnAction(e -> eliminarUrnaSeleccionada());
-        btnCerrarFormulario.setOnAction(e -> closeForm());
+        btnNuevaUrna.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                openForm();
+            }
+        });
 
-        FilteredList<Urna> filteredData = new FilteredList<>(masterData, b -> true);
+        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarNuevaUrna();
+            }
+        });
 
-        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredData.setPredicate(urna -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
+        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                eliminarUrnaSeleccionada();
+            }
+        });
 
-                String lowerCaseFilter = newValue.toLowerCase();
+        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                closeForm();
+            }
+        });
 
-                if (urna.getId().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                } else if (urna.getMaterial().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                }
-                return false;
-            });
+        FilteredList<Urna> filteredData = new FilteredList<>(masterData, new Predicate<Urna>() {
+            @Override
+            public boolean test(Urna urna) {
+                return true;
+            }
+        });
 
-            lblEstadoTabla.setText(filteredData.size() + " urnas");
+        txtBuscar.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                filteredData.setPredicate(new Predicate<Urna>() {
+                    @Override
+                    public boolean test(Urna urna) {
+                        if (newValue == null || newValue.isEmpty()) {
+                            return true;
+                        }
+                        String lowerCaseFilter = newValue.toLowerCase();
+                        if (urna.getId().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        } else if (urna.getMaterial().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                lblEstadoTabla.setText(filteredData.size() + " urnas");
+            }
         });
 
         SortedList<Urna> sortedData = new SortedList<>(filteredData);
@@ -133,27 +172,37 @@ public class UrnasController implements Initializable {
 
         Utils.columnID(colID);
 
-        colCapacidad.setCellFactory(column -> new TableCell<Urna, Double>() {
+        colCapacidad.setCellFactory(new Callback<TableColumn<Urna, Double>, TableCell<Urna, Double>>() {
             @Override
-            protected void updateItem(Double item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(String.format(java.util.Locale.US, "%.1f L", item).replace(".0 L", " L"));
-                }
+            public TableCell<Urna, Double> call(TableColumn<Urna, Double> column) {
+                return new TableCell<Urna, Double>() {
+                    @Override
+                    protected void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(String.format(java.util.Locale.US, "%.1f L", item).replace(".0 L", " L"));
+                        }
+                    }
+                };
             }
         });
 
-        colPrecio.setCellFactory(column -> new TableCell<Urna, Double>() {
+        colPrecio.setCellFactory(new Callback<TableColumn<Urna, Double>, TableCell<Urna, Double>>() {
             @Override
-            protected void updateItem(Double item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(String.format("%.2f €", item));
-                }
+            public TableCell<Urna, Double> call(TableColumn<Urna, Double> column) {
+                return new TableCell<Urna, Double>() {
+                    @Override
+                    protected void updateItem(Double item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(String.format("%.2f €", item));
+                        }
+                    }
+                };
             }
         });
 
@@ -171,16 +220,22 @@ public class UrnasController implements Initializable {
             }
         };
 
-        taskObtenerUrnas.setOnSucceeded(event -> {
-            List<Urna> resultado = taskObtenerUrnas.getValue();
-            masterData.setAll(resultado);
-            tablaUrnas.sort();
-            lblEstadoTabla.setText(masterData.size() + " urnas");
+        taskObtenerUrnas.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                List<Urna> resultado = taskObtenerUrnas.getValue();
+                masterData.setAll(resultado);
+                tablaUrnas.sort();
+                lblEstadoTabla.setText(masterData.size() + " urnas");
+            }
         });
 
-        taskObtenerUrnas.setOnFailed(event -> {
-            System.out.println("Error al cargar datos de MongoDB");
-            lblEstadoTabla.setText("Error de conexión");
+        taskObtenerUrnas.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                System.out.println("Error al cargar datos de MongoDB");
+                lblEstadoTabla.setText("Error de conexión");
+            }
         });
 
         Thread hiloSecundario = new Thread(taskObtenerUrnas);
@@ -244,76 +299,88 @@ public class UrnasController implements Initializable {
     }
 
     private void configurarSeleccionDeTabla() {
-        tablaUrnas.setOnMouseClicked(event -> {
-            Urna newSelection = tablaUrnas.getSelectionModel().getSelectedItem();
+        tablaUrnas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Urna newSelection = tablaUrnas.getSelectionModel().getSelectedItem();
 
-            if (newSelection != null) {
-                urnaSeleccionada = newSelection;
+                if (newSelection != null) {
+                    urnaSeleccionada = newSelection;
 
-                try {
-                    txtDetalleCapacidad.setText("" + newSelection.getCapacidad());
-                    txtDetalleMaterial.setText(newSelection.getMaterial());
-                    txtDetallePrecio.setText("" + newSelection.getPrecio());
+                    try {
+                        txtDetalleCapacidad.setText("" + newSelection.getCapacidad());
+                        txtDetalleMaterial.setText(newSelection.getMaterial());
+                        txtDetallePrecio.setText("" + newSelection.getPrecio());
 
-                    panelFormularioNuevo.setTranslateX(400);
-                    panelFormularioNuevo.setVisible(false);
-                    spacerLateral.setPrefWidth(0);
-                    spacerLateral.setMinWidth(0);
-                    vistaTabla.setVisible(false);
-                    vistaTabla.setManaged(false);
-                    vistaDetalles.setVisible(true);
-                    vistaDetalles.setManaged(true);
-                    tablaUrnas.getSelectionModel().clearSelection();
+                        panelFormularioNuevo.setTranslateX(400);
+                        panelFormularioNuevo.setVisible(false);
+                        spacerLateral.setPrefWidth(0);
+                        spacerLateral.setMinWidth(0);
+                        vistaTabla.setVisible(false);
+                        vistaTabla.setManaged(false);
+                        vistaDetalles.setVisible(true);
+                        vistaDetalles.setManaged(true);
+                        tablaUrnas.getSelectionModel().clearSelection();
 
-                } catch (Exception ex) {
-                    System.err.println("Error al cargar la urna seleccionada: " + ex.getMessage());
+                    } catch (Exception ex) {
+                        System.err.println("Error al cargar la urna seleccionada: " + ex.getMessage());
+                    }
                 }
             }
         });
 
-        btnVolver.setOnAction(e -> {
-            vistaDetalles.setVisible(false);
-            vistaDetalles.setManaged(false);
+        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                vistaDetalles.setVisible(false);
+                vistaDetalles.setManaged(false);
 
-            vistaTabla.setVisible(true);
-            vistaTabla.setManaged(true);
+                vistaTabla.setVisible(true);
+                vistaTabla.setManaged(true);
 
-            bloquearCamposEdicion();
+                bloquearCamposEdicion();
+            }
         });
     }
 
     private void configurarModoEdicion() {
-        btnEditar.setOnAction(e -> {
-            txtDetalleCapacidad.setEditable(true);
-            txtDetalleMaterial.setEditable(true);
-            txtDetallePrecio.setEditable(true);
+        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                txtDetalleCapacidad.setEditable(true);
+                txtDetalleMaterial.setEditable(true);
+                txtDetallePrecio.setEditable(true);
 
-            String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
-            txtDetalleCapacidad.setStyle(estiloEditable);
-            txtDetalleMaterial.setStyle(estiloEditable);
-            txtDetallePrecio.setStyle(estiloEditable);
+                String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
+                txtDetalleCapacidad.setStyle(estiloEditable);
+                txtDetalleMaterial.setStyle(estiloEditable);
+                txtDetallePrecio.setStyle(estiloEditable);
 
-            btnEditar.setVisible(false);
-            btnEditar.setManaged(false);
-            btnEliminar.setVisible(false);
-            btnEliminar.setManaged(false);
-            btnGuardarEdicion.setVisible(true);
-            btnGuardarEdicion.setManaged(true);
+                btnEditar.setVisible(false);
+                btnEditar.setManaged(false);
+                btnEliminar.setVisible(false);
+                btnEliminar.setManaged(false);
+                btnGuardarEdicion.setVisible(true);
+                btnGuardarEdicion.setManaged(true);
+            }
         });
 
-        btnGuardarEdicion.setOnAction(e -> {
-            if (urnaSeleccionada != null) {
-                urnaSeleccionada.setCapacidad(Double.valueOf(txtDetalleCapacidad.getText()));
-                urnaSeleccionada.setMaterial(txtDetalleMaterial.getText());
-                urnaSeleccionada.setPrecio(Double.valueOf(txtDetallePrecio.getText()));
+        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (urnaSeleccionada != null) {
+                    urnaSeleccionada.setCapacidad(Double.valueOf(txtDetalleCapacidad.getText()));
+                    urnaSeleccionada.setMaterial(txtDetalleMaterial.getText());
+                    urnaSeleccionada.setPrecio(Double.valueOf(txtDetallePrecio.getText()));
 
-                UrnaDAO dao = new UrnaDAO();
-                dao.actualizarUrna(urnaSeleccionada);
+                    UrnaDAO dao = new UrnaDAO();
+                    dao.actualizarUrna(urnaSeleccionada);
 
-                tablaUrnas.refresh();
+                    tablaUrnas.refresh();
+                }
+
+                bloquearCamposEdicion();
             }
-
-            bloquearCamposEdicion();
         });
     }
 

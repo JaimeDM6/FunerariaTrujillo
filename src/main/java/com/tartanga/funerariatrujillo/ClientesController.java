@@ -4,6 +4,16 @@ import com.tartanga.funerariatrujillo.DAO.ClienteDAO;
 import com.tartanga.funerariatrujillo.Objects.Cliente;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Utils.Utils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -11,6 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
@@ -18,14 +30,19 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.concurrent.Task;
-import javafx.scene.control.cell.PropertyValueFactory;
+import java.util.function.Predicate;
 
 public class ClientesController implements Initializable {
+
+    private final ClienteDAO clienteDAO;
+
+    public ClientesController() {
+        this.clienteDAO = new ClienteDAO();
+    }
+
+    public ClientesController(ClienteDAO clienteDAO) {
+        this.clienteDAO = clienteDAO;
+    }
 
     @FXML
     private VBox vistaTabla;
@@ -112,32 +129,63 @@ public class ClientesController implements Initializable {
         spacerLateral.setPrefWidth(0);
         spacerLateral.setMinWidth(0);
 
-        btnNuevoCliente.setOnAction(e -> openForm());
-        btnGuardarNuevo.setOnAction(e -> guardarNuevoCliente());
-        btnEliminar.setOnAction(e -> eliminarClienteSeleccionado());
-        btnCerrarFormulario.setOnAction(e -> closeForm());
+        btnNuevoCliente.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                openForm();
+            }
+        });
 
-        FilteredList<Cliente> filteredData = new FilteredList<>(masterData, b -> true);
+        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarNuevoCliente();
+            }
+        });
 
-        txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredData.setPredicate(cliente -> {
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
+        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                eliminarClienteSeleccionado();
+            }
+        });
 
-                String lowerCaseFilter = newValue.toLowerCase();
+        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                closeForm();
+            }
+        });
 
-                if (cliente.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                } else if (cliente.getDni().toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                } else if (String.valueOf(cliente.getTelefono()).toLowerCase().contains(lowerCaseFilter)) {
-                    return true;
-                }
-                return false;
-            });
+        FilteredList<Cliente> filteredData = new FilteredList<>(masterData, new Predicate<Cliente>() {
+            @Override
+            public boolean test(Cliente cliente) {
+                return true;
+            }
+        });
 
-            lblEstadoTabla.setText(filteredData.size() + " clientes");
+        txtBuscar.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                filteredData.setPredicate(new Predicate<Cliente>() {
+                    @Override
+                    public boolean test(Cliente cliente) {
+                        if (newValue == null || newValue.isEmpty()) {
+                            return true;
+                        }
+                        String lowerCaseFilter = newValue.toLowerCase();
+                        if (cliente.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        } else if (cliente.getDni().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        } else if (String.valueOf(cliente.getTelefono()).toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                lblEstadoTabla.setText(filteredData.size() + " clientes");
+            }
         });
 
         SortedList<Cliente> sortedData = new SortedList<>(filteredData);
@@ -158,10 +206,10 @@ public class ClientesController implements Initializable {
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombreCompleto"));
         colDNI.setCellValueFactory(new PropertyValueFactory<>("dni"));
-        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correoElectronico"));
+        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo_electronico"));
         colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        colFechaRegistro.setCellValueFactory(new PropertyValueFactory<>("fechaRegistro"));
+        colFechaRegistro.setCellValueFactory(new PropertyValueFactory<>("fecha_registro"));
 
         Utils.columnID(colID);
         Utils.columnDate(colFechaRegistro);
@@ -175,21 +223,26 @@ public class ClientesController implements Initializable {
         Task<List<Cliente>> taskObtenerClientes = new Task<List<Cliente>>() {
             @Override
             protected List<Cliente> call() throws Exception {
-                ClienteDAO dao = new ClienteDAO();
-                return dao.obtenerClientes();
+                return clienteDAO.obtenerClientes();
             }
         };
 
-        taskObtenerClientes.setOnSucceeded(event -> {
-            List<Cliente> resultado = taskObtenerClientes.getValue();
-            masterData.setAll(resultado);
-            tablaClientes.sort();
-            lblEstadoTabla.setText(masterData.size() + " clientes");
+        taskObtenerClientes.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                List<Cliente> resultado = taskObtenerClientes.getValue();
+                masterData.setAll(resultado);
+                tablaClientes.sort();
+                lblEstadoTabla.setText(masterData.size() + " clientes");
+            }
         });
 
-        taskObtenerClientes.setOnFailed(event -> {
-            System.out.println("Error al cargar datos de MongoDB");
-            lblEstadoTabla.setText("Error de conexión");
+        taskObtenerClientes.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                System.out.println("Error al cargar datos");
+                lblEstadoTabla.setText("Error de conexión");
+            }
         });
 
         Thread hiloSecundario = new Thread(taskObtenerClientes);
@@ -209,8 +262,8 @@ public class ClientesController implements Initializable {
         nuevoCliente.setApellidos(txtNuevoApellidos.getText().trim());
         nuevoCliente.setDni(txtNuevoDni.getText().trim());
         nuevoCliente.setTelefono(txtNuevoTelefono.getText().trim());
-        nuevoCliente.setCorreoElectronico(txtNuevoCorreo.getText().trim());
-        nuevoCliente.setFechaRegistro(new Date());
+        nuevoCliente.setCorreo_electronico(txtNuevoCorreo.getText().trim());
+        nuevoCliente.setFecha_registro(new Date());
 
         Direccion dir = new Direccion();
         dir.setCalle(txtNuevoCalle.getText().trim());
@@ -223,8 +276,7 @@ public class ClientesController implements Initializable {
         }
         nuevoCliente.setDireccion(dir);
 
-        ClienteDAO dao = new ClienteDAO();
-        if (dao.insertarCliente(nuevoCliente)) {
+        if (clienteDAO.insertarCliente(nuevoCliente)) {
             masterData.add(nuevoCliente);
             tablaClientes.sort();
             lblEstadoTabla.setText(masterData.size() + " clientes");
@@ -247,9 +299,7 @@ public class ClientesController implements Initializable {
 
     private void eliminarClienteSeleccionado() {
         if (clienteSeleccionado != null) {
-            ClienteDAO dao = new ClienteDAO();
-
-            if (dao.eliminarCliente(clienteSeleccionado.getId())) {
+            if (clienteDAO.eliminarCliente(clienteSeleccionado.getId())) {
                 masterData.remove(clienteSeleccionado);
                 lblEstadoTabla.setText(masterData.size() + " clientes");
 
@@ -272,93 +322,103 @@ public class ClientesController implements Initializable {
     }
 
     private void configurarSeleccionDeTabla() {
-        tablaClientes.setOnMouseClicked(event -> {
-            Cliente newSelection = tablaClientes.getSelectionModel().getSelectedItem();
+        tablaClientes.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Cliente newSelection = tablaClientes.getSelectionModel().getSelectedItem();
 
-            if (newSelection != null) {
-                clienteSeleccionado = newSelection;
+                if (newSelection != null) {
+                    clienteSeleccionado = newSelection;
 
-                try {
-                    txtDetalleNombre.setText(newSelection.getNombre());
-                    txtDetalleApellidos.setText(newSelection.getApellidos());
-                    txtDetalleDni.setText(newSelection.getDni());
-                    txtDetalleTelefono.setText(newSelection.getTelefono());
+                    try {
+                        txtDetalleNombre.setText(newSelection.getNombre());
+                        txtDetalleApellidos.setText(newSelection.getApellidos());
+                        txtDetalleDni.setText(newSelection.getDni());
+                        txtDetalleTelefono.setText(newSelection.getTelefono());
+                        txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
-                    txtDetalleCorreo.setText(newSelection.getCorreoElectronico());
+                        if (newSelection.getDireccion() != null) {
+                            txtDetalleDireccion.setText(newSelection.getDireccion().toString());
+                        } else {
+                            txtDetalleDireccion.setText("Sin dirección");
+                        }
 
-                    if (newSelection.getDireccion() != null) {
-                        txtDetalleDireccion.setText(newSelection.getDireccion().toString());
-                    } else {
-                        txtDetalleDireccion.setText("Sin dirección");
+                        panelFormularioNuevo.setTranslateX(400);
+                        panelFormularioNuevo.setVisible(false);
+                        spacerLateral.setPrefWidth(0);
+                        spacerLateral.setMinWidth(0);
+                        vistaTabla.setVisible(false);
+                        vistaTabla.setManaged(false);
+                        vistaDetalles.setVisible(true);
+                        vistaDetalles.setManaged(true);
+                        tablaClientes.getSelectionModel().clearSelection();
+
+                    } catch (Exception ex) {
+                        System.err.println("Error al cargar la ficha: " + ex.getMessage());
                     }
-
-                    panelFormularioNuevo.setTranslateX(400);
-                    panelFormularioNuevo.setVisible(false);
-                    spacerLateral.setPrefWidth(0);
-                    spacerLateral.setMinWidth(0);
-                    vistaTabla.setVisible(false);
-                    vistaTabla.setManaged(false);
-                    vistaDetalles.setVisible(true);
-                    vistaDetalles.setManaged(true);
-                    tablaClientes.getSelectionModel().clearSelection();
-
-                } catch (Exception ex) {
-                    System.err.println("Error al cargar la ficha: " + ex.getMessage());
                 }
             }
         });
 
-        btnVolver.setOnAction(e -> {
-            vistaDetalles.setVisible(false);
-            vistaDetalles.setManaged(false);
+        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                vistaDetalles.setVisible(false);
+                vistaDetalles.setManaged(false);
 
-            vistaTabla.setVisible(true);
-            vistaTabla.setManaged(true);
+                vistaTabla.setVisible(true);
+                vistaTabla.setManaged(true);
 
-            bloquearCamposEdicion();
+                bloquearCamposEdicion();
+            }
         });
     }
 
     private void configurarModoEdicion() {
-        btnEditar.setOnAction(e -> {
-            txtDetalleNombre.setEditable(true);
-            txtDetalleApellidos.setEditable(true);
-            txtDetalleDni.setEditable(true);
-            txtDetalleTelefono.setEditable(true);
-            txtDetalleCorreo.setEditable(true);
-            txtDetalleDireccion.setEditable(true);
+        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                txtDetalleNombre.setEditable(true);
+                txtDetalleApellidos.setEditable(true);
+                txtDetalleDni.setEditable(true);
+                txtDetalleTelefono.setEditable(true);
+                txtDetalleCorreo.setEditable(true);
+                txtDetalleDireccion.setEditable(true);
 
-            String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
-            txtDetalleNombre.setStyle(estiloEditable);
-            txtDetalleApellidos.setStyle(estiloEditable);
-            txtDetalleDni.setStyle(estiloEditable);
-            txtDetalleTelefono.setStyle(estiloEditable);
-            txtDetalleCorreo.setStyle(estiloEditable);
-            txtDetalleDireccion.setStyle(estiloEditable);
+                String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
+                txtDetalleNombre.setStyle(estiloEditable);
+                txtDetalleApellidos.setStyle(estiloEditable);
+                txtDetalleDni.setStyle(estiloEditable);
+                txtDetalleTelefono.setStyle(estiloEditable);
+                txtDetalleCorreo.setStyle(estiloEditable);
+                txtDetalleDireccion.setStyle(estiloEditable);
 
-            btnEditar.setVisible(false);
-            btnEditar.setManaged(false);
-            btnEliminar.setVisible(false);
-            btnEliminar.setManaged(false);
-            btnGuardarEdicion.setVisible(true);
-            btnGuardarEdicion.setManaged(true);
+                btnEditar.setVisible(false);
+                btnEditar.setManaged(false);
+                btnEliminar.setVisible(false);
+                btnEliminar.setManaged(false);
+                btnGuardarEdicion.setVisible(true);
+                btnGuardarEdicion.setManaged(true);
+            }
         });
 
-        btnGuardarEdicion.setOnAction(e -> {
-            if (clienteSeleccionado != null) {
-                clienteSeleccionado.setNombre(txtDetalleNombre.getText());
-                clienteSeleccionado.setApellidos(txtDetalleApellidos.getText());
-                clienteSeleccionado.setDni(txtDetalleDni.getText());
-                clienteSeleccionado.setTelefono(txtDetalleTelefono.getText());
-                clienteSeleccionado.setCorreoElectronico(txtDetalleCorreo.getText());
+        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (clienteSeleccionado != null) {
+                    clienteSeleccionado.setNombre(txtDetalleNombre.getText());
+                    clienteSeleccionado.setApellidos(txtDetalleApellidos.getText());
+                    clienteSeleccionado.setDni(txtDetalleDni.getText());
+                    clienteSeleccionado.setTelefono(txtDetalleTelefono.getText());
+                    clienteSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText());
 
-                ClienteDAO dao = new ClienteDAO();
-                dao.actualizarCliente(clienteSeleccionado);
+                    clienteDAO.actualizarCliente(clienteSeleccionado);
 
-                tablaClientes.refresh();
+                    tablaClientes.refresh();
+                }
+
+                bloquearCamposEdicion();
             }
-
-            bloquearCamposEdicion();
         });
     }
 

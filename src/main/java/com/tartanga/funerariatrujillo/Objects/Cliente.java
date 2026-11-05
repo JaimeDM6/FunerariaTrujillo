@@ -87,11 +87,11 @@ public class Cliente implements Comparable<Cliente>, Serializable {
         this.dni = dni;
     }
 
-    public String getCorreoElectronico() {
+    public String getCorreo_electronico() {
         return correo_electronico;
     }
 
-    public void setCorreoElectronico(String correo_electronico) {
+    public void setCorreo_electronico(String correo_electronico) {
         this.correo_electronico = correo_electronico;
     }
 
@@ -111,11 +111,11 @@ public class Cliente implements Comparable<Cliente>, Serializable {
         this.telefono = telefono;
     }
 
-    public Date getFechaRegistro() {
+    public Date getFecha_registro() {
         return fecha_registro;
     }
 
-    public void setFechaRegistro(Date fecha_registro) {
+    public void setFecha_registro(Date fecha_registro) {
         this.fecha_registro = fecha_registro;
     }
 

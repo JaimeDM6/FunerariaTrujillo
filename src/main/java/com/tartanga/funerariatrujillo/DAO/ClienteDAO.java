@@ -23,9 +23,9 @@ public class ClienteDAO {
                     c.setNombre(doc.getString("nombre"));
                     c.setApellidos(doc.getString("apellidos"));
                     c.setDni(doc.getString("dni"));
-                    c.setCorreoElectronico(doc.getString("correo_electronico"));
+                    c.setCorreo_electronico(doc.getString("correo_electronico"));
                     c.setTelefono(doc.getString("telefono"));
-                    c.setFechaRegistro(doc.getDate("fecha_registro"));
+                    c.setFecha_registro(doc.getDate("fecha_registro"));
 
                     Document dirDoc = (Document) doc.get("direccion");
                     if (dirDoc != null) {
@@ -64,7 +64,7 @@ public class ClienteDAO {
                     .append("apellidos", c.getApellidos())
                     .append("dni", c.getDni())
                     .append("telefono", c.getTelefono())
-                    .append("correo_electronico", c.getCorreoElectronico())
+                    .append("correo_electronico", c.getCorreo_electronico())
             );
 
             collection.updateOne(filtro, updateDocs);
@@ -89,8 +89,8 @@ public class ClienteDAO {
                     .append("apellidos", c.getApellidos())
                     .append("dni", c.getDni())
                     .append("telefono", c.getTelefono())
-                    .append("correo_electronico", c.getCorreoElectronico())
-                    .append("fecha_registro", c.getFechaRegistro())
+                    .append("correo_electronico", c.getCorreo_electronico())
+                    .append("fecha_registro", c.getFecha_registro())
                     .append("direccion", dirDoc);
 
             collection.insertOne(doc);
