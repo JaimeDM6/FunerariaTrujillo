@@ -35,7 +35,7 @@
     -fx-fill: transparent;
 }
 
-.button-inactive #btnDifuntos SVGPath {
+#btnDifuntos.button-inactive SVGPath {
     -fx-fill: #7A5230;
     -fx-stroke: transparent;
 }
@@ -60,7 +60,7 @@
     -fx-fill: transparent;
 }
 
-.button-active #btnDifuntos SVGPath {
+#btnDifuntos.button-active SVGPath {
     -fx-fill: #C8860A;
     -fx-stroke: transparent;
 }
