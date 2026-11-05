@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.UrnasController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+    <children>
+        <HBox spacing="0.0">
+            <children>
+                <StackPane HBox.hgrow="ALWAYS">
+                    <children>
+                        <VBox fx:id="vistaTabla" spacing="20.0" StackPane.alignment="TOP_LEFT">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Cátalogo de urnas" textFill="#2e1a0e" wrapText="true">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label text="Mantén el catálogo de urnas con su capacidad, material y precio por unidad." textFill="#7a5230" wrapText="true">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="14.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="40.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4;" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#7a5230" scaleX="0.8" scaleY="0.8">
+                                                    <HBox.margin>
+                                                        <Insets left="10.0" right="5.0" />
+                                                    </HBox.margin>
+                                                </SVGPath>
+                                                <TextField fx:id="txtBuscar" promptText="Buscar por ID o material" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="14.0" />
+                                                    </font>
+                                                </TextField>
+                                            </children>
+                                        </HBox>
+                                        <Button fx:id="btnNuevaUrna" mnemonicParsing="false" prefHeight="40.0" style="-fx-cursor: hand;" text="Nueva urna" textFill="#2e1a0e" minWidth="150.0">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="14.0" />
+                                            </font>
+                                            <graphic>
+                                                <SVGPath content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#2e1a0e" scaleX="0.7" scaleY="0.7" />
+                                            </graphic>
+                                            <padding>
+                                                <Insets left="15.0" right="15.0" />
+                                            </padding>
+                                        </Button>
+                                    </children>
+                                </HBox>
+
+                                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <TableView fx:id="tablaUrnas" prefHeight="350.0" style="-fx-border-color: #C8B99A; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="colID" minWidth="80.0" prefWidth="130.0" text="ID" />
+                                                <TableColumn fx:id="colCapacidad" minWidth="80.0" prefWidth="130.0" text="Capacidad" />
+                                                <TableColumn fx:id="colMaterial" minWidth="120.0" prefWidth="230.0" text="Material" />
+                                                <TableColumn fx:id="colPrecio" minWidth="80.0" prefWidth="130.0" text="Precio" />
+                                            </columns>
+                                        </TableView>
+                                        <Label fx:id="lblEstadoTabla" text="0 urnas" textFill="#7a5230">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox fx:id="vistaDetalles" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
+                            <padding>
+                                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                            </padding>
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                    <children>
+                                        <Button fx:id="btnVolver" mnemonicParsing="false" styleClass="button-back" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                                            <graphic>
+                                                <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#7a5230" />
+                                            </graphic>
+                                        </Button>
+                                        <VBox>
+                                            <Label text="Datos de la urna" textFill="#2e1a0e" wrapText="true">
+                                                <font>
+                                                    <Font name="Inter 18pt Bold" size="22.0" />
+                                                </font>
+                                            </Label>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnEliminar" minWidth="120.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F9EBEA; -fx-border-color: #D9534F; -fx-border-radius: 4; -fx-cursor: hand;" text="Eliminar urna" textFill="#C9302C">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                            </font>
+                                        </Button>
+
+                                        <Button fx:id="btnEditar" minWidth="110.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F0E6C8; -fx-border-color: #E8A820; -fx-border-radius: 4; -fx-cursor: hand;" text="Editar datos" textFill="#7a5230">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                            </font>
+                                        </Button>
+                                        <Button fx:id="btnGuardarEdicion" managed="false" minWidth="130.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cambios" textFill="#2e1a0e" visible="false">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                            </font>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                                
+                                <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <HBox spacing="20.0">
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Capacidad" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCapacidad" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                            </VBox>
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Material" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleMaterial" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="20.0">
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Precio" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetallePrecio" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                            </VBox>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+                
+                <Region fx:id="spacerLateral" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
+            </children>
+        </HBox>
+
+        <VBox fx:id="panelFormularioNuevo" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
+            <padding>
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label text="Registrar urna" textFill="#2e1a0e" wrapText="true">
+                                <font>
+                                    <Font name="Inter 18pt Bold" size="18.0" />
+                                </font>
+                            </Label>
+                            <TextFlow>
+                                <children>
+                                    <Text fill="#7a5230" text="Los campos con " />
+                                    <Text fill="#d9534f" text="*" />
+                                    <Text fill="#7a5230" text=" son obligatorios." />
+                                </children>
+                            </TextFlow>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                        <graphic>
+                            <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#7a5230" />
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Capacidad *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevaCapacidad" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Material *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoMaterial" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                    </VBox>
+                </HBox>
+            
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Precio *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoPrecio" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                    </VBox>
+                </HBox>
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar urna" textFill="#2e1a0e">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

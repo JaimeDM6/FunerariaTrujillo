@@ -7,29 +7,41 @@ public class Urna implements Comparable<Urna>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private Double capacidad;
     private String material;
     private Double precio;
 
     public Urna() {
+        id = "";
         capacidad = 0.0;
         material = "";
         precio = 0.0;
     }
 
     public Urna(Urna u) {
+        this.id = u.id;
         this.capacidad = u.capacidad;
         this.material = u.material;
         this.precio = u.precio;
     }
 
-    public Urna(Double ca, String ma, Double pe, Double pr) {
-        this.capacidad = ca;
-        this.material = ma;
+    public Urna(String i, Double c, String m, Double pr) {
+        this.id = i;
+        this.capacidad = c;
+        this.material = m;
         this.precio = pr;
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Double getCapacidad() {
         return capacidad;
     }

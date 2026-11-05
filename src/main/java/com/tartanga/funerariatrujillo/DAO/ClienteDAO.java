@@ -1,10 +1,7 @@
 package com.tartanga.funerariatrujillo.DAO;
 
 import com.tartanga.funerariatrujillo.Objects.*;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -12,16 +9,11 @@ import java.util.List;
 
 public class ClienteDAO {
 
-    private static final String URI = "mongodb://localhost:27017";
-    private static final String DB_NAME = "FunerariaTrujillo";
-    private static final String COLLECTION_NAME = "cliente";
-
     public List<Cliente> obtenerClientes() {
         List<Cliente> clientes = new ArrayList<>();
 
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+        try {
+            MongoCollection<Document> collection = MongoConfig.getCollection("cliente");
 
             for (Document doc : collection.find()) {
                 try {
@@ -52,21 +44,18 @@ public class ClienteDAO {
                     clientes.add(c);
                 } catch (NumberFormatException docEx) {
                     System.err.println("Error procesando el cliente con ID: " + doc.getObjectId("_id"));
-                    docEx.printStackTrace();
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error general de conexión a MongoDB.");
-            e.printStackTrace();
+            System.err.println("Error al obtener los clientes: " + e.getMessage());
         }
 
         return clientes;
     }
 
     public boolean actualizarCliente(Cliente c) {
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+        try {
+            MongoCollection<Document> collection = MongoConfig.getCollection("cliente");
 
             Document filtro = new Document("_id", new org.bson.types.ObjectId(c.getId()));
 
@@ -81,16 +70,14 @@ public class ClienteDAO {
             collection.updateOne(filtro, updateDocs);
             return true;
         } catch (Exception e) {
-            System.err.println("Error al actualizar cliente en MongoDB.");
-            e.printStackTrace();
+            System.err.println("Error al actualizar el cliente: " + e.getMessage());
             return false;
         }
     }
 
     public boolean insertarCliente(Cliente c) {
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+        try {
+            MongoCollection<Document> collection = MongoConfig.getCollection("cliente");
 
             Document dirDoc = new Document()
                     .append("calle", c.getDireccion().getCalle())
@@ -111,24 +98,18 @@ public class ClienteDAO {
             c.setId(doc.getObjectId("_id").toString());
             return true;
         } catch (Exception e) {
-            System.err.println("Error al insertar nuevo cliente en MongoDB.");
-            e.printStackTrace();
+            System.err.println("Error al insertar el cliente: " + e.getMessage());
             return false;
         }
     }
 
     public boolean eliminarCliente(String id) {
-        try (MongoClient mongoClient = MongoClients.create(URI)) {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
-
+        try {
             Document filtro = new Document("_id", new org.bson.types.ObjectId(id));
-            collection.deleteOne(filtro);
-
+            MongoConfig.getCollection("cliente").deleteOne(filtro);
             return true;
         } catch (Exception e) {
-            System.err.println("Error al eliminar el cliente en MongoDB.");
-            e.printStackTrace();
+            System.err.println("Error al eliminar el cliente: " + e.getMessage());
             return false;
         }
     }

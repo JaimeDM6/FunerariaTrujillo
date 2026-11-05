@@ -18,12 +18,51 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 0 0 0 3;
+    -fx-text-fill: #4A3120;
+    -fx-font-family: "Inter 18pt";
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
     -fx-cursor: hand;
 }
 
 .button-inactive:hover {
     -fx-background-color: #E6DBC6;
     -fx-border-color: transparent transparent transparent #C8B99A;
+}
+
+.button-inactive SVGPath {
+    -fx-stroke: #7A5230;
+    -fx-fill: transparent;
+}
+
+.button-inactive #btnDifuntos SVGPath {
+    -fx-fill: #7A5230;
+    -fx-stroke: transparent;
+}
+
+.button-active {
+    -fx-background-color: #DDD0B3;
+    -fx-border-color: transparent transparent transparent #C8860A;
+    -fx-border-width: 0 0 0 3;
+    -fx-text-fill: #2E1A0E;
+    -fx-font-family: "Inter 18pt";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.button-active:hover {
+    -fx-background-color: #DDD0B3;
+    -fx-cursor: default;
+}
+
+.button-active SVGPath {
+    -fx-stroke: #C8860A;
+    -fx-fill: transparent;
+}
+
+.button-active #btnDifuntos SVGPath {
+    -fx-fill: #C8860A;
+    -fx-stroke: transparent;
 }
 
 .button-back {

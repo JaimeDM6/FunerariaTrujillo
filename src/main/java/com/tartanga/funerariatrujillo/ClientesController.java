@@ -3,9 +3,7 @@ package com.tartanga.funerariatrujillo;
 import com.tartanga.funerariatrujillo.DAO.ClienteDAO;
 import com.tartanga.funerariatrujillo.Objects.Cliente;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import com.tartanga.funerariatrujillo.Utils.Utils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,10 +13,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -27,7 +23,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class ClientesController implements Initializable {
@@ -55,6 +50,8 @@ public class ClientesController implements Initializable {
     private Button btnGuardarEdicion;
     @FXML
     private Button btnGuardarNuevo;
+    @FXML
+    private Button btnEliminar;
 
     @FXML
     private TextField txtBuscar;
@@ -91,6 +88,8 @@ public class ClientesController implements Initializable {
     @FXML
     private Label lblEstadoTabla;
     @FXML
+    private TableColumn<Cliente, String> colID;
+    @FXML
     private TableColumn<Cliente, String> colNombre;
     @FXML
     private TableColumn<Cliente, String> colDNI;
@@ -103,10 +102,8 @@ public class ClientesController implements Initializable {
     @FXML
     private TableColumn<Cliente, Date> colFechaRegistro;
 
-    private ObservableList<Cliente> masterData = FXCollections.observableArrayList();
+    private final ObservableList<Cliente> masterData = FXCollections.observableArrayList();
     private Cliente clienteSeleccionado;
-    @FXML
-    private Button btnEliminar;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -150,6 +147,7 @@ public class ClientesController implements Initializable {
         colFechaRegistro.setSortType(TableColumn.SortType.DESCENDING);
         tablaClientes.getSortOrder().add(colFechaRegistro);
 
+        colID.setReorderable(false);
         colNombre.setReorderable(false);
         colDNI.setReorderable(false);
         colCorreo.setReorderable(false);
@@ -157,27 +155,16 @@ public class ClientesController implements Initializable {
         colTelefono.setReorderable(false);
         colFechaRegistro.setReorderable(false);
 
+        colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombreCompleto"));
         colDNI.setCellValueFactory(new PropertyValueFactory<>("dni"));
         colCorreo.setCellValueFactory(new PropertyValueFactory<>("correoElectronico"));
         colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         colFechaRegistro.setCellValueFactory(new PropertyValueFactory<>("fechaRegistro"));
-        colFechaRegistro.setCellFactory(column -> {
-            return new TableCell<Cliente, Date>() {
-                private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
-                @Override
-                protected void updateItem(Date item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(format.format(item));
-                    }
-                }
-            };
-        });
+        Utils.columnID(colID);
+        Utils.columnDate(colFechaRegistro);
 
         cargarDatos();
         configurarSeleccionDeTabla();
@@ -208,50 +195,6 @@ public class ClientesController implements Initializable {
         Thread hiloSecundario = new Thread(taskObtenerClientes);
         hiloSecundario.setDaemon(true);
         hiloSecundario.start();
-    }
-
-    private void openForm() {
-        if (panelFormularioNuevo.getTranslateX() == 0) {
-            return;
-        }
-
-        panelFormularioNuevo.setVisible(true);
-
-        Timeline slide = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(panelFormularioNuevo.translateXProperty(), 400),
-                        new KeyValue(spacerLateral.prefWidthProperty(), 0),
-                        new KeyValue(spacerLateral.minWidthProperty(), 0)
-                ),
-                new KeyFrame(Duration.millis(350),
-                        new KeyValue(panelFormularioNuevo.translateXProperty(), 0),
-                        new KeyValue(spacerLateral.prefWidthProperty(), 370),
-                        new KeyValue(spacerLateral.minWidthProperty(), 370)
-                )
-        );
-
-        slide.play();
-    }
-
-    private void closeForm() {
-        Timeline slide = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(panelFormularioNuevo.translateXProperty(), 0),
-                        new KeyValue(spacerLateral.prefWidthProperty(), 370),
-                        new KeyValue(spacerLateral.minWidthProperty(), 370)
-                ),
-                new KeyFrame(Duration.millis(350),
-                        new KeyValue(panelFormularioNuevo.translateXProperty(), 400),
-                        new KeyValue(spacerLateral.prefWidthProperty(), 0),
-                        new KeyValue(spacerLateral.minWidthProperty(), 0)
-                )
-        );
-
-        slide.setOnFinished(e -> {
-            panelFormularioNuevo.setVisible(false);
-        });
-
-        slide.play();
     }
 
     private void guardarNuevoCliente() {
@@ -320,6 +263,14 @@ public class ClientesController implements Initializable {
         }
     }
 
+    private void openForm() {
+        Utils.openForm(panelFormularioNuevo, spacerLateral);
+    }
+
+    private void closeForm() {
+        Utils.closeForm(panelFormularioNuevo, spacerLateral);
+    }
+
     private void configurarSeleccionDeTabla() {
         tablaClientes.setOnMouseClicked(event -> {
             Cliente newSelection = tablaClientes.getSelectionModel().getSelectedItem();
@@ -353,7 +304,6 @@ public class ClientesController implements Initializable {
 
                 } catch (Exception ex) {
                     System.err.println("Error al cargar la ficha: " + ex.getMessage());
-                    ex.printStackTrace();
                 }
             }
         });

@@ -75,9 +75,10 @@
                                     <children>
                                         <TableView fx:id="tablaClientes" prefHeight="350.0" style="-fx-border-color: #C8B99A; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
                                             <columns>
-                                                <TableColumn fx:id="colNombre" minWidth="150.0" prefWidth="250.0" text="Nombre y apellidos" />
+                                                <TableColumn fx:id="colID" minWidth="60.0" prefWidth="110.0" text="ID" />
+                                                <TableColumn fx:id="colNombre" minWidth="110.0" prefWidth="210.0" text="Nombre y apellidos" />
                                                 <TableColumn fx:id="colDNI" minWidth="80.0" prefWidth="130.0" text="DNI" />
-                                                <TableColumn fx:id="colCorreo" minWidth="120.0" prefWidth="230.0" text="Correo electrónico" />
+                                                <TableColumn fx:id="colCorreo" minWidth="100.0" prefWidth="210.0" text="Correo electrónico" />
                                                 <TableColumn fx:id="colDireccion" minWidth="120.0" prefWidth="270.0" text="Dirección" />
                                                 <TableColumn fx:id="colTelefono" minWidth="100.0" prefWidth="120.0" text="Teléfono" />
                                                 <TableColumn fx:id="colFechaRegistro" minWidth="85.0" prefWidth="140.0" text="Fecha de registro" />

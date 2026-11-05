@@ -36,15 +36,14 @@
                 <Insets left="10.0" right="10.0" />
             </padding>
             <children>
-                <!-- Botón Activo (Mantiene su estilo en línea para destacar) -->
-                <Button fx:id="btnClientes" alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #DDD0B3; -fx-border-color: transparent transparent transparent #C8860A; -fx-border-width: 0 0 0 3;" text="Clientes" textFill="#2E1A0E">
+                <Button fx:id="btnClientes" styleClass="button-inactive" alignment="CENTER_LEFT" graphicTextGap="15.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Clientes" textFill="#2E1A0E">
                     <graphic>
                         <StackPane minWidth="35.0" prefWidth="35.0" maxWidth="35.0" alignment="CENTER">
                             <SVGPath content="M11.2508 14.25V12.75C11.2508 11.9544 10.9347 11.1913 10.3721 10.6287C9.80944 10.0661 9.04631 9.75 8.2506 9.75H3.75024C2.95453 9.75 2.1914 10.0661 1.62875 10.6287C1.0661 11.1913 0.75 11.9544 0.75 12.75V14.25M11.2508 0.845947C11.8942 1.01272 12.464 1.3884 12.8707 1.91399C13.2775 2.43959 13.4982 3.08536 13.4982 3.74995C13.4982 4.41453 13.2775 5.0603 12.8707 5.5859C12.464 6.1115 11.8942 6.48717 11.2508 6.65395M15.7512 14.2499V12.7499C15.7507 12.0852 15.5294 11.4395 15.1222 10.9141C14.7149 10.3888 14.1447 10.0136 13.501 9.84741M9.00066 3.75C9.00066 5.40685 7.65741 6.75 6.00042 6.75C4.34343 6.75 3.00018 5.40685 3.00018 3.75C3.00018 2.09315 4.34343 0.75 6.00042 0.75C7.65741 0.75 9.00066 2.09315 9.00066 3.75Z" fill="TRANSPARENT" stroke="#c8860a" strokeLineCap="ROUND" strokeLineJoin="ROUND" strokeWidth="2.0" />
                         </StackPane>
                     </graphic>
                     <font>
-                        <Font name="Inter 18pt Bold" size="14.0" />
+                        <Font name="Inter 18pt Regular" size="14.0" />
                     </font>
                     <padding>
                         <Insets bottom="10.0" left="12.0" right="10.0" top="10.0" />
