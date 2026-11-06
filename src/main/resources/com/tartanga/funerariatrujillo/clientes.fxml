@@ -50,7 +50,7 @@
                                                         <Insets left="10.0" right="5.0" />
                                                     </HBox.margin>
                                                 </SVGPath>
-                                                <TextField fx:id="txtBuscar" promptText="Buscar por nombre, teléfono o código" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS">
+                                                <TextField fx:id="txtBuscar" promptText="Buscar por nombre, teléfono o código" HBox.hgrow="ALWAYS">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="14.0" />
                                                     </font>
@@ -142,7 +142,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleNombre" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleNombre" editable="false" prefHeight="38.0"/>
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                                 <Label text="Apellidos" textFill="#7a5230">
@@ -150,7 +150,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleApellidos" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleApellidos" editable="false" prefHeight="38.0" />
                                             </VBox>
                                         </HBox>
                                         <HBox spacing="20.0">
@@ -160,7 +160,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleDni" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleDni" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                                 <Label text="Teléfono" textFill="#7a5230">
@@ -168,7 +168,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleTelefono" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleTelefono" editable="false" prefHeight="38.0" />
                                             </VBox>
                                         </HBox>
                                         <VBox spacing="5.0">
@@ -177,16 +177,34 @@
                                                     <Font name="Inter 18pt Regular" size="12.0" />
                                                 </font>
                                             </Label>
-                                            <TextField fx:id="txtDetalleCorreo" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                            <TextField fx:id="txtDetalleCorreo" editable="false" prefHeight="38.0" />
                                         </VBox>
-                                        <VBox spacing="5.0">
-                                            <Label text="Dirección" textFill="#7a5230">
-                                                <font>
-                                                    <Font name="Inter 18pt Regular" size="12.0" />
-                                                </font>
-                                            </Label>
-                                            <TextField fx:id="txtDetalleDireccion" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
-                                        </VBox>
+                                        <HBox spacing="20.0">
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Calle" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCalle" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Ciudad" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCiudad" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                            <VBox spacing="5.0" prefWidth="100.0">
+                                                <Label text="C.P." textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCP" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                        </HBox>
                                     </children>
                                 </VBox>
                             </children>
@@ -235,7 +253,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoNombre" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoNombre" prefHeight="35.0" />
                     </VBox>
                     <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                         <Label text="Apellidos *" textFill="#2e1a0e">
@@ -243,7 +261,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoApellidos" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoApellidos" prefHeight="35.0" />
                     </VBox>
                 </HBox>
             
@@ -254,7 +272,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoDni" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoDni" prefHeight="35.0" />
                     </VBox>
                     <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                         <Label text="Teléfono *" textFill="#2e1a0e">
@@ -262,7 +280,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoTelefono" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoTelefono" prefHeight="35.0" />
                     </VBox>
                 </HBox>
 
@@ -272,7 +290,7 @@
                             <Font name="System Bold" size="12.0"/>
                         </font>
                     </Label>
-                    <TextField fx:id="txtNuevoCorreo" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                    <TextField fx:id="txtNuevoCorreo" prefHeight="35.0" />
                 </VBox>
 
                 <VBox spacing="5.0">
@@ -281,7 +299,7 @@
                             <Font name="System Bold" size="12.0"/>
                         </font>
                     </Label>
-                    <TextField fx:id="txtNuevoCalle" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                    <TextField fx:id="txtNuevoCalle" prefHeight="35.0" />
                 </VBox>
 
                 <HBox spacing="10.0">
@@ -291,7 +309,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoCiudad" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoCiudad" prefHeight="35.0" />
                     </VBox>
                     <VBox prefWidth="100.0" spacing="5.0">
                         <Label text="C.P." textFill="#2e1a0e">
@@ -299,7 +317,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoCP" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoCP" prefHeight="35.0" />
                     </VBox>
                 </HBox>
 

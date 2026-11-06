@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -100,7 +101,11 @@ public class ClientesController implements Initializable {
     @FXML
     private TextField txtDetalleCorreo;
     @FXML
-    private TextField txtDetalleDireccion;
+    private TextField txtDetalleCalle;
+    @FXML
+    private TextField txtDetalleCiudad;
+    @FXML
+    private TextField txtDetalleCP;
 
     @FXML
     private Label lblEstadoTabla;
@@ -240,8 +245,12 @@ public class ClientesController implements Initializable {
         taskObtenerClientes.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                System.out.println("Error al cargar datos");
                 lblEstadoTabla.setText("Error de conexión");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de conexión");
+                alert.setHeaderText(null);
+                alert.setContentText("No se pudo cargar la lista de clientes desde la base de datos.");
+                alert.showAndWait();
             }
         });
 
@@ -251,9 +260,63 @@ public class ClientesController implements Initializable {
     }
 
     private void guardarNuevoCliente() {
-        if (txtNuevoNombre.getText().trim().isEmpty() || txtNuevoApellidos.getText().trim().isEmpty()
-                || txtNuevoDni.getText().trim().isEmpty() || txtNuevoTelefono.getText().trim().isEmpty()) {
-            System.out.println("Faltan campos obligatorios");
+        txtNuevoNombre.getStyleClass().remove("error");
+        txtNuevoApellidos.getStyleClass().remove("error");
+        txtNuevoDni.getStyleClass().remove("error");
+        txtNuevoTelefono.getStyleClass().remove("error");
+        txtNuevoCorreo.getStyleClass().remove("error");
+        txtNuevoCalle.getStyleClass().remove("error");
+        txtNuevoCiudad.getStyleClass().remove("error");
+        txtNuevoCP.getStyleClass().remove("error");
+
+        boolean hayError = false;
+
+        if (txtNuevoNombre.getText().isBlank()) {
+            txtNuevoNombre.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoApellidos.getText().isBlank()) {
+            txtNuevoApellidos.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoDni.getText().isBlank()) {
+            txtNuevoDni.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoTelefono.getText().isBlank()) {
+            txtNuevoTelefono.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoCorreo.getText().isBlank()) {
+            txtNuevoCorreo.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoCalle.getText().isBlank()) {
+            txtNuevoCalle.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoCiudad.getText().isBlank()) {
+            txtNuevoCiudad.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoCP.getText().isBlank()) {
+            txtNuevoCP.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Faltan datos");
+            alert.setHeaderText(null);
+            alert.setContentText("Todos los campos son obligatorios.");
+            alert.showAndWait();
             return;
         }
 
@@ -283,6 +346,12 @@ public class ClientesController implements Initializable {
 
             limpiarFormularioNuevo();
             closeForm();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Hubo un problema al guardar el cliente en la base de datos.");
+            alert.showAndWait();
         }
     }
 
@@ -309,6 +378,12 @@ public class ClientesController implements Initializable {
                 vistaTabla.setManaged(true);
 
                 clienteSeleccionado = null;
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al eliminar el cliente de la base de datos.");
+                alert.showAndWait();
             }
         }
     }
@@ -338,9 +413,13 @@ public class ClientesController implements Initializable {
                         txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
                         if (newSelection.getDireccion() != null) {
-                            txtDetalleDireccion.setText(newSelection.getDireccion().toString());
+                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null ? newSelection.getDireccion().getCalle() : "");
+                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null ? newSelection.getDireccion().getCiudad() : "");
+                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? "" : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
                         } else {
-                            txtDetalleDireccion.setText("Sin dirección");
+                            txtDetalleCalle.setText("");
+                            txtDetalleCiudad.setText("");
+                            txtDetalleCP.setText("");
                         }
 
                         panelFormularioNuevo.setTranslateX(400);
@@ -383,7 +462,9 @@ public class ClientesController implements Initializable {
                 txtDetalleDni.setEditable(true);
                 txtDetalleTelefono.setEditable(true);
                 txtDetalleCorreo.setEditable(true);
-                txtDetalleDireccion.setEditable(true);
+                txtDetalleCalle.setEditable(true);
+                txtDetalleCiudad.setEditable(true);
+                txtDetalleCP.setEditable(true);
 
                 String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
                 txtDetalleNombre.setStyle(estiloEditable);
@@ -391,7 +472,9 @@ public class ClientesController implements Initializable {
                 txtDetalleDni.setStyle(estiloEditable);
                 txtDetalleTelefono.setStyle(estiloEditable);
                 txtDetalleCorreo.setStyle(estiloEditable);
-                txtDetalleDireccion.setStyle(estiloEditable);
+                txtDetalleCalle.setStyle(estiloEditable);
+                txtDetalleCiudad.setStyle(estiloEditable);
+                txtDetalleCP.setStyle(estiloEditable);
 
                 btnEditar.setVisible(false);
                 btnEditar.setManaged(false);
@@ -405,6 +488,66 @@ public class ClientesController implements Initializable {
         btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                txtDetalleNombre.getStyleClass().remove("error");
+                txtDetalleApellidos.getStyleClass().remove("error");
+                txtDetalleDni.getStyleClass().remove("error");
+                txtDetalleTelefono.getStyleClass().remove("error");
+                txtDetalleCorreo.getStyleClass().remove("error");
+                txtDetalleCalle.getStyleClass().remove("error");
+                txtDetalleCiudad.getStyleClass().remove("error");
+                txtDetalleCP.getStyleClass().remove("error");
+
+                boolean hayError = false;
+
+                if (txtDetalleNombre.getText().isBlank()) {
+                    txtDetalleNombre.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleApellidos.getText().isBlank()) {
+                    txtDetalleApellidos.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleDni.getText().isBlank()) {
+                    txtDetalleDni.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleTelefono.getText().isBlank()) {
+                    txtDetalleTelefono.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleCorreo.getText().isBlank()) {
+                    txtDetalleCorreo.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleCalle.getText().isBlank()) {
+                    txtDetalleCalle.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleCiudad.getText().isBlank()) {
+                    txtDetalleCiudad.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleCP.getText().isBlank()) {
+                    txtDetalleCP.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (hayError) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Datos incompletos");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No puedes dejar en blanco los campos.");
+                    alert.showAndWait();
+                    return;
+                }
+
                 if (clienteSeleccionado != null) {
                     clienteSeleccionado.setNombre(txtDetalleNombre.getText());
                     clienteSeleccionado.setApellidos(txtDetalleApellidos.getText());
@@ -412,9 +555,28 @@ public class ClientesController implements Initializable {
                     clienteSeleccionado.setTelefono(txtDetalleTelefono.getText());
                     clienteSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText());
 
-                    clienteDAO.actualizarCliente(clienteSeleccionado);
+                    Direccion dir = clienteSeleccionado.getDireccion();
+                    if (dir == null) {
+                        dir = new Direccion();
+                    }
+                    dir.setCalle(txtDetalleCalle.getText().trim());
+                    dir.setCiudad(txtDetalleCiudad.getText().trim());
+                    try {
+                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtDetalleCP.getText().trim()));
+                    } catch (NumberFormatException ex) {
+                        dir.setCodigoPostal(0);
+                    }
+                    clienteSeleccionado.setDireccion(dir);
 
-                    tablaClientes.refresh();
+                    if (clienteDAO.actualizarCliente(clienteSeleccionado)) {
+                        tablaClientes.refresh();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                        alert.showAndWait();
+                    }
                 }
 
                 bloquearCamposEdicion();
@@ -428,7 +590,9 @@ public class ClientesController implements Initializable {
         txtDetalleDni.setEditable(false);
         txtDetalleTelefono.setEditable(false);
         txtDetalleCorreo.setEditable(false);
-        txtDetalleDireccion.setEditable(false);
+        txtDetalleCalle.setEditable(false);
+        txtDetalleCiudad.setEditable(false);
+        txtDetalleCP.setEditable(false);
 
         String estiloLectura = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
         txtDetalleNombre.setStyle(estiloLectura);
@@ -436,7 +600,9 @@ public class ClientesController implements Initializable {
         txtDetalleDni.setStyle(estiloLectura);
         txtDetalleTelefono.setStyle(estiloLectura);
         txtDetalleCorreo.setStyle(estiloLectura);
-        txtDetalleDireccion.setStyle(estiloLectura);
+        txtDetalleCalle.setStyle(estiloLectura);
+        txtDetalleCiudad.setStyle(estiloLectura);
+        txtDetalleCP.setStyle(estiloLectura);
 
         btnGuardarEdicion.setVisible(false);
         btnGuardarEdicion.setManaged(false);

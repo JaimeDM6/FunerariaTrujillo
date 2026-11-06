@@ -19,6 +19,7 @@ import org.testfx.util.WaitForAsyncUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.Label;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.api.FxAssert.verifyThat;
@@ -172,5 +173,58 @@ public class ClientesControllerTest extends ApplicationTest {
         clickOn("#btnVolver");
         verifyThat("#vistaDetalles", isInvisible());
         verifyThat("#vistaTabla", isVisible());
+    }
+
+    @Test
+    public void testCreateClient() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoCliente");
+        sleep(450);
+
+        clickOn("#txtNuevoNombre").write("Nuevo");
+        clickOn("#txtNuevoApellidos").write("Cliente");
+        clickOn("#txtNuevoDni").write("87654321B");
+        clickOn("#txtNuevoTelefono").write("600111222");
+        clickOn("#txtNuevoCorreo").write("test@test.com");
+        clickOn("#txtNuevoCalle").write("Calle");
+        clickOn("#txtNuevoCiudad").write("Ciudad");
+        clickOn("#txtNuevoCP").write("10001");
+
+        clickOn("#btnGuardarNuevo");
+        sleep(450);
+
+        assertEquals(initialSize + 1, tabla.getItems().size(), "La tabla debe tener un cliente más.");
+        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
+        assertEquals((initialSize + 1) + " clientes", lblEstado.getText());
+    }
+
+    @Test
+    public void testDeleteClient() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+
+        verifyThat("#vistaDetalles", isVisible());
+
+        clickOn("#btnEliminar");
+
+        verifyThat("#vistaTabla", isVisible());
+        verifyThat("#vistaDetalles", isInvisible());
+        assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un cliente menos.");
+        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
+        assertEquals((initialSize - 1) + " clientes", lblEstado.getText());
     }
 }

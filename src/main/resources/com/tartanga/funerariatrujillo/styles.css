@@ -1,3 +1,5 @@
+/*** BOTONES ***/
+
 .button {
     -fx-background-color: #C68E17;
     -fx-background-radius: 4;
@@ -73,6 +75,44 @@
     -fx-background-color: #F9F7F3;
 }
 
+/*** TEXTFIELDS ***/
+.text-field {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D6CCBD;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-border-width: 1.5;
+}
+
+.text-field:hover {
+    -fx-border-color: #C8B99A;
+}
+
+.text-field:focused {
+    -fx-border-color: #C68E17;
+    -fx-effect: dropshadow(gaussian, rgba(198, 142, 23, 0.2), 5, 0, 0, 0);
+}
+
+.text-field.error {
+    -fx-border-color: #D9534F;
+    -fx-background-color: #FDF4F4;
+}
+
+.text-field.error:focused {
+    -fx-border-color: #C9302C;
+    -fx-effect: dropshadow(gaussian, rgba(217, 83, 79, 0.2), 5, 0, 0, 0);
+}
+
+#txtBuscar {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+#txtBuscar:hover, #txtBuscar:focused {
+    -fx-border-color: transparent;
+}
+
 .check-box .box {
     -fx-background-color: #FFFFFF;
     -fx-border-color: #D6CCBD;
@@ -89,6 +129,8 @@
 .check-box:selected .mark {
     -fx-background-color: #FFFFFF;
 }
+
+/*** TABLAS ***/
 
 .table-view {
     -fx-background-color: transparent;
