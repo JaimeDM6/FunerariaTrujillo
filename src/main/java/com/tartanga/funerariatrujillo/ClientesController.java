@@ -466,15 +466,13 @@ public class ClientesController implements Initializable {
                 txtDetalleCiudad.setEditable(true);
                 txtDetalleCP.setEditable(true);
 
-                String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
-                txtDetalleNombre.setStyle(estiloEditable);
-                txtDetalleApellidos.setStyle(estiloEditable);
-                txtDetalleDni.setStyle(estiloEditable);
-                txtDetalleTelefono.setStyle(estiloEditable);
-                txtDetalleCorreo.setStyle(estiloEditable);
-                txtDetalleCalle.setStyle(estiloEditable);
-                txtDetalleCiudad.setStyle(estiloEditable);
-                txtDetalleCP.setStyle(estiloEditable);
+                txtDetalleNombre.getStyleClass().remove("error");
+                txtDetalleApellidos.getStyleClass().remove("error");
+                txtDetalleDni.getStyleClass().remove("error");
+                txtDetalleTelefono.getStyleClass().remove("error");
+                txtDetalleCalle.getStyleClass().remove("error");
+                txtDetalleCiudad.getStyleClass().remove("error");
+                txtDetalleCP.getStyleClass().remove("error");
 
                 btnEditar.setVisible(false);
                 btnEditar.setManaged(false);
@@ -593,16 +591,6 @@ public class ClientesController implements Initializable {
         txtDetalleCalle.setEditable(false);
         txtDetalleCiudad.setEditable(false);
         txtDetalleCP.setEditable(false);
-
-        String estiloLectura = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
-        txtDetalleNombre.setStyle(estiloLectura);
-        txtDetalleApellidos.setStyle(estiloLectura);
-        txtDetalleDni.setStyle(estiloLectura);
-        txtDetalleTelefono.setStyle(estiloLectura);
-        txtDetalleCorreo.setStyle(estiloLectura);
-        txtDetalleCalle.setStyle(estiloLectura);
-        txtDetalleCiudad.setStyle(estiloLectura);
-        txtDetalleCP.setStyle(estiloLectura);
 
         btnGuardarEdicion.setVisible(false);
         btnGuardarEdicion.setManaged(false);

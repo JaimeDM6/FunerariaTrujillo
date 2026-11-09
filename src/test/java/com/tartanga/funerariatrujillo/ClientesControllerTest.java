@@ -13,6 +13,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
@@ -26,6 +29,7 @@ import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.*;
 import static org.testfx.matcher.control.TextInputControlMatchers.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ClientesControllerTest extends ApplicationTest {
 
     public static class MockClienteDAO extends ClienteDAO {
@@ -86,6 +90,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(1)
     public void testInitialState() {
         verifyThat("#vistaTabla", isVisible());
         verifyThat("#vistaDetalles", isInvisible());
@@ -95,6 +100,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(2)
     public void testOpenForm() {
         clickOn("#btnNuevoCliente");
         sleep(450);
@@ -105,6 +111,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(3)
     public void testCloseForm() {
         clickOn("#btnNuevoCliente");
         sleep(450);
@@ -118,6 +125,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(4)
     public void testBlankForm() {
         clickOn("#btnNuevoCliente");
         sleep(400);
@@ -128,6 +136,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(5)
     public void testSearchFilter() {
         clickOn("#txtBuscar").write("Texto de prueba");
         verifyThat("#txtBuscar", hasText("Texto de prueba"));
@@ -135,6 +144,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(6)
     public void testCompleteFlow() {
         WaitForAsyncUtils.waitForFxEvents();
 
@@ -176,6 +186,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(7)
     public void testCreateClient() {
         WaitForAsyncUtils.waitForFxEvents();
         TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();
@@ -202,6 +213,7 @@ public class ClientesControllerTest extends ApplicationTest {
     }
 
     @Test
+    @Order(8)
     public void testDeleteClient() {
         WaitForAsyncUtils.waitForFxEvents();
         TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();

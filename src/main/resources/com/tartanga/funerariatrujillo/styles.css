@@ -93,6 +93,20 @@
     -fx-effect: dropshadow(gaussian, rgba(198, 142, 23, 0.2), 5, 0, 0, 0);
 }
 
+.text-field:readonly, .text-field:disabled {
+    -fx-background-color: #EDE7D9;
+    -fx-border-color: #7A5230;
+    -fx-effect: none;
+}
+
+.text-field:readonly:hover, .text-field:disabled:hover,
+.text-field:readonly:focused, .text-field:disabled:focused {
+    -fx-background-color: #EDE7D9;
+    -fx-border-color: #7A5230;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
 .text-field.error {
     -fx-border-color: #D9534F;
     -fx-background-color: #FDF4F4;

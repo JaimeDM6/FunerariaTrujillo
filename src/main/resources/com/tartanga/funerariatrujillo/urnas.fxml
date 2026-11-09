@@ -50,7 +50,7 @@
                                                         <Insets left="10.0" right="5.0" />
                                                     </HBox.margin>
                                                 </SVGPath>
-                                                <TextField fx:id="txtBuscar" promptText="Buscar por ID o material" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS">
+                                                <TextField fx:id="txtBuscar" promptText="Buscar por ID o material" HBox.hgrow="ALWAYS">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="14.0" />
                                                     </font>
@@ -139,7 +139,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleCapacidad" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleCapacidad" editable="false" prefHeight="38.0"/>
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                                 <Label text="Material" textFill="#7a5230">
@@ -147,7 +147,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleMaterial" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetalleMaterial" editable="false" prefHeight="38.0"/>
                                             </VBox>
                                         </HBox>
                                         <HBox spacing="20.0">
@@ -157,7 +157,7 @@
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetallePrecio" editable="false" prefHeight="38.0" style="-fx-background-color: #F9F7F3; -fx-border-color: #E2DBD0; -fx-border-radius: 4;" maxWidth="1.7976931348623157E308"/>
+                                                <TextField fx:id="txtDetallePrecio" editable="false" prefHeight="38.0"/>
                                             </VBox>
                                         </HBox>
                                     </children>
@@ -208,7 +208,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevaCapacidad" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevaCapacidad" prefHeight="35.0" />
                     </VBox>
                     <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                         <Label text="Material *" textFill="#2e1a0e">
@@ -216,7 +216,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoMaterial" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoMaterial" prefHeight="35.0" />
                     </VBox>
                 </HBox>
             
@@ -227,7 +227,7 @@
                                 <Font name="System Bold" size="12.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="txtNuevoPrecio" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;"/>
+                        <TextField fx:id="txtNuevoPrecio" prefHeight="35.0" />
                     </VBox>
                 </HBox>
 
