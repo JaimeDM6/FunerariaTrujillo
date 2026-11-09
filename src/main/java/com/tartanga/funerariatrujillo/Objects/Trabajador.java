@@ -11,24 +11,26 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         TANATOPRACTOR, AGENTE_FUNERARIO, RECEPCIONISTA, DIRECTOR, CONDUCTOR
     }
 
+    private String id;
     private String nombre;
     private String apellidos;
     private String dni;
     private String correo_electronico;
     private Direccion direccion;
-    private int numero_ss;
+    private String numero_ss;
     private String iban;
     private Cargo cargo;
     private Double salario;
     private String tipo_jornada;
 
     public Trabajador() {
+        id = "";
         nombre = "";
         apellidos = "";
         dni = "";
         correo_electronico = "";
         direccion = new Direccion();
-        numero_ss = 0;
+        numero_ss = "";
         iban = "";
         cargo = Cargo.AGENTE_FUNERARIO;
         salario = 0.0;
@@ -36,6 +38,7 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     }
 
     public Trabajador(Trabajador t) {
+        this.id = t.id;
         this.nombre = t.nombre;
         this.apellidos = t.apellidos;
         this.dni = t.dni;
@@ -48,7 +51,7 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         this.tipo_jornada = t.tipo_jornada;
     }
 
-    public Trabajador(String n, String a, String d, String c, Direccion di, int nu, String i, Cargo ca, Double s, String t) {
+    public Trabajador(String n, String a, String d, String c, Direccion di, String nu, String i, Cargo ca, Double s, String t) {
         this.nombre = n;
         this.apellidos = a;
         this.dni = d;
@@ -62,6 +65,14 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -102,11 +113,11 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         this.direccion = direccion;
     }
 
-    public int getNumero_ss() {
+    public String getNumero_ss() {
         return numero_ss;
     }
 
-    public void setNumero_ss(int numero_ss) {
+    public void setNumero_ss(String numero_ss) {
         this.numero_ss = numero_ss;
     }
 
