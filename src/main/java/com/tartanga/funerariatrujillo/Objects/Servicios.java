@@ -7,17 +7,20 @@ public class Servicios implements Comparable<Servicios>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private String nombre;
     private String descripcion;
     private Double precio;
 
     public Servicios() {
+        id = "";
         nombre = "";
         descripcion = "";
         precio = 0.0;
     }
 
     public Servicios(Servicios s) {
+        this.id = s.id;
         this.nombre = s.nombre;
         this.descripcion = s.descripcion;
         this.precio = s.precio;
@@ -30,6 +33,14 @@ public class Servicios implements Comparable<Servicios>, Serializable {
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
