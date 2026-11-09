@@ -4,6 +4,7 @@ import com.tartanga.funerariatrujillo.DAO.TrabajadorDAO;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Objects.Trabajador;
 import com.tartanga.funerariatrujillo.Utils.Utils;
+import com.tartanga.funerariatrujillo.Security.PasswordHasher;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -19,6 +20,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -91,6 +93,12 @@ public class TrabajadorController implements Initializable {
     private ComboBox<String> cmbNuevoCargo;
     @FXML
     private ComboBox<String> cmbNuevaJornada;
+    @FXML
+    private TextField txtNuevoUsuario;
+    @FXML
+    private PasswordField txtNuevaPassword;
+    @FXML
+    private ComboBox<String> cmbNuevoRol;
 
     @FXML
     private TextField txtDetalleNombre;
@@ -116,6 +124,8 @@ public class TrabajadorController implements Initializable {
     private ComboBox<String> cmbDetalleCargo;
     @FXML
     private ComboBox<String> cmbDetalleJornada;
+    @FXML
+    private ComboBox<String> cmbDetalleRol;
 
     private final ObservableList<Trabajador> masterData = FXCollections.observableArrayList();
     private Trabajador trabajadorSeleccionado;
@@ -142,8 +152,13 @@ public class TrabajadorController implements Initializable {
         cmbDetalleCargo.setItems(FXCollections.observableArrayList(cargos));
         cmbNuevaJornada.setItems(jornadas);
         cmbDetalleJornada.setItems(FXCollections.observableArrayList(jornadas));
+        ObservableList<String> roles = FXCollections.observableArrayList(
+                "Agente Funerario", "Contabilidad", "Tanatopraxia", "Administración");
+        cmbNuevoRol.setItems(roles);
+        cmbDetalleRol.setItems(FXCollections.observableArrayList(roles));
         cmbNuevoCargo.setValue("Agente Funerario");
         cmbNuevaJornada.setValue("Completa");
+        cmbNuevoRol.setValue("Agente Funerario");
     }
 
     private void configurarTabla() {
@@ -267,10 +282,19 @@ public class TrabajadorController implements Initializable {
                 cmbNuevoCargo, cmbNuevaJornada)) {
             return;
         }
+        if (txtNuevoUsuario.getText().trim().isEmpty() || txtNuevaPassword.getText().length() < 8
+                || cmbNuevoRol.getValue() == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Credenciales incompletas",
+                    "El usuario, una contraseña de al menos 8 caracteres y el rol son obligatorios.");
+            return;
+        }
         try {
             Trabajador trabajador = crearTrabajador(txtNuevoNombre, txtNuevoApellidos, txtNuevoDni,
                     txtNuevoCorreo, txtNuevoCalle, txtNuevoCiudad, txtNuevoCP, txtNuevoSS,
                     txtNuevoIban, txtNuevoSalario, cmbNuevoCargo, cmbNuevaJornada);
+            trabajador.setUsuario(txtNuevoUsuario.getText().trim());
+            trabajador.setPassword(PasswordHasher.hash(txtNuevaPassword.getText().toCharArray()));
+            trabajador.setRol(convertirRol(cmbNuevoRol.getValue()));
             if (new TrabajadorDAO().insertarTrabajador(trabajador)) {
                 masterData.add(trabajador);
                 lblEstadoTabla.setText(masterData.size() + " trabajadores");
@@ -353,7 +377,7 @@ public class TrabajadorController implements Initializable {
         trabajador.setCorreo_electronico(correo.getText().trim());
         trabajador.setNumero_ss(ss.getText().trim());
         trabajador.setIban(iban.getText().trim());
-        trabajador.setSalario(Double.parseDouble(salario.getText().trim().replace(",", ".")));
+        trabajador.setSalario(Double.valueOf(salario.getText().trim().replace(",", ".")));
         trabajador.setCargo(convertirCargo(cargo.getValue()));
         trabajador.setTipo_jornada(jornada.getValue());
         trabajador.setDireccion(crearDireccion(calle, ciudad, cp));
@@ -376,6 +400,7 @@ public class TrabajadorController implements Initializable {
         trabajadorSeleccionado.setNumero_ss(actualizado.getNumero_ss());
         trabajadorSeleccionado.setIban(actualizado.getIban());
         trabajadorSeleccionado.setCargo(actualizado.getCargo());
+        trabajadorSeleccionado.setRol(convertirRol(cmbDetalleRol.getValue()));
         trabajadorSeleccionado.setSalario(actualizado.getSalario());
         trabajadorSeleccionado.setTipo_jornada(actualizado.getTipo_jornada());
     }
@@ -394,6 +419,15 @@ public class TrabajadorController implements Initializable {
             return Trabajador.Cargo.DIRECTOR;
         }
         return Trabajador.Cargo.CONDUCTOR;
+    }
+
+    private Trabajador.Rol convertirRol(String valor) {
+        for (Trabajador.Rol rol : Trabajador.Rol.values()) {
+            if (rol.toString().equals(valor)) {
+                return rol;
+            }
+        }
+        return Trabajador.Rol.AGENTE_FUNERARIO;
     }
 
     private void mostrarDetalles(Trabajador trabajador) {
@@ -417,6 +451,7 @@ public class TrabajadorController implements Initializable {
         txtDetalleSalario.setText(String.valueOf(trabajador.getSalario()));
         cmbDetalleCargo.setValue(obtenerNombreCargo(trabajador.getCargo()));
         cmbDetalleJornada.setValue(trabajador.getTipo_jornada());
+        cmbDetalleRol.setValue(trabajador.getRol().toString());
         if (trabajador.getDireccion() != null) {
             txtDetalleCalle.setText(trabajador.getDireccion().getCalle());
             txtDetalleCiudad.setText(trabajador.getDireccion().getCiudad());
@@ -448,6 +483,7 @@ public class TrabajadorController implements Initializable {
         }
         cmbDetalleCargo.setDisable(!editable);
         cmbDetalleJornada.setDisable(!editable);
+        cmbDetalleRol.setDisable(!editable);
         btnEditar.setVisible(!editable);
         btnEditar.setManaged(!editable);
         btnEliminar.setVisible(!editable);
@@ -484,8 +520,11 @@ public class TrabajadorController implements Initializable {
         txtNuevoSS.clear();
         txtNuevoIban.clear();
         txtNuevoSalario.clear();
+        txtNuevoUsuario.clear();
+        txtNuevaPassword.clear();
         cmbNuevoCargo.setValue("Agente Funerario");
         cmbNuevaJornada.setValue("Completa");
+        cmbNuevoRol.setValue("Agente Funerario");
     }
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {

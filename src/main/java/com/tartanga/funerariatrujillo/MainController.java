@@ -10,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import com.tartanga.funerariatrujillo.Security.UserSession;
 
 /**
  * FXML Controller class
@@ -49,6 +50,15 @@ public class MainController implements Initializable {
 
         } catch (IOException e) {
             System.err.println("No se pudo cargar la vista: " + archivoFxml);
+        }
+    }
+
+    public void cerrarSesion() {
+        UserSession.logout();
+        try {
+            App.setRoot("login");
+        } catch (IOException e) {
+            System.err.println("No se pudo cerrar la sesión: " + e.getMessage());
         }
     }
 }
