@@ -14,8 +14,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
-<StackPane alignment="CENTER_RIGHT" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.TrabajadorController">
+<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css"
+           xmlns="http://javafx.com/javafx/25"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.TrabajadorController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -27,17 +31,21 @@
                         <VBox fx:id="vistaTabla" spacing="20.0" StackPane.alignment="TOP_LEFT">
                             <children>
                                 <VBox spacing="5.0">
-                                    <Label text="Gestión de trabajadores" textFill="#2e1a0e">
-                                        <font>
-                                            <Font name="Inter 18pt Bold" size="24.0" />
-                                        </font>
-                                    </Label>
-                                    <Label text="Consulta el equipo y registra o edita sus datos personales y laborales." textFill="#7a5230">
-                              <font>
-                                 <Font size="14.0" />
-                              </font></Label>
+                                    <children>
+                                        <Label text="Gestión de trabajadores" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label text="Consulta el equipo y registra o edita sus datos personales y laborales." textFill="#7a5230" wrapText="true">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="14.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
                                 </VBox>
-                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" prefHeight="40.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4;" HBox.hgrow="ALWAYS">
                                             <children>
@@ -53,7 +61,7 @@
                                                 </TextField>
                                             </children>
                                         </HBox>
-                                        <Button fx:id="btnNuevoTrabajador" minWidth="150.0" mnemonicParsing="false" prefHeight="40.0" style="-fx-cursor: hand;" text="Nuevo trabajador" textFill="#2e1a0e">
+                                        <Button fx:id="btnNuevoTrabajador" mnemonicParsing="false" prefHeight="40.0" style="-fx-cursor: hand;" text="Nuevo trabajador" textFill="#2e1a0e" minWidth="150.0">
                                             <font>
                                                 <Font name="Inter 18pt Bold" size="14.0" />
                                             </font>
@@ -66,24 +74,38 @@
                                         </Button>
                                     </children>
                                 </HBox>
-                                <TableView fx:id="tablaTrabajadores" prefHeight="370.0" style="-fx-border-color: #C8B99A; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn fx:id="colNombre" prefWidth="300.0" text="Nombre y apellidos" />
-                                        <TableColumn fx:id="colCargo" prefWidth="220.0" text="Cargo" />
-                                    </columns>
-                                </TableView>
-                                <Label fx:id="lblEstadoTabla" text="0 trabajadores" textFill="#7a5230" />
+
+                                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <TableView fx:id="tablaTrabajadores" prefHeight="350.0" style="-fx-border-color: #C8B99A; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="colID" minWidth="60.0" prefWidth="110.0" text="ID" />
+                                                <TableColumn fx:id="colNombre" minWidth="110.0" prefWidth="210.0" text="Nombre y apellidos" />
+                                                <TableColumn fx:id="colDNI" minWidth="80.0" prefWidth="130.0" text="DNI" />
+                                                <TableColumn fx:id="colCorreo" minWidth="100.0" prefWidth="210.0" text="Correo electrónico" />
+                                                <TableColumn fx:id="colDireccion" minWidth="120.0" prefWidth="270.0" text="Dirección" />
+                                                <TableColumn fx:id="colNumSS" minWidth="100.0" prefWidth="150.0" text="Número de SS" />
+                                                <TableColumn fx:id="colCargo" prefWidth="220.0" text="Cargo" />
+                                            </columns>
+                                        </TableView>
+                                        <Label fx:id="lblEstadoTabla" text="0 trabajadores" textFill="#7a5230">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
 
-                        <VBox fx:id="vistaDetalles" spacing="18.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
+                        <VBox fx:id="vistaDetalles" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
                             <padding>
-                                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                             </padding>
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="15.0">
                                     <children>
-                                        <Button fx:id="btnVolver" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;" styleClass="button-back">
+                                        <Button fx:id="btnVolver" mnemonicParsing="false" styleClass="button-back" style="-fx-background-color: transparent; -fx-cursor: hand;">
                                             <graphic>
                                                 <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#7a5230" />
                                             </graphic>
@@ -98,83 +120,137 @@
                                         <Region HBox.hgrow="ALWAYS" />
                                         <Button fx:id="btnEliminar" minWidth="120.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F9EBEA; -fx-border-color: #D9534F; -fx-border-radius: 4; -fx-cursor: hand;" text="Eliminar trabajador" textFill="#C9302C">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
                                             </font>
                                         </Button>
+
                                         <Button fx:id="btnEditar" minWidth="110.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F0E6C8; -fx-border-color: #E8A820; -fx-border-radius: 4; -fx-cursor: hand;" text="Editar datos" textFill="#7a5230">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
                                             </font>
                                         </Button>
                                         <Button fx:id="btnGuardarEdicion" managed="false" minWidth="130.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cambios" textFill="#2e1a0e" visible="false">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                                <Font name="Inter 18pt Bold" size="13.0"/>
                                             </font>
                                         </Button>
                                     </children>
                                 </HBox>
-                                <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+
+                                <VBox spacing="15.0" VBox.vgrow="ALWAYS">
                                     <children>
-                                        <HBox spacing="12.0">
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Nombre *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleNombre" editable="false" />
+                                        <HBox spacing="20.0">
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Nombre *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleNombre" editable="false" prefHeight="38.0"/>
                                             </VBox>
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Apellidos *" textFill="#7a5230" />
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Apellidos *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
                                                 <TextField fx:id="txtDetalleApellidos" editable="false" />
                                             </VBox>
                                         </HBox>
-                                        <HBox spacing="12.0">
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="DNI *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleDni" editable="false" />
+                                        <HBox spacing="20.0">
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Documento de identidad *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleDni" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                                <Label text="Correo electrónico *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCorreo" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Correo electrónico *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleCorreo" editable="false" />
-                                            </VBox>
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Dirección *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleCalle" editable="false" />
-                                            </VBox>
-                                        </HBox>
-                                        <HBox spacing="12.0">
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Ciudad *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleCiudad" editable="false" />
-                                            </VBox>
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="C.P. *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleCP" editable="false" />
-                                            </VBox>
-                                            <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Número SS *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleSS" editable="false" />
+                                                <Label text="Calle *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCalle" editable="false" prefHeight="38.0" />
                                             </VBox>
                                         </HBox>
                                         <HBox spacing="12.0">
                                             <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="IBAN *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleIban" editable="false" />
+                                                <Label text="Ciudad *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCiudad" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Salario *" textFill="#7a5230" />
-                                                <TextField fx:id="txtDetalleSalario" editable="false" />
+                                                <Label text="Código Postal *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleCP" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox HBox.hgrow="ALWAYS">
-                                                <Label text="Cargo *" textFill="#7a5230" />
-                                                <ComboBox fx:id="cmbDetalleCargo" disable="true" maxWidth="1.7976931348623157E308" />
+                                                <Label text="Número SS *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleSS" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                        </HBox>
+                                        <HBox spacing="12.0">
+                                            <VBox HBox.hgrow="ALWAYS">
+                                                <Label text="IBAN *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleIban" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                            <VBox HBox.hgrow="ALWAYS">
+                                                <Label text="Salario *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextField fx:id="txtDetalleSalario" editable="false" prefHeight="38.0" />
+                                            </VBox>
+                                            <VBox HBox.hgrow="ALWAYS">
+                                                <Label text="Cargo *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbDetalleCargo" disable="true" />
                                             </VBox>
                                         </HBox>
                                         <HBox spacing="12.0">
                                             <VBox prefWidth="220.0">
-                                                <Label text="Tipo de jornada *" textFill="#7a5230" />
-                                                <ComboBox fx:id="cmbDetalleJornada" disable="true" maxWidth="1.7976931348623157E308" />
+                                                <Label text="Tipo de jornada *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbDetalleJornada" disable="true" />
                                             </VBox>
                                             <VBox prefWidth="220.0">
-                                                <Label text="Rol *" textFill="#7a5230" />
-                                                <ComboBox fx:id="cmbDetalleRol" disable="true" maxWidth="1.7976931348623157E308" />
+                                                <Label text="Rol *" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbDetalleRol" disable="true" />
                                             </VBox>
                                         </HBox>
                                     </children>
@@ -183,55 +259,182 @@
                         </VBox>
                     </children>
                 </StackPane>
+
                 <Region fx:id="spacerLateral" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
             </children>
         </HBox>
 
-        <VBox fx:id="panelFormularioNuevo" maxWidth="370.0" minWidth="370.0" prefWidth="370.0" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
+        <VBox fx:id="panelFormularioNuevo" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
             </padding>
             <children>
-                <HBox>
-                    <Label text="Registrar trabajador" textFill="#2e1a0e">
-                        <font>
-                            <Font name="Inter 18pt Bold" size="18.0" />
-                        </font>
-                    </Label>
+                <HBox alignment="CENTER_LEFT">
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label text="Registrar trabajador" textFill="#2e1a0e">
+                                <font>
+                                    <Font name="Inter 18pt Bold" size="18.0" />
+                                </font>
+                            </Label>
+                            <TextFlow>
+                                <children>
+                                    <Text fill="#7a5230" text="Los campos con " />
+                                    <Text fill="#d9534f" text="*" />
+                                    <Text fill="#7a5230" text=" son obligatorios." />
+                                </children>
+                            </TextFlow>
+                        </children>
+                    </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnCerrarFormulario" style="-fx-background-color: transparent;">
+                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;">
                         <graphic>
                             <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#7a5230" />
                         </graphic>
                     </Button>
                 </HBox>
-                <HBox spacing="8.0">
-                    <TextField fx:id="txtNuevoNombre" promptText="Nombre *" HBox.hgrow="ALWAYS" />
-                    <TextField fx:id="txtNuevoApellidos" promptText="Apellidos *" HBox.hgrow="ALWAYS" />
+
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Nombre *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoNombre" prefHeight="35.0" />
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Apellidos *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoApellidos" prefHeight="35.0" />
+                    </VBox>
                 </HBox>
-                <HBox spacing="8.0">
-                    <TextField fx:id="txtNuevoDni" promptText="DNI *" HBox.hgrow="ALWAYS" />
-                    <TextField fx:id="txtNuevoCorreo" promptText="Correo electrónico *" HBox.hgrow="ALWAYS" />
+
+                <VBox spacing="5.0">
+                    <Label text="DNI *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoDni" prefHeight="35.0" />
+                </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Correo electrónico *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoCorreo" prefHeight="35.0" />
+                </VBox>
+                
+                <VBox spacing="5.0">
+                    <Label text="Calle *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoCalle" prefHeight="35.0" />
+                </VBox>
+
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Ciudad *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoCiudad" prefHeight="35.0" />
+                    </VBox>
+                    <VBox prefWidth="100.0" spacing="5.0">
+                        <Label text="Código Postal *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoCP" prefHeight="35.0" />
+                    </VBox>
                 </HBox>
-                <TextField fx:id="txtNuevoCalle" promptText="Dirección *" />
-                <HBox spacing="8.0">
-                    <TextField fx:id="txtNuevoCiudad" promptText="Ciudad *" HBox.hgrow="ALWAYS" />
-                    <TextField fx:id="txtNuevoCP" promptText="C.P. *" HBox.hgrow="ALWAYS" />
+                <VBox spacing="5.0">
+                    <Label text="Número de Seguridad Social *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoSS" prefHeight="35.0" />
+                </VBox>
+                <VBox spacing="5.0">
+                    <Label text="Número de IBAN *" textFill="#2e1a0e">
+                        <font>
+                            <Font name="System Bold" size="12.0"/>
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtNuevoIban" prefHeight="35.0" />
+                </VBox>
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Salario *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtNuevoSalario" prefHeight="35.0" />
+                    </VBox>
+                    <VBox prefWidth="200.0" spacing="5.0">
+                        <Label text="Cargo *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="cmbNuevoCargo" prefHeight="35.0" />
+                    </VBox>
                 </HBox>
-                <HBox spacing="8.0">
-                    <TextField fx:id="txtNuevoSS" promptText="Número SS *" HBox.hgrow="ALWAYS" />
-                    <TextField fx:id="txtNuevoIban" promptText="IBAN *" HBox.hgrow="ALWAYS" />
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Tipo de jornada *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="cmbNuevaJornada" prefHeight="35.0" />
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Rol *" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="cmbNuevoRol" prefHeight="35.0" />
+                    </VBox>
                 </HBox>
-                <HBox spacing="8.0">
-                    <TextField fx:id="txtNuevoSalario" promptText="Salario *" HBox.hgrow="ALWAYS" />
-                    <ComboBox fx:id="cmbNuevoCargo" promptText="Cargo *" HBox.hgrow="ALWAYS" />
+                <HBox spacing="10.0">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Nueva contraseña" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="txtNuevaPassword" prefHeight="35.0" />
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
+                        <Label text="Confirmar contraseña" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="12.0"/>
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="txtNuevaConfirmarPassword" prefHeight="35.0" />
+                    </VBox>
                 </HBox>
-                <ComboBox fx:id="cmbNuevaJornada" promptText="Tipo de jornada *" />
-                <TextField fx:id="txtNuevoUsuario" promptText="Usuario de acceso *" />
-                <PasswordField fx:id="txtNuevaPassword" promptText="Contraseña (mínimo 8 caracteres) *" />
-                <ComboBox fx:id="cmbNuevoRol" promptText="Rol *" />
-                <Region VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-cursor: hand;" text="Guardar trabajador" />
+
+                <Region VBox.vgrow="ALWAYS"/>
+
+                <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar trabajador" textFill="#2e1a0e">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                </Button>
             </children>
         </VBox>
     </children>
