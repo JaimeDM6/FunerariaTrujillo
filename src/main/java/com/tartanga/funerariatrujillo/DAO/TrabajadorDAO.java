@@ -3,7 +3,6 @@ package com.tartanga.funerariatrujillo.DAO;
 import com.mongodb.client.MongoCollection;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Objects.Trabajador;
-import com.tartanga.funerariatrujillo.Security.PasswordHasher;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static com.mongodb.client.model.Filters.eq;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class TrabajadorDAO {
 
@@ -206,7 +206,8 @@ public class TrabajadorDAO {
             if (passwordHash == null) {
                 passwordHash = documento.getString("passwordHash");
             }
-            boolean valid = PasswordHasher.matches(password, passwordHash);
+            boolean valid = passwordHash != null
+                    && BCrypt.checkpw(new String(password), passwordHash);
             if (!valid) {
                 String legacyPassword = documento.getString("password");
                 valid = legacyPassword != null
@@ -216,7 +217,8 @@ public class TrabajadorDAO {
                 if (valid) {
                     MongoConfig.getCollection(COLLECTION_NAME).updateOne(
                             eq("_id", documento.getObjectId("_id")),
-                            new Document("$set", new Document("password", PasswordHasher.hash(password)))
+                            new Document("$set", new Document("password", BCrypt.hashpw(
+                                    new String(password), BCrypt.gensalt(12))))
                                     .append("$unset", new Document("passwordHash", "")));
                 }
             } else if (documento.getString("password") == null

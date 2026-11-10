@@ -4,7 +4,7 @@ import com.tartanga.funerariatrujillo.DAO.TrabajadorDAO;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Objects.Trabajador;
 import com.tartanga.funerariatrujillo.Utils.Utils;
-import com.tartanga.funerariatrujillo.Security.PasswordHasher;
+import org.mindrot.jbcrypt.BCrypt;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -293,7 +293,7 @@ public class TrabajadorController implements Initializable {
                     txtNuevoCorreo, txtNuevoCalle, txtNuevoCiudad, txtNuevoCP, txtNuevoSS,
                     txtNuevoIban, txtNuevoSalario, cmbNuevoCargo, cmbNuevaJornada);
             trabajador.setUsuario(txtNuevoUsuario.getText().trim());
-            trabajador.setPassword(PasswordHasher.hash(txtNuevaPassword.getText().toCharArray()));
+            trabajador.setPassword(BCrypt.hashpw(txtNuevaPassword.getText(), BCrypt.gensalt(12)));
             trabajador.setRol(convertirRol(cmbNuevoRol.getValue()));
             if (new TrabajadorDAO().insertarTrabajador(trabajador)) {
                 masterData.add(trabajador);

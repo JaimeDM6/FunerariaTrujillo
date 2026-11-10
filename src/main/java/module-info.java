@@ -5,14 +5,17 @@ module com.tartanga.funerariatrujillo {
     requires org.mongodb.driver.sync.client;
     requires org.mongodb.bson;
     requires org.mongodb.driver.core;
+    requires jbcrypt;
 
     opens com.tartanga.funerariatrujillo to javafx.fxml;
+
     exports com.tartanga.funerariatrujillo;
-    
+
     opens com.tartanga.funerariatrujillo.Objects to javafx.base;
+
     exports com.tartanga.funerariatrujillo.Objects;
     exports com.tartanga.funerariatrujillo.Security;
-    
+
     exports com.tartanga.funerariatrujillo.DAO;
     exports com.tartanga.funerariatrujillo.Utils;
 }
