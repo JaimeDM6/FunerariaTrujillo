@@ -36,7 +36,7 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     private String correo_electronico;
     private String usuario;
     /**
-     * Contraseña almacenada como hash PBKDF2, nunca en texto plano.
+     * Contraseña almacenada como hash BCrypt, nunca en texto plano.
      */
     private String password;
     private Direccion direccion;

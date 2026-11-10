@@ -3,11 +3,14 @@ package com.tartanga.funerariatrujillo.Utils;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.util.Callback;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -47,34 +50,48 @@ public class Utils {
                 )
         );
 
-        slide.setOnFinished(e -> panelFormulario.setVisible(false));
+        slide.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                panelFormulario.setVisible(false);
+            }
+        });
+
         slide.play();
     }
 
-    // Método para recortar el ID a 6 caracteres
     public static <T> void columnID(TableColumn<T, String> columna) {
-        columna.setCellFactory(col -> new TableCell<T, String>() {
+        columna.setCellFactory(new Callback<TableColumn<T, String>, TableCell<T, String>>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.length() > 6 ? item.substring(item.length() - 6).toUpperCase() : item);
-                }
+            public TableCell<T, String> call(TableColumn<T, String> param) {
+                return new TableCell<T, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.length() > 6 ? item.substring(item.length() - 6).toUpperCase() : item);
+                        }
+                    }
+                };
             }
         });
     }
 
-    // Método para formatear Fechas a DD/MM/YYYY
     public static <T> void columnDate(TableColumn<T, Date> columna) {
-        columna.setCellFactory(col -> new TableCell<T, Date>() {
-            private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-
+        columna.setCellFactory(new Callback<TableColumn<T, Date>, TableCell<T, Date>>() {
             @Override
-            protected void updateItem(Date item, boolean empty) {
-                super.updateItem(item, empty);
-                setText((empty || item == null) ? null : format.format(item));
+            public TableCell<T, Date> call(TableColumn<T, Date> param) {
+                return new TableCell<T, Date>() {
+                    private final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setText((empty || item == null) ? null : format.format(item));
+                    }
+                };
             }
         });
     }
