@@ -4,12 +4,13 @@ import com.mongodb.client.MongoCollection;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Objects.Trabajador;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import static com.mongodb.client.model.Filters.eq;
+import com.tartanga.funerariatrujillo.Objects.Trabajador.Cargo;
+import com.tartanga.funerariatrujillo.Objects.Trabajador.Rol;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class TrabajadorDAO {
@@ -21,172 +22,147 @@ public class TrabajadorDAO {
 
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection(COLLECTION_NAME);
-            for (Document documento : collection.find()) {
+
+            for (Document doc : collection.find()) {
                 try {
-                    trabajadores.add(convertirDocumento(documento));
-                } catch (Exception documentoEx) {
-                    System.err.println("Error procesando un trabajador: " + documentoEx.getMessage());
-                    documentoEx.printStackTrace();
+                    Trabajador t = new Trabajador();
+
+                    t.setId(doc.getObjectId("_id").toString());
+                    t.setNombre(doc.getString("nombre"));
+                    t.setApellidos(doc.getString("apellidos"));
+                    t.setDni(doc.getString("dni"));
+                    t.setCorreo_electronico(doc.getString("correo_electronico"));
+                    t.setUsuario(doc.getString("usuario"));
+                    t.setPassword(doc.getString("password"));
+
+                    Document dirDoc = (Document) doc.get("direccion");
+                    if (dirDoc != null) {
+                        Direccion dir = new Direccion();
+                        dir.setCalle(dirDoc.getString("calle"));
+                        dir.setCiudad(dirDoc.getString("ciudad"));
+
+                        Object cpObj = dirDoc.get("codigo_postal");
+                        if (cpObj != null && !cpObj.toString().isEmpty()) {
+                            dir.setCodigoPostal(Integer.parseInt(cpObj.toString()));
+                        }
+                        t.setDireccion(dir);
+                    }
+
+                    t.setNumero_ss(doc.getString("numero_ss"));
+
+                    Document bancoDoc = (Document) doc.get("datos_bancarios");
+                    if (bancoDoc != null) {
+                        t.setIban(bancoDoc.getString("iban"));
+                    } else {
+                        t.setIban(doc.getString("iban"));
+                    }
+
+                    Object salarioObj = doc.get("salario");
+                    if (salarioObj instanceof Double) {
+                        t.setSalario((Double) salarioObj);
+                    } else if (salarioObj instanceof Integer) {
+                        t.setSalario(((Integer) salarioObj).doubleValue());
+                    }
+
+                    String cargoStr = doc.getString("cargo");
+                    if (cargoStr != null) {
+                        try {
+                            String cargoNormalizado = cargoStr.toUpperCase().replace(" ", "_");
+                            t.setCargo(Cargo.valueOf(cargoNormalizado));
+                        } catch (IllegalArgumentException e) {
+                            System.err.println("Cargo no reconocido: " + cargoStr);
+                        }
+                    }
+
+                    String rolStr = doc.getString("rol");
+                    if (rolStr != null) {
+                        try {
+                            t.setRol(Rol.valueOf(rolStr.toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                            System.err.println("Rol no reconocido: " + rolStr);
+                        }
+                    }
+
+                    t.setTipo_jornada(doc.getString("tipo_jornada"));
+
+                    trabajadores.add(t);
+                } catch (NumberFormatException docEx) {
+                    System.err.println("Error procesando el trabajador con ID: " + doc.getObjectId("_id"));
                 }
             }
         } catch (Exception e) {
             System.err.println("Error al obtener los trabajadores: " + e.getMessage());
-            e.printStackTrace();
         }
 
         return trabajadores;
     }
 
-    private Trabajador convertirDocumento(Document documento) {
-        Trabajador trabajador = new Trabajador();
-        ObjectId id = documento.getObjectId("_id");
-
-        if (id != null) {
-            trabajador.setId(id.toString());
-        }
-
-        trabajador.setNombre(documento.getString("nombre"));
-        trabajador.setApellidos(documento.getString("apellidos"));
-        trabajador.setDni(documento.getString("dni"));
-        trabajador.setCorreo_electronico(documento.getString("correo_electronico"));
-        trabajador.setUsuario(documento.getString("usuario"));
-        trabajador.setPassword(documento.getString("password") != null
-                ? documento.getString("password") : documento.getString("passwordHash"));
-        trabajador.setNumero_ss(documento.getString("numero_ss"));
-        trabajador.setCargo(convertirCargo(documento.getString("cargo")));
-        trabajador.setRol(convertirRol(documento.getString("rol"), trabajador.getCargo()));
-        trabajador.setSalario(obtenerDouble(documento.get("salario")));
-        trabajador.setTipo_jornada(documento.getString("tipo_jornada"));
-        trabajador.setDireccion(convertirDireccion(documento.get("direccion")));
-
-        Document datosBancarios = obtenerDocumento(documento.get("datos_bancarios"));
-        if (datosBancarios != null) {
-            trabajador.setIban(datosBancarios.getString("iban"));
-        }
-
-        return trabajador;
-    }
-
-    private Direccion convertirDireccion(Object valor) {
-        Direccion direccion = new Direccion();
-        Document documento = obtenerDocumento(valor);
-
-        if (documento == null) {
-            return direccion;
-        }
-
-        direccion.setCalle(documento.getString("calle"));
-        direccion.setCiudad(documento.getString("ciudad"));
-        direccion.setCodigoPostal(convertirCodigoPostal(documento.getString("codigo_postal")));
-        return direccion;
-    }
-
-    private Document obtenerDocumento(Object valor) {
-        if (valor instanceof Document) {
-            return (Document) valor;
-        }
-        return null;
-    }
-
-    private int convertirCodigoPostal(String valor) {
+    public boolean actualizarTrabajador(Trabajador t) {
         try {
-            if (valor == null || valor.isEmpty()) {
-                return 0;
-            }
-            return Integer.parseInt(valor);
-        } catch (NumberFormatException e) {
-            return 0;
+            MongoCollection<Document> collection = MongoConfig.getCollection("trabajador");
+
+            Document filtro = new Document("_id", new org.bson.types.ObjectId(t.getId()));
+
+            Document updateDocs = new Document("$set", new Document()
+                    .append("nombre", t.getNombre())
+                    .append("apellidos", t.getApellidos())
+                    .append("dni", t.getDni())
+                    .append("correo_electronico", t.getCorreo_electronico())
+                    .append("numero_ss", t.getNumero_ss())
+                    .append("iban", t.getIban())
+                    .append("salario", t.getSalario())
+                    .append("cargo", t.getCargo())
+                    .append("tipo_jornada", t.getTipo_jornada())
+            );
+
+            collection.updateOne(filtro, updateDocs);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al actualizar el trabajador: " + e.getMessage());
+            return false;
         }
     }
 
-    private Double obtenerDouble(Object valor) {
-        if (valor instanceof Number) {
-            Number numero = (Number) valor;
-            return numero.doubleValue();
-        }
+    public boolean insertarTrabajador(Trabajador t) {
+        try {
+            MongoCollection<Document> collection = MongoConfig.getCollection("trabajador");
 
-        if (valor instanceof org.bson.types.Decimal128) {
-            org.bson.types.Decimal128 decimal = (org.bson.types.Decimal128) valor;
-            return decimal.doubleValue();
-        }
+            Document dirDoc = new Document()
+                    .append("calle", t.getDireccion().getCalle())
+                    .append("ciudad", t.getDireccion().getCiudad())
+                    .append("codigo_postal", String.valueOf(t.getDireccion().getCodigoPostal()));
 
-        return 0.0;
+            Document doc = new Document()
+                    .append("nombre", t.getNombre())
+                    .append("apellidos", t.getApellidos())
+                    .append("dni", t.getDni())
+                    .append("correo_electronico", t.getCorreo_electronico())
+                    .append("direccion", dirDoc)
+                    .append("numero_ss", t.getNumero_ss())
+                    .append("iban", t.getIban())
+                    .append("salario", t.getSalario())
+                    .append("cargo", t.getCargo())
+                    .append("tipo_jornada", t.getTipo_jornada());
+
+            collection.insertOne(doc);
+
+            t.setId(doc.getObjectId("_id").toString());
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al insertar el trabajador: " + e.getMessage());
+            return false;
+        }
     }
 
-    private Trabajador.Cargo convertirCargo(String valor) {
-        if ("Tanatopractor".equalsIgnoreCase(valor)) {
-            return Trabajador.Cargo.TANATOPRACTOR;
+    public boolean eliminarTrabajador(String id) {
+        try {
+            Document filtro = new Document("_id", new org.bson.types.ObjectId(id));
+            MongoConfig.getCollection("trabajador").deleteOne(filtro);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al eliminar el trabajador: " + e.getMessage());
+            return false;
         }
-        if ("Agente Funerario".equalsIgnoreCase(valor)) {
-            return Trabajador.Cargo.AGENTE_FUNERARIO;
-        }
-        if ("Recepcionista".equalsIgnoreCase(valor)) {
-            return Trabajador.Cargo.RECEPCIONISTA;
-        }
-        if ("Director".equalsIgnoreCase(valor)) {
-            return Trabajador.Cargo.DIRECTOR;
-        }
-        return Trabajador.Cargo.CONDUCTOR;
-    }
-
-    private Trabajador.Rol convertirRol(String valor, Trabajador.Cargo cargo) {
-        for (Trabajador.Rol rol : Trabajador.Rol.values()) {
-            if (rol.toString().equalsIgnoreCase(valor) || rol.name().equalsIgnoreCase(valor)) {
-                return rol;
-            }
-        }
-        return cargo == Trabajador.Cargo.TANATOPRACTOR
-                ? Trabajador.Rol.TANATOPRAXIA
-                : Trabajador.Rol.AGENTE_FUNERARIO;
-    }
-
-    private String obtenerNombreCargo(Trabajador.Cargo cargo) {
-        if (cargo == Trabajador.Cargo.TANATOPRACTOR) {
-            return "Tanatopractor";
-        }
-        if (cargo == Trabajador.Cargo.AGENTE_FUNERARIO) {
-            return "Agente Funerario";
-        }
-        if (cargo == Trabajador.Cargo.RECEPCIONISTA) {
-            return "Recepcionista";
-        }
-        if (cargo == Trabajador.Cargo.DIRECTOR) {
-            return "Director";
-        }
-        return "Conductor";
-    }
-
-    private Document crearDireccion(Trabajador trabajador) {
-        Direccion direccion = trabajador.getDireccion();
-        return new Document()
-                .append("calle", direccion.getCalle())
-                .append("ciudad", direccion.getCiudad())
-                .append("codigo_postal", String.format("%05d", direccion.getCodigoPostal()));
-    }
-
-    private Document crearDatosBancarios(Trabajador trabajador) {
-        return new Document()
-                .append("iban", trabajador.getIban())
-                .append("banco", "");
-    }
-
-    private Document crearDocumento(Trabajador trabajador) {
-        Document documento = new Document()
-                .append("nombre", trabajador.getNombre())
-                .append("apellidos", trabajador.getApellidos())
-                .append("dni", trabajador.getDni())
-                .append("correo_electronico", trabajador.getCorreo_electronico())
-                .append("direccion", crearDireccion(trabajador))
-                .append("numero_ss", trabajador.getNumero_ss())
-                .append("datos_bancarios", crearDatosBancarios(trabajador))
-                .append("cargo", obtenerNombreCargo(trabajador.getCargo()))
-                .append("rol", trabajador.getRol().toString())
-                .append("salario", trabajador.getSalario())
-                .append("tipo_jornada", trabajador.getTipo_jornada());
-        if (trabajador.getPassword() != null && !trabajador.getPassword().isBlank()) {
-            documento.append("password", trabajador.getPassword());
-        }
-        return documento;
     }
 
     public Optional<Trabajador> autenticar(String usuario, char[] password) {
@@ -195,96 +171,98 @@ public class TrabajadorDAO {
         }
 
         try {
-            Document documento = MongoConfig.getCollection(COLLECTION_NAME)
+            Document doc = MongoConfig.getCollection(COLLECTION_NAME)
                     .find(eq("usuario", usuario.trim()))
                     .first();
-            if (documento == null) {
+
+            if (doc == null) {
                 return Optional.empty();
             }
 
-            String passwordHash = documento.getString("password");
-            if (passwordHash == null) {
-                passwordHash = documento.getString("passwordHash");
-            }
-            boolean valid = passwordHash != null
-                    && BCrypt.checkpw(new String(password), passwordHash);
-            if (!valid) {
-                String legacyPassword = documento.getString("password");
-                valid = legacyPassword != null
-                        && java.security.MessageDigest.isEqual(
-                                legacyPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8),
-                                new String(password).getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                if (valid) {
-                    MongoConfig.getCollection(COLLECTION_NAME).updateOne(
-                            eq("_id", documento.getObjectId("_id")),
-                            new Document("$set", new Document("password", BCrypt.hashpw(
-                                    new String(password), BCrypt.gensalt(12))))
-                                    .append("$unset", new Document("passwordHash", "")));
-                }
-            } else if (documento.getString("password") == null
-                    && documento.getString("passwordHash") != null) {
-                MongoConfig.getCollection(COLLECTION_NAME).updateOne(
-                        eq("_id", documento.getObjectId("_id")),
-                        new Document("$set", new Document("password", passwordHash))
-                                .append("$unset", new Document("passwordHash", "")));
-            }
-            if (!valid) {
+            String passwordHash = doc.getString("password");
+
+            if (passwordHash == null || passwordHash.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.of(convertirDocumento(documento));
-        } catch (Exception exception) {
+
+            boolean valid = false;
+            try {
+                valid = BCrypt.checkpw(new String(password), passwordHash);
+            } catch (Exception e) {
+                System.err.println("Error al verificar el hash BCrypt: " + e.getMessage());
+            }
+
+            if (valid) {
+                Trabajador t = new Trabajador();
+
+                t.setId(doc.getObjectId("_id").toString());
+                t.setNombre(doc.getString("nombre"));
+                t.setApellidos(doc.getString("apellidos"));
+                t.setDni(doc.getString("dni"));
+                t.setCorreo_electronico(doc.getString("correo_electronico"));
+                t.setUsuario(doc.getString("usuario"));
+                t.setPassword(doc.getString("password"));
+
+                Document dirDoc = (Document) doc.get("direccion");
+                if (dirDoc != null) {
+                    Direccion dir = new Direccion();
+                    dir.setCalle(dirDoc.getString("calle"));
+                    dir.setCiudad(dirDoc.getString("ciudad"));
+
+                    Object cpObj = dirDoc.get("codigo_postal");
+                    if (cpObj != null && !cpObj.toString().isEmpty()) {
+                        dir.setCodigoPostal(Integer.parseInt(cpObj.toString()));
+                    }
+                    t.setDireccion(dir);
+                }
+
+                t.setNumero_ss(doc.getString("numero_ss"));
+
+                Document bancoDoc = (Document) doc.get("datos_bancarios");
+                if (bancoDoc != null) {
+                    t.setIban(bancoDoc.getString("iban"));
+                } else {
+                    t.setIban(doc.getString("iban"));
+                }
+
+                Object salarioObj = doc.get("salario");
+                if (salarioObj instanceof Double) {
+                    t.setSalario((Double) salarioObj);
+                } else if (salarioObj instanceof Integer) {
+                    t.setSalario(((Integer) salarioObj).doubleValue());
+                }
+
+                String cargoStr = doc.getString("cargo");
+                if (cargoStr != null) {
+                    try {
+                        String cargoNormalizado = cargoStr.toUpperCase().replace(" ", "_");
+                        t.setCargo(Cargo.valueOf(cargoNormalizado));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Cargo no reconocido: " + cargoStr);
+                    }
+                }
+
+                String rolStr = doc.getString("rol");
+                if (rolStr != null) {
+                    try {
+                        t.setRol(Rol.valueOf(rolStr.toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Rol no reconocido: " + rolStr);
+                    }
+                }
+
+                t.setTipo_jornada(doc.getString("tipo_jornada"));
+
+                return Optional.of(t);
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (NumberFormatException exception) {
             System.err.println("Error al autenticar el trabajador: " + exception.getMessage());
             return Optional.empty();
         } finally {
             java.util.Arrays.fill(password, '\0');
-        }
-    }
-
-    public boolean insertarTrabajador(Trabajador trabajador) {
-        try {
-            Document documento = crearDocumento(trabajador);
-            MongoConfig.getCollection(COLLECTION_NAME).insertOne(documento);
-            trabajador.setId(documento.getObjectId("_id").toString());
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error al insertar el trabajador: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean actualizarTrabajador(Trabajador trabajador) {
-        try {
-            if (!ObjectId.isValid(trabajador.getId())) {
-                return false;
-            }
-
-            Document cambios = crearDocumento(trabajador);
-            long encontrados = MongoConfig.getCollection(COLLECTION_NAME)
-                    .updateOne(new Document("_id", new ObjectId(trabajador.getId())), new Document("$set", cambios))
-                    .getMatchedCount();
-            return encontrados > 0;
-        } catch (Exception e) {
-            System.err.println("Error al actualizar el trabajador: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean eliminarTrabajador(String id) {
-        try {
-            if (!ObjectId.isValid(id)) {
-                return false;
-            }
-
-            long eliminados = MongoConfig.getCollection(COLLECTION_NAME)
-                    .deleteOne(new Document("_id", new ObjectId(id)))
-                    .getDeletedCount();
-            return eliminados > 0;
-        } catch (Exception e) {
-            System.err.println("Error al eliminar el trabajador: " + e.getMessage());
-            e.printStackTrace();
-            return false;
         }
     }
 }

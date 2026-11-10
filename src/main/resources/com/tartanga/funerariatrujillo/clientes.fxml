@@ -15,7 +15,9 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.ClientesController">
+<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css"
+           xmlns="http://javafx.com/javafx/25"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.ClientesController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -132,12 +134,12 @@
                                         </Button>
                                     </children>
                                 </HBox>
-                                
+
                                 <VBox spacing="15.0" VBox.vgrow="ALWAYS">
                                     <children>
                                         <HBox spacing="20.0">
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Nombre" textFill="#7a5230">
+                                                <Label text="Nombre *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -145,7 +147,7 @@
                                                 <TextField fx:id="txtDetalleNombre" editable="false" prefHeight="38.0"/>
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Apellidos" textFill="#7a5230">
+                                                <Label text="Apellidos *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -155,7 +157,7 @@
                                         </HBox>
                                         <HBox spacing="20.0">
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Documento de identidad" textFill="#7a5230">
+                                                <Label text="Documento de identidad *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -163,7 +165,7 @@
                                                 <TextField fx:id="txtDetalleDni" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Teléfono" textFill="#7a5230">
+                                                <Label text="Teléfono *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -172,7 +174,7 @@
                                             </VBox>
                                         </HBox>
                                         <VBox spacing="5.0">
-                                            <Label text="Correo electrónico" textFill="#7a5230">
+                                            <Label text="Correo electrónico *" textFill="#7a5230">
                                                 <font>
                                                     <Font name="Inter 18pt Regular" size="12.0" />
                                                 </font>
@@ -181,7 +183,7 @@
                                         </VBox>
                                         <HBox spacing="20.0">
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Calle" textFill="#7a5230">
+                                                <Label text="Calle *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -189,7 +191,7 @@
                                                 <TextField fx:id="txtDetalleCalle" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Ciudad" textFill="#7a5230">
+                                                <Label text="Ciudad *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -197,7 +199,7 @@
                                                 <TextField fx:id="txtDetalleCiudad" editable="false" prefHeight="38.0" />
                                             </VBox>
                                             <VBox spacing="5.0" prefWidth="100.0">
-                                                <Label text="C.P." textFill="#7a5230">
+                                                <Label text="Código Postal *" textFill="#7a5230">
                                                     <font>
                                                         <Font name="Inter 18pt Regular" size="12.0" />
                                                     </font>
@@ -211,7 +213,7 @@
                         </VBox>
                     </children>
                 </StackPane>
-                
+
                 <Region fx:id="spacerLateral" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
             </children>
         </HBox>
@@ -264,7 +266,7 @@
                         <TextField fx:id="txtNuevoApellidos" prefHeight="35.0" />
                     </VBox>
                 </HBox>
-            
+
                 <HBox spacing="10.0">
                     <VBox HBox.hgrow="ALWAYS" spacing="5.0">
                         <Label text="DNI *" textFill="#2e1a0e">
@@ -285,7 +287,7 @@
                 </HBox>
 
                 <VBox spacing="5.0">
-                    <Label text="Correo electrónico" textFill="#2e1a0e">
+                    <Label text="Correo electrónico *" textFill="#2e1a0e">
                         <font>
                             <Font name="System Bold" size="12.0"/>
                         </font>
@@ -294,7 +296,7 @@
                 </VBox>
 
                 <VBox spacing="5.0">
-                    <Label text="Calle" textFill="#2e1a0e">
+                    <Label text="Calle *" textFill="#2e1a0e">
                         <font>
                             <Font name="System Bold" size="12.0"/>
                         </font>
@@ -304,7 +306,7 @@
 
                 <HBox spacing="10.0">
                     <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="Ciudad" textFill="#2e1a0e">
+                        <Label text="Ciudad *" textFill="#2e1a0e">
                             <font>
                                 <Font name="System Bold" size="12.0"/>
                             </font>
@@ -312,7 +314,7 @@
                         <TextField fx:id="txtNuevoCiudad" prefHeight="35.0" />
                     </VBox>
                     <VBox prefWidth="100.0" spacing="5.0">
-                        <Label text="C.P." textFill="#2e1a0e">
+                        <Label text="Código Postal *" textFill="#2e1a0e">
                             <font>
                                 <Font name="System Bold" size="12.0"/>
                             </font>

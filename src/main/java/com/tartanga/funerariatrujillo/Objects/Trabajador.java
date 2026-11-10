@@ -8,14 +8,30 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Cargo {
-        TANATOPRACTOR, AGENTE_FUNERARIO, RECEPCIONISTA, DIRECTOR, CONDUCTOR
+        TANATOPRACTOR("Tanatopractor"),
+        AGENTE_FUNERARIO("Agente Funerario"),
+        RECEPCIONISTA("Recepcionista"),
+        DIRECTOR("Director"),
+        CONDUCTOR("Conductor");
+
+        private final String nombreVisible;
+
+        Cargo(String nombreVisible) {
+            this.nombreVisible = nombreVisible;
+        }
+
+        @Override
+        public String toString() {
+            return nombreVisible;
+        }
     }
 
     public enum Rol {
         AGENTE_FUNERARIO("Agente Funerario"),
         CONTABILIDAD("Contabilidad"),
         TANATOPRAXIA("Tanatopraxia"),
-        ADMINISTRACION("Administración");
+        ADMINISTRACION("Administración"),
+        TRANSPORTE("Transporte");
 
         private final String nombreVisible;
 
@@ -118,6 +134,10 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public String getNombreCompleto() {
+        return (this.nombre + " " + this.apellidos).trim();
     }
 
     public String getDni() {

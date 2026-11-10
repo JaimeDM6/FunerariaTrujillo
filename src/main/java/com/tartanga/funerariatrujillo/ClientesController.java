@@ -254,9 +254,9 @@ public class ClientesController implements Initializable {
             }
         });
 
-        Thread hiloSecundario = new Thread(taskObtenerClientes);
-        hiloSecundario.setDaemon(true);
-        hiloSecundario.start();
+        Thread hilo = new Thread(taskObtenerClientes);
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
     private void guardarNuevoCliente() {

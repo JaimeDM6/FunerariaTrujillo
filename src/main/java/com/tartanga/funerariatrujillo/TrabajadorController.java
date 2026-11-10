@@ -3,6 +3,8 @@ package com.tartanga.funerariatrujillo;
 import com.tartanga.funerariatrujillo.DAO.TrabajadorDAO;
 import com.tartanga.funerariatrujillo.Objects.Direccion;
 import com.tartanga.funerariatrujillo.Objects.Trabajador;
+import com.tartanga.funerariatrujillo.Objects.Trabajador.Cargo;
+import com.tartanga.funerariatrujillo.Objects.Trabajador.Rol;
 import com.tartanga.funerariatrujillo.Utils.Utils;
 import org.mindrot.jbcrypt.BCrypt;
 import javafx.beans.value.ChangeListener;
@@ -12,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,6 +39,16 @@ import java.util.function.Predicate;
 
 public class TrabajadorController implements Initializable {
 
+    private final TrabajadorDAO trabajadorDAO;
+
+    public TrabajadorController() {
+        this.trabajadorDAO = new TrabajadorDAO();
+    }
+
+    public TrabajadorController(TrabajadorDAO trabajadorDAO) {
+        this.trabajadorDAO = trabajadorDAO;
+    }
+
     @FXML
     private VBox vistaTabla;
     @FXML
@@ -46,12 +59,23 @@ public class TrabajadorController implements Initializable {
     private Region spacerLateral;
     @FXML
     private TableView<Trabajador> tablaTrabajadores;
+
     @FXML
     private TextField txtBuscar;
     @FXML
     private Label lblEstadoTabla;
     @FXML
+    private TableColumn<Trabajador, String> colID;
+    @FXML
     private TableColumn<Trabajador, String> colNombre;
+    @FXML
+    private TableColumn<Trabajador, String> colDNI;
+    @FXML
+    private TableColumn<Trabajador, String> colCorreo;
+    @FXML
+    private TableColumn<Trabajador, Direccion> colDireccion;
+    @FXML
+    private TableColumn<Trabajador, Integer> colNumSS;
     @FXML
     private TableColumn<Trabajador, Trabajador.Cargo> colCargo;
     @FXML
@@ -90,15 +114,16 @@ public class TrabajadorController implements Initializable {
     @FXML
     private TextField txtNuevoSalario;
     @FXML
-    private ComboBox<String> cmbNuevoCargo;
+    private ComboBox<Cargo> cmbNuevoCargo;
     @FXML
     private ComboBox<String> cmbNuevaJornada;
-    @FXML
     private TextField txtNuevoUsuario;
     @FXML
     private PasswordField txtNuevaPassword;
     @FXML
-    private ComboBox<String> cmbNuevoRol;
+    private PasswordField txtNuevaConfirmarPassword;
+    @FXML
+    private ComboBox<Rol> cmbNuevoRol;
 
     @FXML
     private TextField txtDetalleNombre;
@@ -121,11 +146,11 @@ public class TrabajadorController implements Initializable {
     @FXML
     private TextField txtDetalleSalario;
     @FXML
-    private ComboBox<String> cmbDetalleCargo;
+    private ComboBox<Cargo> cmbDetalleCargo;
     @FXML
     private ComboBox<String> cmbDetalleJornada;
     @FXML
-    private ComboBox<String> cmbDetalleRol;
+    private ComboBox<Rol> cmbDetalleRol;
 
     private final ObservableList<Trabajador> masterData = FXCollections.observableArrayList();
     private Trabajador trabajadorSeleccionado;
@@ -136,380 +161,278 @@ public class TrabajadorController implements Initializable {
         panelFormularioNuevo.setVisible(false);
         spacerLateral.setPrefWidth(0);
         spacerLateral.setMinWidth(0);
-        configurarCombos();
-        configurarTabla();
-        configurarBusqueda();
-        configurarBotones();
-        cargarDatos();
-    }
 
-    private void configurarCombos() {
-        ObservableList<String> cargos = FXCollections.observableArrayList(
-                "Tanatopractor", "Agente Funerario", "Recepcionista", "Director", "Conductor");
-        ObservableList<String> jornadas = FXCollections.observableArrayList(
-                "Completa", "Parcial", "Nocturna");
-        cmbNuevoCargo.setItems(cargos);
-        cmbDetalleCargo.setItems(FXCollections.observableArrayList(cargos));
+        ObservableList<String> jornadas = FXCollections.observableArrayList("Completa", "Parcial", "Nocturna");
         cmbNuevaJornada.setItems(jornadas);
-        cmbDetalleJornada.setItems(FXCollections.observableArrayList(jornadas));
-        ObservableList<String> roles = FXCollections.observableArrayList(
-                "Agente Funerario", "Contabilidad", "Tanatopraxia", "Administración");
-        cmbNuevoRol.setItems(roles);
-        cmbDetalleRol.setItems(FXCollections.observableArrayList(roles));
-        cmbNuevoCargo.setValue("Agente Funerario");
-        cmbNuevaJornada.setValue("Completa");
-        cmbNuevoRol.setValue("Agente Funerario");
-    }
+        cmbDetalleJornada.setItems(jornadas);
 
-    private void configurarTabla() {
-        colNombre.setCellValueFactory(new PropertyValueFactory<Trabajador, String>("nombre"));
-        colCargo.setCellValueFactory(new PropertyValueFactory<Trabajador, Trabajador.Cargo>("cargo"));
-    }
+        cmbNuevoCargo.setItems(FXCollections.observableArrayList(Cargo.values()));
+        cmbDetalleCargo.setItems(FXCollections.observableArrayList(Cargo.values()));
 
-    private void configurarBusqueda() {
-        FilteredList<Trabajador> filtrados = new FilteredList<Trabajador>(masterData, new Predicate<Trabajador>() {
+        cmbNuevoRol.setItems(FXCollections.observableArrayList(Rol.values()));
+        cmbDetalleRol.setItems(FXCollections.observableArrayList(Rol.values()));
+
+        btnNuevoTrabajador.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                openForm();
+            }
+        });
+
+        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarNuevoTrabajador();
+            }
+        });
+
+        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                eliminarTrabajadorSeleccionado();
+            }
+        });
+
+        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                closeForm();
+            }
+        });
+
+        FilteredList<Trabajador> filteredData = new FilteredList<>(masterData, new Predicate<Trabajador>() {
             @Override
             public boolean test(Trabajador trabajador) {
                 return true;
             }
         });
+
         txtBuscar.textProperty().addListener(new ChangeListener<String>() {
             @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String nuevoValor) {
-                filtrados.setPredicate(new Predicate<Trabajador>() {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                filteredData.setPredicate(new Predicate<Trabajador>() {
                     @Override
                     public boolean test(Trabajador trabajador) {
-                        if (nuevoValor == null || nuevoValor.trim().isEmpty()) {
+                        if (newValue == null || newValue.trim().isEmpty()) {
                             return true;
                         }
-                        String filtro = nuevoValor.toLowerCase();
-                        return trabajador.getNombre().toLowerCase().contains(filtro)
-                                || trabajador.getApellidos().toLowerCase().contains(filtro);
+                        String lowerCaseFilter = newValue.toLowerCase();
+                        if (trabajador.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        } else if (trabajador.getCargo() != null && trabajador.getCargo().toString().toLowerCase().contains(lowerCaseFilter)) {
+                            return true;
+                        }
+                        return false;
                     }
                 });
-                lblEstadoTabla.setText(filtrados.size() + " trabajadores");
+                lblEstadoTabla.setText(filteredData.size() + " trabajadores");
             }
         });
-        SortedList<Trabajador> ordenados = new SortedList<Trabajador>(filtrados);
-        ordenados.comparatorProperty().bind(tablaTrabajadores.comparatorProperty());
-        tablaTrabajadores.setItems(ordenados);
-    }
 
-    private void configurarBotones() {
-        btnNuevoTrabajador.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Utils.openForm(panelFormularioNuevo, spacerLateral);
-            }
-        });
-        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Utils.closeForm(panelFormularioNuevo, spacerLateral);
-            }
-        });
-        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                guardarNuevo();
-            }
-        });
-        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                cambiarEdicion(true);
-            }
-        });
-        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                guardarEdicion();
-            }
-        });
-        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                eliminarSeleccionado();
-            }
-        });
-        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                volverListado();
-            }
-        });
-        tablaTrabajadores.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Trabajador seleccionado = tablaTrabajadores.getSelectionModel().getSelectedItem();
-                if (seleccionado != null) {
-                    mostrarDetalles(seleccionado);
-                }
-            }
-        });
+        SortedList<Trabajador> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(tablaTrabajadores.comparatorProperty());
+        tablaTrabajadores.setItems(sortedData);
+
+        colID.setReorderable(false);
+        colNombre.setReorderable(false);
+        colDNI.setReorderable(false);
+        colCorreo.setReorderable(false);
+        colDireccion.setReorderable(false);
+        colNumSS.setReorderable(false);
+        colCargo.setReorderable(false);
+
+        colID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombreCompleto"));
+        colDNI.setCellValueFactory(new PropertyValueFactory<>("dni"));
+        colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo_electronico"));
+        colDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        colNumSS.setCellValueFactory(new PropertyValueFactory<>("numero_ss"));
+        colCargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
+
+        Utils.columnID(colID);
+
+        cargarDatos();
+        configurarSeleccionDeTabla();
+        configurarModoEdicion();
     }
 
     private void cargarDatos() {
-        Task<List<Trabajador>> tarea = new Task<List<Trabajador>>() {
+        Task<List<Trabajador>> taskObtenerTrabajadores = new Task<List<Trabajador>>() {
             @Override
             protected List<Trabajador> call() {
-                return new TrabajadorDAO().obtenerTrabajadores();
+                return trabajadorDAO.obtenerTrabajadores();
             }
         };
-        tarea.setOnSucceeded(new EventHandler<javafx.concurrent.WorkerStateEvent>() {
+
+        taskObtenerTrabajadores.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
-            public void handle(javafx.concurrent.WorkerStateEvent event) {
-                masterData.setAll(tarea.getValue());
+            public void handle(WorkerStateEvent event) {
+                masterData.setAll(taskObtenerTrabajadores.getValue());
                 tablaTrabajadores.sort();
                 lblEstadoTabla.setText(masterData.size() + " trabajadores");
             }
         });
-        tarea.setOnFailed(new EventHandler<javafx.concurrent.WorkerStateEvent>() {
+
+        taskObtenerTrabajadores.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
-            public void handle(javafx.concurrent.WorkerStateEvent event) {
+            public void handle(WorkerStateEvent event) {
                 lblEstadoTabla.setText("Error de conexión");
-                mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión", "No se han podido cargar los trabajadores.");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de conexión");
+                alert.setHeaderText(null);
+                alert.setContentText("No se pudo cargar la lista de trabajadores desde la base de datos.");
+                alert.showAndWait();
             }
         });
-        Thread hilo = new Thread(tarea);
+
+        Thread hilo = new Thread(taskObtenerTrabajadores);
         hilo.setDaemon(true);
         hilo.start();
     }
 
-    private void guardarNuevo() {
-        if (!validarCampos(txtNuevoNombre, txtNuevoApellidos, txtNuevoDni, txtNuevoCorreo,
-                txtNuevoCalle, txtNuevoCiudad, txtNuevoCP, txtNuevoSS, txtNuevoIban, txtNuevoSalario,
-                cmbNuevoCargo, cmbNuevaJornada)) {
+    private void guardarNuevoTrabajador() {
+        txtNuevoNombre.getStyleClass().remove("error");
+        txtNuevoApellidos.getStyleClass().remove("error");
+        txtNuevoDni.getStyleClass().remove("error");
+        txtNuevoCorreo.getStyleClass().remove("error");
+        txtNuevoCalle.getStyleClass().remove("error");
+        txtNuevoCiudad.getStyleClass().remove("error");
+        txtNuevoCP.getStyleClass().remove("error");
+        txtNuevoSS.getStyleClass().remove("error");
+        txtNuevoIban.getStyleClass().remove("error");
+        txtNuevoSalario.getStyleClass().remove("error");
+        txtNuevoUsuario.getStyleClass().remove("error");
+        txtNuevaPassword.getStyleClass().remove("error");
+        cmbNuevoCargo.getStyleClass().remove("error");
+        cmbNuevaJornada.getStyleClass().remove("error");
+        cmbNuevoRol.getStyleClass().remove("error");
+
+        boolean hayError = false;
+
+        if (txtNuevoNombre.getText().trim().isEmpty()) {
+            txtNuevoNombre.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoApellidos.getText().trim().isEmpty()) {
+            txtNuevoApellidos.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoDni.getText().trim().isEmpty()) {
+            txtNuevoDni.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoCorreo.getText().trim().isEmpty()) {
+            txtNuevoCorreo.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoCalle.getText().trim().isEmpty()) {
+            txtNuevoCalle.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoCiudad.getText().trim().isEmpty()) {
+            txtNuevoCiudad.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoCP.getText().trim().isEmpty()) {
+            txtNuevoCP.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoSS.getText().trim().isEmpty()) {
+            txtNuevoSS.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoIban.getText().trim().isEmpty()) {
+            txtNuevoIban.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoSalario.getText().trim().isEmpty()) {
+            txtNuevoSalario.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevoUsuario.getText().trim().isEmpty()) {
+            txtNuevoUsuario.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtNuevaPassword.getText().trim().isEmpty() || txtNuevaPassword.getText().trim().length() < 8) {
+            txtNuevaPassword.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbNuevoCargo.getSelectionModel().getSelectedIndex() == -1) {
+            cmbNuevoCargo.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbNuevaJornada.getSelectionModel().getSelectedIndex() == -1) {
+            cmbNuevaJornada.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbNuevoRol.getSelectionModel().getSelectedIndex() == -1) {
+            cmbNuevoRol.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Faltan datos");
+            alert.setHeaderText(null);
+            alert.setContentText("Todos los campos son obligatorios y la contraseña debe tener al menos 8 caracteres.");
+            alert.showAndWait();
             return;
         }
-        if (txtNuevoUsuario.getText().trim().isEmpty() || txtNuevaPassword.getText().length() < 8
-                || cmbNuevoRol.getValue() == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Credenciales incompletas",
-                    "El usuario, una contraseña de al menos 8 caracteres y el rol son obligatorios.");
+
+        Trabajador nuevoTrabajador = new Trabajador();
+        nuevoTrabajador.setNombre(txtNuevoNombre.getText().trim());
+        nuevoTrabajador.setApellidos(txtNuevoApellidos.getText().trim());
+        nuevoTrabajador.setDni(txtNuevoDni.getText().trim());
+        nuevoTrabajador.setCorreo_electronico(txtNuevoCorreo.getText().trim());
+        nuevoTrabajador.setNumero_ss(txtNuevoSS.getText().trim());
+        nuevoTrabajador.setIban(txtNuevoIban.getText().trim());
+        nuevoTrabajador.setUsuario(txtNuevoUsuario.getText().trim());
+
+        String hashPass = BCrypt.hashpw(txtNuevaPassword.getText(), BCrypt.gensalt(12));
+        nuevoTrabajador.setPassword(hashPass);
+
+        try {
+            nuevoTrabajador.setSalario(Double.parseDouble(txtNuevoSalario.getText().trim()));
+        } catch (NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Formato incorrecto");
+            alert.setHeaderText(null);
+            alert.setContentText("El salario debe ser un valor numérico.");
+            alert.showAndWait();
             return;
         }
+
+        nuevoTrabajador.setCargo(cmbNuevoCargo.getSelectionModel().getSelectedItem());
+        nuevoTrabajador.setTipo_jornada(cmbNuevaJornada.getSelectionModel().getSelectedItem());
+        nuevoTrabajador.setRol(cmbNuevoRol.getSelectionModel().getSelectedItem());
+
+        Direccion dir = new Direccion();
+        dir.setCalle(txtNuevoCalle.getText().trim());
+        dir.setCiudad(txtNuevoCiudad.getText().trim());
         try {
-            Trabajador trabajador = crearTrabajador(txtNuevoNombre, txtNuevoApellidos, txtNuevoDni,
-                    txtNuevoCorreo, txtNuevoCalle, txtNuevoCiudad, txtNuevoCP, txtNuevoSS,
-                    txtNuevoIban, txtNuevoSalario, cmbNuevoCargo, cmbNuevaJornada);
-            trabajador.setUsuario(txtNuevoUsuario.getText().trim());
-            trabajador.setPassword(BCrypt.hashpw(txtNuevaPassword.getText(), BCrypt.gensalt(12)));
-            trabajador.setRol(convertirRol(cmbNuevoRol.getValue()));
-            if (new TrabajadorDAO().insertarTrabajador(trabajador)) {
-                masterData.add(trabajador);
-                lblEstadoTabla.setText(masterData.size() + " trabajadores");
-                limpiarNuevo();
-                Utils.closeForm(panelFormularioNuevo, spacerLateral);
-            } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se ha podido guardar el trabajador.");
-            }
-        } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Salario incorrecto", "El salario debe ser un número no negativo.");
+            dir.setCodigoPostal(txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
+        } catch (NumberFormatException ex) {
+            dir.setCodigoPostal(0);
         }
-    }
+        nuevoTrabajador.setDireccion(dir);
 
-    private void guardarEdicion() {
-        if (trabajadorSeleccionado == null || !validarCampos(txtDetalleNombre, txtDetalleApellidos, txtDetalleDni,
-                txtDetalleCorreo, txtDetalleCalle, txtDetalleCiudad, txtDetalleCP, txtDetalleSS,
-                txtDetalleIban, txtDetalleSalario, cmbDetalleCargo, cmbDetalleJornada)) {
-            return;
-        }
-        try {
-            actualizarTrabajadorDesdeCampos();
-            if (new TrabajadorDAO().actualizarTrabajador(trabajadorSeleccionado)) {
-                tablaTrabajadores.refresh();
-                cambiarEdicion(false);
-            } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se ha podido actualizar el trabajador.");
-            }
-        } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Salario incorrecto", "El salario debe ser un número no negativo.");
-        }
-    }
+        if (trabajadorDAO.insertarTrabajador(nuevoTrabajador)) {
+            masterData.add(nuevoTrabajador);
+            tablaTrabajadores.sort();
+            lblEstadoTabla.setText(masterData.size() + " trabajadores");
 
-    private boolean validarCampos(TextField nombre, TextField apellidos, TextField dni, TextField correo,
-            TextField calle, TextField ciudad, TextField cp, TextField ss, TextField iban, TextField salario,
-            ComboBox<String> cargo, ComboBox<String> jornada) {
-        if (nombre.getText().trim().isEmpty() || apellidos.getText().trim().isEmpty()
-                || dni.getText().trim().isEmpty() || correo.getText().trim().isEmpty()
-                || calle.getText().trim().isEmpty() || ciudad.getText().trim().isEmpty()
-                || cp.getText().trim().isEmpty() || ss.getText().trim().isEmpty()
-                || iban.getText().trim().isEmpty() || salario.getText().trim().isEmpty()
-                || cargo.getValue() == null || jornada.getValue() == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos", "Todos los campos marcados con * son obligatorios.");
-            return false;
-        }
-        if (!dni.getText().trim().matches("[0-9]{8}[A-Z]")) {
-            mostrarAlerta(Alert.AlertType.WARNING, "DNI incorrecto", "El DNI debe tener 8 números y una letra mayúscula.");
-            return false;
-        }
-        if (!correo.getText().trim().matches("^.+@.+\\..+$")) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Correo incorrecto", "Introduce un correo electrónico válido.");
-            return false;
-        }
-        if (!cp.getText().trim().matches("[0-9]{5}")) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Código postal incorrecto", "El código postal debe tener 5 cifras.");
-            return false;
-        }
-        if (!iban.getText().trim().matches("[A-Z]{2}[0-9]{22}")) {
-            mostrarAlerta(Alert.AlertType.WARNING, "IBAN incorrecto", "El IBAN debe tener dos letras y 22 números.");
-            return false;
-        }
-        try {
-            if (Double.parseDouble(salario.getText().trim().replace(",", ".")) < 0) {
-                mostrarAlerta(Alert.AlertType.WARNING, "Salario incorrecto", "El salario no puede ser negativo.");
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Salario incorrecto", "El salario debe ser numérico.");
-            return false;
-        }
-        return true;
-    }
-
-    private Trabajador crearTrabajador(TextField nombre, TextField apellidos, TextField dni, TextField correo,
-            TextField calle, TextField ciudad, TextField cp, TextField ss, TextField iban, TextField salario,
-            ComboBox<String> cargo, ComboBox<String> jornada) {
-        Trabajador trabajador = new Trabajador();
-        trabajador.setNombre(nombre.getText().trim());
-        trabajador.setApellidos(apellidos.getText().trim());
-        trabajador.setDni(dni.getText().trim());
-        trabajador.setCorreo_electronico(correo.getText().trim());
-        trabajador.setNumero_ss(ss.getText().trim());
-        trabajador.setIban(iban.getText().trim());
-        trabajador.setSalario(Double.valueOf(salario.getText().trim().replace(",", ".")));
-        trabajador.setCargo(convertirCargo(cargo.getValue()));
-        trabajador.setTipo_jornada(jornada.getValue());
-        trabajador.setDireccion(crearDireccion(calle, ciudad, cp));
-        return trabajador;
-    }
-
-    private Direccion crearDireccion(TextField calle, TextField ciudad, TextField cp) {
-        return new Direccion(calle.getText().trim(), ciudad.getText().trim(), Integer.parseInt(cp.getText().trim()));
-    }
-
-    private void actualizarTrabajadorDesdeCampos() {
-        Trabajador actualizado = crearTrabajador(txtDetalleNombre, txtDetalleApellidos, txtDetalleDni,
-                txtDetalleCorreo, txtDetalleCalle, txtDetalleCiudad, txtDetalleCP, txtDetalleSS,
-                txtDetalleIban, txtDetalleSalario, cmbDetalleCargo, cmbDetalleJornada);
-        trabajadorSeleccionado.setNombre(actualizado.getNombre());
-        trabajadorSeleccionado.setApellidos(actualizado.getApellidos());
-        trabajadorSeleccionado.setDni(actualizado.getDni());
-        trabajadorSeleccionado.setCorreo_electronico(actualizado.getCorreo_electronico());
-        trabajadorSeleccionado.setDireccion(actualizado.getDireccion());
-        trabajadorSeleccionado.setNumero_ss(actualizado.getNumero_ss());
-        trabajadorSeleccionado.setIban(actualizado.getIban());
-        trabajadorSeleccionado.setCargo(actualizado.getCargo());
-        trabajadorSeleccionado.setRol(convertirRol(cmbDetalleRol.getValue()));
-        trabajadorSeleccionado.setSalario(actualizado.getSalario());
-        trabajadorSeleccionado.setTipo_jornada(actualizado.getTipo_jornada());
-    }
-
-    private Trabajador.Cargo convertirCargo(String valor) {
-        if ("Tanatopractor".equals(valor)) {
-            return Trabajador.Cargo.TANATOPRACTOR;
-        }
-        if ("Agente Funerario".equals(valor)) {
-            return Trabajador.Cargo.AGENTE_FUNERARIO;
-        }
-        if ("Recepcionista".equals(valor)) {
-            return Trabajador.Cargo.RECEPCIONISTA;
-        }
-        if ("Director".equals(valor)) {
-            return Trabajador.Cargo.DIRECTOR;
-        }
-        return Trabajador.Cargo.CONDUCTOR;
-    }
-
-    private Trabajador.Rol convertirRol(String valor) {
-        for (Trabajador.Rol rol : Trabajador.Rol.values()) {
-            if (rol.toString().equals(valor)) {
-                return rol;
-            }
-        }
-        return Trabajador.Rol.AGENTE_FUNERARIO;
-    }
-
-    private void mostrarDetalles(Trabajador trabajador) {
-        trabajadorSeleccionado = trabajador;
-        cargarCamposDetalle(trabajador);
-        vistaTabla.setVisible(false);
-        vistaTabla.setManaged(false);
-        vistaDetalles.setVisible(true);
-        vistaDetalles.setManaged(true);
-        tablaTrabajadores.getSelectionModel().clearSelection();
-        cambiarEdicion(false);
-    }
-
-    private void cargarCamposDetalle(Trabajador trabajador) {
-        txtDetalleNombre.setText(trabajador.getNombre());
-        txtDetalleApellidos.setText(trabajador.getApellidos());
-        txtDetalleDni.setText(trabajador.getDni());
-        txtDetalleCorreo.setText(trabajador.getCorreo_electronico());
-        txtDetalleSS.setText(trabajador.getNumero_ss());
-        txtDetalleIban.setText(trabajador.getIban());
-        txtDetalleSalario.setText(String.valueOf(trabajador.getSalario()));
-        cmbDetalleCargo.setValue(obtenerNombreCargo(trabajador.getCargo()));
-        cmbDetalleJornada.setValue(trabajador.getTipo_jornada());
-        cmbDetalleRol.setValue(trabajador.getRol().toString());
-        if (trabajador.getDireccion() != null) {
-            txtDetalleCalle.setText(trabajador.getDireccion().getCalle());
-            txtDetalleCiudad.setText(trabajador.getDireccion().getCiudad());
-            txtDetalleCP.setText(String.format("%05d", trabajador.getDireccion().getCodigoPostal()));
-        }
-    }
-
-    private String obtenerNombreCargo(Trabajador.Cargo cargo) {
-        if (cargo == Trabajador.Cargo.TANATOPRACTOR) {
-            return "Tanatopractor";
-        }
-        if (cargo == Trabajador.Cargo.AGENTE_FUNERARIO) {
-            return "Agente Funerario";
-        }
-        if (cargo == Trabajador.Cargo.RECEPCIONISTA) {
-            return "Recepcionista";
-        }
-        if (cargo == Trabajador.Cargo.DIRECTOR) {
-            return "Director";
-        }
-        return "Conductor";
-    }
-
-    private void cambiarEdicion(boolean editable) {
-        TextField[] campos = {txtDetalleNombre, txtDetalleApellidos, txtDetalleDni, txtDetalleCorreo,
-            txtDetalleCalle, txtDetalleCiudad, txtDetalleCP, txtDetalleSS, txtDetalleIban, txtDetalleSalario};
-        for (TextField campo : campos) {
-            campo.setEditable(editable);
-        }
-        cmbDetalleCargo.setDisable(!editable);
-        cmbDetalleJornada.setDisable(!editable);
-        cmbDetalleRol.setDisable(!editable);
-        btnEditar.setVisible(!editable);
-        btnEditar.setManaged(!editable);
-        btnEliminar.setVisible(!editable);
-        btnEliminar.setManaged(!editable);
-        btnGuardarEdicion.setVisible(editable);
-        btnGuardarEdicion.setManaged(editable);
-    }
-
-    private void eliminarSeleccionado() {
-        if (trabajadorSeleccionado != null && new TrabajadorDAO().eliminarTrabajador(trabajadorSeleccionado.getId())) {
-            masterData.remove(trabajadorSeleccionado);
-            volverListado();
+            limpiarFormularioNuevo();
+            closeForm();
         } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se ha podido eliminar el trabajador.");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Hubo un problema al guardar el trabajador en la base de datos.");
+            alert.showAndWait();
         }
     }
 
-    private void volverListado() {
-        vistaDetalles.setVisible(false);
-        vistaDetalles.setManaged(false);
-        vistaTabla.setVisible(true);
-        vistaTabla.setManaged(true);
-        trabajadorSeleccionado = null;
-    }
-
-    private void limpiarNuevo() {
+    private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevoApellidos.clear();
         txtNuevoDni.clear();
@@ -522,16 +445,299 @@ public class TrabajadorController implements Initializable {
         txtNuevoSalario.clear();
         txtNuevoUsuario.clear();
         txtNuevaPassword.clear();
-        cmbNuevoCargo.setValue("Agente Funerario");
-        cmbNuevaJornada.setValue("Completa");
-        cmbNuevoRol.setValue("Agente Funerario");
+        cmbNuevoCargo.getSelectionModel().clearSelection();
+        cmbNuevaJornada.getSelectionModel().clearSelection();
+        cmbNuevoRol.getSelectionModel().clearSelection();
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    private void eliminarTrabajadorSeleccionado() {
+        if (trabajadorSeleccionado != null) {
+            if (trabajadorDAO.eliminarTrabajador(trabajadorSeleccionado.getId())) {
+                masterData.remove(trabajadorSeleccionado);
+                lblEstadoTabla.setText(masterData.size() + " trabajadores");
+
+                vistaDetalles.setVisible(false);
+                vistaDetalles.setManaged(false);
+                vistaTabla.setVisible(true);
+                vistaTabla.setManaged(true);
+
+                trabajadorSeleccionado = null;
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al eliminar el trabajador de la base de datos.");
+                alert.showAndWait();
+            }
+        }
+    }
+
+    private void openForm() {
+        Utils.openForm(panelFormularioNuevo, spacerLateral);
+    }
+
+    private void closeForm() {
+        Utils.closeForm(panelFormularioNuevo, spacerLateral);
+    }
+
+    private void configurarSeleccionDeTabla() {
+        tablaTrabajadores.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Trabajador newSelection = tablaTrabajadores.getSelectionModel().getSelectedItem();
+
+                if (newSelection != null) {
+                    trabajadorSeleccionado = newSelection;
+
+                    try {
+                        txtDetalleNombre.setText(newSelection.getNombre());
+                        txtDetalleApellidos.setText(newSelection.getApellidos());
+                        txtDetalleDni.setText(newSelection.getDni());
+                        txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
+
+                        if (newSelection.getDireccion() != null) {
+                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null ? newSelection.getDireccion().getCalle() : "");
+                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null ? newSelection.getDireccion().getCiudad() : "");
+                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? "" : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
+                        } else {
+                            txtDetalleCalle.setText("");
+                            txtDetalleCiudad.setText("");
+                            txtDetalleCP.setText("");
+                        }
+
+                        txtDetalleSS.setText(newSelection.getNumero_ss());
+                        txtDetalleIban.setText(newSelection.getIban());
+                        txtDetalleSalario.setText("" + newSelection.getSalario());
+                        cmbDetalleCargo.getSelectionModel().select(newSelection.getCargo());
+                        cmbDetalleJornada.getSelectionModel().select(newSelection.getTipo_jornada());
+                        cmbDetalleRol.getSelectionModel().select(newSelection.getRol());
+
+                        panelFormularioNuevo.setTranslateX(400);
+                        panelFormularioNuevo.setVisible(false);
+                        spacerLateral.setPrefWidth(0);
+                        spacerLateral.setMinWidth(0);
+                        vistaTabla.setVisible(false);
+                        vistaTabla.setManaged(false);
+                        vistaDetalles.setVisible(true);
+                        vistaDetalles.setManaged(true);
+                        tablaTrabajadores.getSelectionModel().clearSelection();
+
+                    } catch (Exception ex) {
+                        System.err.println("Error al cargar la ficha: " + ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                vistaDetalles.setVisible(false);
+                vistaDetalles.setManaged(false);
+
+                vistaTabla.setVisible(true);
+                vistaTabla.setManaged(true);
+
+                bloquearCamposEdicion();
+            }
+        });
+    }
+
+    private void configurarModoEdicion() {
+        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                txtDetalleNombre.setEditable(true);
+                txtDetalleApellidos.setEditable(true);
+                txtDetalleDni.setEditable(true);
+                txtDetalleCorreo.setEditable(true);
+                txtDetalleCalle.setEditable(true);
+                txtDetalleCiudad.setEditable(true);
+                txtDetalleCP.setEditable(true);
+                txtDetalleSS.setEditable(true);
+                txtDetalleIban.setEditable(true);
+                txtDetalleSalario.setEditable(true);
+                cmbDetalleCargo.setDisable(false);
+                cmbDetalleJornada.setDisable(false);
+                cmbDetalleRol.setDisable(false);
+
+                txtDetalleNombre.getStyleClass().remove("error");
+                txtDetalleApellidos.getStyleClass().remove("error");
+                txtDetalleDni.getStyleClass().remove("error");
+                txtDetalleCalle.getStyleClass().remove("error");
+                txtDetalleCiudad.getStyleClass().remove("error");
+                txtDetalleCP.getStyleClass().remove("error");
+                txtDetalleSS.getStyleClass().remove("error");
+                txtDetalleIban.getStyleClass().remove("error");
+                txtDetalleSalario.getStyleClass().remove("error");
+                cmbDetalleCargo.getStyleClass().remove("error");
+                cmbDetalleJornada.getStyleClass().remove("error");
+                cmbDetalleRol.getStyleClass().remove("error");
+
+                btnEditar.setVisible(false);
+                btnEditar.setManaged(false);
+                btnEliminar.setVisible(false);
+                btnEliminar.setManaged(false);
+                btnGuardarEdicion.setVisible(true);
+                btnGuardarEdicion.setManaged(true);
+            }
+        });
+
+        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                txtDetalleNombre.getStyleClass().remove("error");
+                txtDetalleApellidos.getStyleClass().remove("error");
+                txtDetalleDni.getStyleClass().remove("error");
+                txtDetalleCorreo.getStyleClass().remove("error");
+                txtDetalleCalle.getStyleClass().remove("error");
+                txtDetalleCiudad.getStyleClass().remove("error");
+                txtDetalleCP.getStyleClass().remove("error");
+                txtDetalleSS.getStyleClass().remove("error");
+                txtDetalleIban.getStyleClass().remove("error");
+                txtDetalleSalario.getStyleClass().remove("error");
+                cmbDetalleCargo.getStyleClass().remove("error");
+                cmbDetalleJornada.getStyleClass().remove("error");
+                cmbDetalleRol.getStyleClass().remove("error");
+
+                boolean hayError = false;
+
+                if (txtDetalleNombre.getText().trim().isEmpty()) {
+                    txtDetalleNombre.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleApellidos.getText().trim().isEmpty()) {
+                    txtDetalleApellidos.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleDni.getText().trim().isEmpty()) {
+                    txtDetalleDni.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleCorreo.getText().trim().isEmpty()) {
+                    txtDetalleCorreo.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleCalle.getText().trim().isEmpty()) {
+                    txtDetalleCalle.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleCiudad.getText().trim().isEmpty()) {
+                    txtDetalleCiudad.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleCP.getText().trim().isEmpty()) {
+                    txtDetalleCP.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleSS.getText().trim().isEmpty()) {
+                    txtDetalleSS.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleIban.getText().trim().isEmpty()) {
+                    txtDetalleIban.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (txtDetalleSalario.getText().trim().isEmpty()) {
+                    txtDetalleSalario.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (cmbDetalleCargo.getSelectionModel().getSelectedIndex() == -1) {
+                    cmbDetalleCargo.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (cmbDetalleJornada.getSelectionModel().getSelectedIndex() == -1) {
+                    cmbDetalleJornada.getStyleClass().add("error");
+                    hayError = true;
+                }
+                if (cmbDetalleRol.getSelectionModel().getSelectedIndex() == -1) {
+                    cmbDetalleRol.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (hayError) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Datos incompletos");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No puedes dejar en blanco los campos.");
+                    alert.showAndWait();
+                    return;
+                }
+
+                if (trabajadorSeleccionado != null) {
+                    trabajadorSeleccionado.setNombre(txtDetalleNombre.getText().trim());
+                    trabajadorSeleccionado.setApellidos(txtDetalleApellidos.getText().trim());
+                    trabajadorSeleccionado.setDni(txtDetalleDni.getText().trim());
+                    trabajadorSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText().trim());
+
+                    Direccion dir = trabajadorSeleccionado.getDireccion();
+                    if (dir == null) {
+                        dir = new Direccion();
+                    }
+                    dir.setCalle(txtDetalleCalle.getText().trim());
+                    dir.setCiudad(txtDetalleCiudad.getText().trim());
+                    try {
+                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtDetalleCP.getText().trim()));
+                    } catch (NumberFormatException ex) {
+                        dir.setCodigoPostal(0);
+                    }
+                    trabajadorSeleccionado.setDireccion(dir);
+
+                    trabajadorSeleccionado.setNumero_ss(txtDetalleSS.getText().trim());
+                    trabajadorSeleccionado.setIban(txtDetalleIban.getText().trim());
+
+                    try {
+                        trabajadorSeleccionado.setSalario(Double.valueOf(txtDetalleSalario.getText().trim()));
+                    } catch (NumberFormatException ex) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Formato incorrecto");
+                        alert.setHeaderText(null);
+                        alert.setContentText("El salario debe ser un valor numérico.");
+                        alert.showAndWait();
+                        return;
+                    }
+
+                    trabajadorSeleccionado.setCargo(cmbDetalleCargo.getSelectionModel().getSelectedItem());
+                    trabajadorSeleccionado.setTipo_jornada(cmbDetalleJornada.getSelectionModel().getSelectedItem());
+                    trabajadorSeleccionado.setRol(cmbDetalleRol.getSelectionModel().getSelectedItem());
+
+                    if (trabajadorDAO.actualizarTrabajador(trabajadorSeleccionado)) {
+                        tablaTrabajadores.refresh();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                        alert.showAndWait();
+                        return;
+                    }
+                }
+
+                bloquearCamposEdicion();
+            }
+        });
+    }
+
+    private void bloquearCamposEdicion() {
+        txtDetalleNombre.setEditable(false);
+        txtDetalleApellidos.setEditable(false);
+        txtDetalleDni.setEditable(false);
+        txtDetalleCorreo.setEditable(false);
+        txtDetalleCalle.setEditable(false);
+        txtDetalleCiudad.setEditable(false);
+        txtDetalleCP.setEditable(false);
+        txtDetalleSS.setEditable(false);
+        txtDetalleIban.setEditable(false);
+        txtDetalleSalario.setEditable(false);
+        cmbDetalleCargo.setDisable(true);
+        cmbDetalleJornada.setDisable(true);
+        cmbDetalleRol.setDisable(true);
+
+        btnGuardarEdicion.setVisible(false);
+        btnGuardarEdicion.setManaged(false);
+        btnEditar.setVisible(true);
+        btnEditar.setManaged(true);
+        btnEliminar.setVisible(true);
+        btnEliminar.setManaged(true);
     }
 }
