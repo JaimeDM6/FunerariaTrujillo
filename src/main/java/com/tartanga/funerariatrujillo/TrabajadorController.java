@@ -104,7 +104,7 @@ public class TrabajadorController implements Initializable {
     @FXML
     private TextField txtNuevoCalle;
     @FXML
-    private TextField txtNuevoCiudad;
+    private TextField txtNuevaCiudad;
     @FXML
     private TextField txtNuevoCP;
     @FXML
@@ -117,11 +117,12 @@ public class TrabajadorController implements Initializable {
     private ComboBox<Cargo> cmbNuevoCargo;
     @FXML
     private ComboBox<String> cmbNuevaJornada;
-    private TextField txtNuevoUsuario;
+
     @FXML
     private PasswordField txtNuevaPassword;
     @FXML
     private PasswordField txtNuevaConfirmarPassword;
+
     @FXML
     private ComboBox<Rol> cmbNuevoRol;
 
@@ -290,19 +291,47 @@ public class TrabajadorController implements Initializable {
         hilo.start();
     }
 
+    private String generarUsuario(String nombre, String apellidos) {
+        String cleanNombre = java.text.Normalizer.normalize(nombre.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("\\s+", "");
+
+        String cleanApellido = java.text.Normalizer.normalize(apellidos.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .split("\\s+")[0];
+
+        String usuarioGenerado = "";
+
+        for (int i = 1; i <= cleanNombre.length(); i++) {
+            usuarioGenerado = cleanNombre.substring(0, i) + "." + cleanApellido;
+            if (!trabajadorDAO.existeUsuario(usuarioGenerado)) {
+                return usuarioGenerado;
+            }
+        }
+
+        int contador = 1;
+        String fallback = usuarioGenerado;
+        while (trabajadorDAO.existeUsuario(fallback)) {
+            fallback = usuarioGenerado + contador;
+            contador++;
+        }
+
+        return fallback;
+    }
+
     private void guardarNuevoTrabajador() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevoApellidos.getStyleClass().remove("error");
         txtNuevoDni.getStyleClass().remove("error");
         txtNuevoCorreo.getStyleClass().remove("error");
         txtNuevoCalle.getStyleClass().remove("error");
-        txtNuevoCiudad.getStyleClass().remove("error");
+        txtNuevaCiudad.getStyleClass().remove("error");
         txtNuevoCP.getStyleClass().remove("error");
         txtNuevoSS.getStyleClass().remove("error");
         txtNuevoIban.getStyleClass().remove("error");
         txtNuevoSalario.getStyleClass().remove("error");
-        txtNuevoUsuario.getStyleClass().remove("error");
         txtNuevaPassword.getStyleClass().remove("error");
+        txtNuevaConfirmarPassword.getStyleClass().remove("error");
         cmbNuevoCargo.getStyleClass().remove("error");
         cmbNuevaJornada.getStyleClass().remove("error");
         cmbNuevoRol.getStyleClass().remove("error");
@@ -329,8 +358,8 @@ public class TrabajadorController implements Initializable {
             txtNuevoCalle.getStyleClass().add("error");
             hayError = true;
         }
-        if (txtNuevoCiudad.getText().trim().isEmpty()) {
-            txtNuevoCiudad.getStyleClass().add("error");
+        if (txtNuevaCiudad.getText().trim().isEmpty()) {
+            txtNuevaCiudad.getStyleClass().add("error");
             hayError = true;
         }
         if (txtNuevoCP.getText().trim().isEmpty()) {
@@ -349,14 +378,25 @@ public class TrabajadorController implements Initializable {
             txtNuevoSalario.getStyleClass().add("error");
             hayError = true;
         }
-        if (txtNuevoUsuario.getText().trim().isEmpty()) {
-            txtNuevoUsuario.getStyleClass().add("error");
-            hayError = true;
-        }
-        if (txtNuevaPassword.getText().trim().isEmpty() || txtNuevaPassword.getText().trim().length() < 8) {
+
+        String pass = txtNuevaPassword.getText().trim();
+        String confirm = txtNuevaConfirmarPassword.getText().trim();
+
+        if (pass.isEmpty() || pass.length() < 8) {
             txtNuevaPassword.getStyleClass().add("error");
             hayError = true;
+        } else if (!pass.equals(confirm)) {
+            txtNuevaPassword.getStyleClass().add("error");
+            txtNuevaConfirmarPassword.getStyleClass().add("error");
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Contraseñas no coinciden");
+            alert.setHeaderText(null);
+            alert.setContentText("Las contraseñas introducidas no son iguales.");
+            alert.showAndWait();
+            return;
         }
+
         if (cmbNuevoCargo.getSelectionModel().getSelectedIndex() == -1) {
             cmbNuevoCargo.getStyleClass().add("error");
             hayError = true;
@@ -386,13 +426,15 @@ public class TrabajadorController implements Initializable {
         nuevoTrabajador.setCorreo_electronico(txtNuevoCorreo.getText().trim());
         nuevoTrabajador.setNumero_ss(txtNuevoSS.getText().trim());
         nuevoTrabajador.setIban(txtNuevoIban.getText().trim());
-        nuevoTrabajador.setUsuario(txtNuevoUsuario.getText().trim());
 
-        String hashPass = BCrypt.hashpw(txtNuevaPassword.getText(), BCrypt.gensalt(12));
+        String usuario = generarUsuario(txtNuevoNombre.getText(), txtNuevoApellidos.getText());
+        nuevoTrabajador.setUsuario(usuario);
+
+        String hashPass = BCrypt.hashpw(pass, BCrypt.gensalt(12));
         nuevoTrabajador.setPassword(hashPass);
 
         try {
-            nuevoTrabajador.setSalario(Double.parseDouble(txtNuevoSalario.getText().trim()));
+            nuevoTrabajador.setSalario(Double.valueOf(txtNuevoSalario.getText().trim()));
         } catch (NumberFormatException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Formato incorrecto");
@@ -408,7 +450,7 @@ public class TrabajadorController implements Initializable {
 
         Direccion dir = new Direccion();
         dir.setCalle(txtNuevoCalle.getText().trim());
-        dir.setCiudad(txtNuevoCiudad.getText().trim());
+        dir.setCiudad(txtNuevaCiudad.getText().trim());
         try {
             dir.setCodigoPostal(txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
         } catch (NumberFormatException ex) {
@@ -438,13 +480,13 @@ public class TrabajadorController implements Initializable {
         txtNuevoDni.clear();
         txtNuevoCorreo.clear();
         txtNuevoCalle.clear();
-        txtNuevoCiudad.clear();
+        txtNuevaCiudad.clear();
         txtNuevoCP.clear();
         txtNuevoSS.clear();
         txtNuevoIban.clear();
         txtNuevoSalario.clear();
-        txtNuevoUsuario.clear();
         txtNuevaPassword.clear();
+        txtNuevaConfirmarPassword.clear();
         cmbNuevoCargo.getSelectionModel().clearSelection();
         cmbNuevaJornada.getSelectionModel().clearSelection();
         cmbNuevoRol.getSelectionModel().clearSelection();
@@ -557,6 +599,7 @@ public class TrabajadorController implements Initializable {
                 txtDetalleSS.setEditable(true);
                 txtDetalleIban.setEditable(true);
                 txtDetalleSalario.setEditable(true);
+
                 cmbDetalleCargo.setDisable(false);
                 cmbDetalleJornada.setDisable(false);
                 cmbDetalleRol.setDisable(false);
@@ -729,6 +772,7 @@ public class TrabajadorController implements Initializable {
         txtDetalleSS.setEditable(false);
         txtDetalleIban.setEditable(false);
         txtDetalleSalario.setEditable(false);
+
         cmbDetalleCargo.setDisable(true);
         cmbDetalleJornada.setDisable(true);
         cmbDetalleRol.setDisable(true);

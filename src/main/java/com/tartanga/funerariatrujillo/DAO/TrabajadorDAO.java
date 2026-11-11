@@ -165,6 +165,18 @@ public class TrabajadorDAO {
         }
     }
 
+    public boolean existeUsuario(String usuario) {
+        try {
+            Document doc = MongoConfig.getCollection(COLLECTION_NAME)
+                    .find(eq("usuario", usuario.trim()))
+                    .first();
+            return doc != null;
+        } catch (Exception e) {
+            System.err.println("Error comprobando disponibilidad del usuario: " + e.getMessage());
+            return true;
+        }
+    }
+
     public Optional<Trabajador> autenticar(String usuario, char[] password) {
         if (usuario == null || usuario.isBlank() || password == null || password.length == 0) {
             return Optional.empty();
