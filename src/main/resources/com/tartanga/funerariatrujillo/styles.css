@@ -75,6 +75,24 @@
     -fx-background-color: #F9F7F3;
 }
 
+.button-delete {
+    -fx-background-color: #F9EBEA;
+    -fx-border-color: #D9534F;
+}
+
+.button-delete:hover {
+    -fx-background-color: #F7B3AF;
+}
+
+.button-edit {
+    -fx-background-color: #F0E6C8;
+    -fx-border-color: #E8A820;
+}
+
+.button-edit:hover {
+    -fx-background-color: #EFD177;
+}
+
 /*** TEXTFIELDS ***/
 .text-field, .combo-box {
     -fx-background-color: #FFFFFF;
@@ -102,7 +120,7 @@
 .text-field:readonly:hover, .text-field:disabled:hover,
 .text-field:readonly:focused, .text-field:disabled:focused,
 .combo-box:readonly:hover, .combo-box:disabled:hover,
-.combo-box:readonly:focused, .combo-box::disabled:focused {
+.combo-box:readonly:focused, .combo-box:disabled:focused {
     -fx-background-color: #EDE7D9;
     -fx-border-color: #7A5230;
     -fx-effect: none;
@@ -206,50 +224,52 @@
     -fx-font-weight: bold;
 }
 
-.table-view .scroll-bar:vertical {
+/*** SCROLL BAR ***/
+
+.scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-pref-width: 12px;
 }
 
-.table-view .scroll-bar:horizontal {
+.scroll-bar:horizontal {
     -fx-background-color: transparent;
     -fx-pref-height: 12px;
 }
 
-.table-view .scroll-bar:vertical .track,
-.table-view .scroll-bar:horizontal .track {
-    -fx-background-color: #F9F7F3;
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+    -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
 }
 
-.table-view .scroll-bar:vertical .thumb,
-.table-view .scroll-bar:horizontal .thumb {
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
     -fx-background-color: #D6CCBD;
     -fx-background-radius: 6px;
 }
 
-.table-view .scroll-bar:vertical .thumb:hover,
-.table-view .scroll-bar:horizontal .thumb:hover {
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
     -fx-background-color: #C68E17;
 }
 
-.table-view .scroll-bar:vertical .thumb:pressed,
-.table-view .scroll-bar:horizontal .thumb:pressed {
+.scroll-bar:vertical .thumb:pressed,
+.scroll-bar:horizontal .thumb:pressed {
     -fx-background-color: #7A5230;
 }
 
-.table-view .scroll-bar .increment-button,
-.table-view .scroll-bar .decrement-button {
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
     -fx-background-color: transparent;
     -fx-pref-height: 0px;
     -fx-pref-width: 0px;
     -fx-padding: 0;
 }
 
-.table-view .scroll-bar .increment-arrow,
-.table-view .scroll-bar .decrement-arrow {
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
     -fx-shape: " ";
     -fx-padding: 0;
 }

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -43,7 +44,7 @@
                                     </children>
                                 </VBox>
 
-                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <HBox alignment="CENTER_LEFT" prefHeight="40.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4;" HBox.hgrow="ALWAYS">
                                             <children>
@@ -59,7 +60,7 @@
                                                 </TextField>
                                             </children>
                                         </HBox>
-                                        <Button fx:id="btnNuevoCliente" mnemonicParsing="false" prefHeight="40.0" style="-fx-cursor: hand;" text="Nuevo cliente" textFill="#2e1a0e" minWidth="150.0">
+                                        <Button fx:id="btnNuevoCliente" minWidth="150.0" mnemonicParsing="false" prefHeight="40.0" text="Nuevo cliente" textFill="#2e1a0e">
                                             <font>
                                                 <Font name="Inter 18pt Bold" size="14.0" />
                                             </font>
@@ -76,14 +77,17 @@
                                 <VBox spacing="5.0" VBox.vgrow="ALWAYS">
                                     <children>
                                         <TableView fx:id="tablaClientes" prefHeight="350.0" style="-fx-border-color: #C8B99A; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
+                                            <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                            </columnResizePolicy>
                                             <columns>
-                                                <TableColumn fx:id="colID" minWidth="60.0" prefWidth="110.0" text="ID" />
-                                                <TableColumn fx:id="colNombre" minWidth="110.0" prefWidth="210.0" text="Nombre y apellidos" />
-                                                <TableColumn fx:id="colDNI" minWidth="80.0" prefWidth="130.0" text="DNI" />
-                                                <TableColumn fx:id="colCorreo" minWidth="100.0" prefWidth="210.0" text="Correo electrónico" />
-                                                <TableColumn fx:id="colDireccion" minWidth="120.0" prefWidth="270.0" text="Dirección" />
-                                                <TableColumn fx:id="colTelefono" minWidth="100.0" prefWidth="120.0" text="Teléfono" />
-                                                <TableColumn fx:id="colFechaRegistro" minWidth="85.0" prefWidth="140.0" text="Fecha de registro" />
+                                                <TableColumn fx:id="colID" maxWidth="800.0" minWidth="55.0" prefWidth="0.0" text="ID" />
+                                                <TableColumn fx:id="colNombre" maxWidth="2000.0" minWidth="120.0" prefWidth="0.0" text="Nombre y apellidos" />
+                                                <TableColumn fx:id="colDNI" maxWidth="1100.0" minWidth="85.0" prefWidth="0.0" text="DNI" />
+                                                <TableColumn fx:id="colCorreo" maxWidth="2000.0" minWidth="120.0" prefWidth="0.0" text="Correo electrónico" />
+                                                <TableColumn fx:id="colDireccion" maxWidth="2000.0" minWidth="120.0" prefWidth="0.0" text="Dirección" />
+                                                <TableColumn fx:id="colTelefono" maxWidth="1000.0" minWidth="90.0" prefWidth="0.0" text="Teléfono" />
+                                                <TableColumn fx:id="colFechaRegistro" maxWidth="1100.0" minWidth="95.0" prefWidth="0.0" text="Fecha de registro" />
                                             </columns>
                                         </TableView>
                                         <Label fx:id="lblEstadoTabla" text="0 clientes" textFill="#7a5230">
@@ -96,117 +100,146 @@
                             </children>
                         </VBox>
 
-                        <VBox fx:id="vistaDetalles" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
+                        <VBox fx:id="vistaDetalles" maxHeight="-Infinity" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
                             <padding>
                                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                             </padding>
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="15.0">
                                     <children>
-                                        <Button fx:id="btnVolver" mnemonicParsing="false" styleClass="button-back" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                                        <Button fx:id="btnVolver" mnemonicParsing="false" styleClass="button-back">
                                             <graphic>
                                                 <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#7a5230" />
                                             </graphic>
                                         </Button>
-                                        <VBox>
+                                        <VBox spacing="2.0">
                                             <Label text="Ficha del cliente" textFill="#2e1a0e" wrapText="true">
                                                 <font>
                                                     <Font name="Inter 18pt Bold" size="22.0" />
                                                 </font>
                                             </Label>
+                                            <Label text="Datos de identificación, contacto y domicilio de facturación." textFill="#7a5230" wrapText="true">
+                                                <font>
+                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                </font>
+                                            </Label>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button fx:id="btnEliminar" minWidth="120.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F9EBEA; -fx-border-color: #D9534F; -fx-border-radius: 4; -fx-cursor: hand;" text="Eliminar cliente" textFill="#C9302C">
+                                        <Button fx:id="btnEliminar" minWidth="120.0" mnemonicParsing="false" prefHeight="35.0" styleClass="button-delete" text="Eliminar cliente" textFill="#C9302C">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
                                             </font>
                                         </Button>
-
-                                        <Button fx:id="btnEditar" minWidth="110.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #F0E6C8; -fx-border-color: #E8A820; -fx-border-radius: 4; -fx-cursor: hand;" text="Editar datos" textFill="#7a5230">
+                                        <Button fx:id="btnEditar" minWidth="110.0" mnemonicParsing="false" prefHeight="35.0" styleClass="button-edit" text="Editar datos" textFill="#7a5230">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnGuardarEdicion" managed="false" minWidth="130.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cambios" textFill="#2e1a0e" visible="false">
+                                        <Button fx:id="btnGuardarEdicion" managed="false" minWidth="130.0" mnemonicParsing="false" prefHeight="35.0" text="Guardar cambios" textFill="#2e1a0e" visible="false">
                                             <font>
-                                                <Font name="Inter 18pt Bold" size="13.0"/>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
                                             </font>
                                         </Button>
                                     </children>
                                 </HBox>
 
-                                <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+                                <VBox spacing="16.0">
                                     <children>
-                                        <HBox spacing="20.0">
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Nombre *" textFill="#7a5230">
+                                        <VBox spacing="12.0" style="-fx-background-color: #FAF7F2; -fx-border-color: #E6DEC8; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                            <padding>
+                                                <Insets bottom="15.0" left="18.0" right="18.0" top="14.0" />
+                                            </padding>
+                                            <children>
+                                                <Label text="DATOS PERSONALES Y CONTACTO" textFill="#7a5230">
                                                     <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                        <Font name="Inter 18pt Bold" size="11.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleNombre" editable="false" prefHeight="38.0"/>
-                                            </VBox>
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Apellidos *" textFill="#7a5230">
-                                                    <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                                <TextField fx:id="txtDetalleApellidos" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                        </HBox>
-                                        <HBox spacing="20.0">
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Documento de identidad *" textFill="#7a5230">
-                                                    <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                                <TextField fx:id="txtDetalleDni" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Teléfono *" textFill="#7a5230">
-                                                    <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                                <TextField fx:id="txtDetalleTelefono" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                        </HBox>
-                                        <VBox spacing="5.0">
-                                            <Label text="Correo electrónico *" textFill="#7a5230">
-                                                <font>
-                                                    <Font name="Inter 18pt Regular" size="12.0" />
-                                                </font>
-                                            </Label>
-                                            <TextField fx:id="txtDetalleCorreo" editable="false" prefHeight="38.0" />
+                                                <HBox spacing="15.0">
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Nombre" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleNombre" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Apellidos" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleApellidos" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                </HBox>
+                                                <HBox spacing="15.0">
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Documento de identidad" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleDni" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Teléfono" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleTelefono" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Correo electrónico" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleCorreo" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                </HBox>
+                                            </children>
                                         </VBox>
-                                        <HBox spacing="20.0">
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Calle *" textFill="#7a5230">
+
+                                        <VBox spacing="12.0" style="-fx-background-color: #FAF7F2; -fx-border-color: #E6DEC8; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                            <padding>
+                                                <Insets bottom="15.0" left="18.0" right="18.0" top="14.0" />
+                                            </padding>
+                                            <children>
+                                                <Label text="DIRECCIÓN POSTAL" textFill="#7a5230">
                                                     <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                        <Font name="Inter 18pt Bold" size="11.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="txtDetalleCalle" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                                <Label text="Ciudad *" textFill="#7a5230">
-                                                    <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                                <TextField fx:id="txtDetalleCiudad" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                            <VBox spacing="5.0" prefWidth="100.0">
-                                                <Label text="Código Postal *" textFill="#7a5230">
-                                                    <font>
-                                                        <Font name="Inter 18pt Regular" size="12.0" />
-                                                    </font>
-                                                </Label>
-                                                <TextField fx:id="txtDetalleCP" editable="false" prefHeight="38.0" />
-                                            </VBox>
-                                        </HBox>
+                                                <HBox spacing="15.0">
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Calle" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleCalle" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                                        <Label text="Ciudad" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleCiudad" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" prefWidth="0.0" />
+                                                    </VBox>
+                                                    <VBox maxWidth="160.0" minWidth="120.0" prefWidth="160.0" spacing="5.0">
+                                                        <Label text="Código Postal" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextField fx:id="txtDetalleCP" editable="false" maxWidth="1.7976931348623157E308" prefHeight="38.0" />
+                                                    </VBox>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
                                     </children>
                                 </VBox>
                             </children>
@@ -218,12 +251,9 @@
             </children>
         </HBox>
 
-        <VBox fx:id="panelFormularioNuevo" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
-            <padding>
-                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
-            </padding>
+        <VBox fx:id="panelFormularioNuevo" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
             <children>
-                <HBox alignment="CENTER_LEFT">
+                <HBox alignment="CENTER_LEFT" style="-fx-padding: 25 25 10 25;">
                     <VBox spacing="5.0">
                         <children>
                             <Label text="Registrar cliente" textFill="#2e1a0e" wrapText="true">
@@ -241,95 +271,105 @@
                         </children>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" styleClass="button-back">
                         <graphic>
                             <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#7a5230" />
                         </graphic>
                     </Button>
                 </HBox>
 
-                <HBox spacing="10.0">
-                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="Nombre *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoNombre" prefHeight="35.0" />
-                    </VBox>
-                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="Apellidos *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoApellidos" prefHeight="35.0" />
-                    </VBox>
-                </HBox>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #FFFFFF;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="15.0" style="-fx-padding: 10 25 15 25;">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Nombre *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoNombre" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
+                                    </VBox>
+                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Apellidos *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoApellidos" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
+                                    </VBox>
+                                </HBox>
 
-                <HBox spacing="10.0">
-                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="DNI *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoDni" prefHeight="35.0" />
-                    </VBox>
-                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="Teléfono *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoTelefono" prefHeight="35.0" />
-                    </VBox>
-                </HBox>
+                                <HBox spacing="10.0">
+                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="DNI *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoDni" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
+                                    </VBox>
+                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Teléfono *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoTelefono" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
+                                    </VBox>
+                                </HBox>
 
-                <VBox spacing="5.0">
-                    <Label text="Correo electrónico *" textFill="#2e1a0e">
-                        <font>
-                            <Font name="System Bold" size="12.0"/>
-                        </font>
-                    </Label>
-                    <TextField fx:id="txtNuevoCorreo" prefHeight="35.0" />
+                                <VBox spacing="5.0">
+                                    <Label text="Correo electrónico *" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtNuevoCorreo" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
+                                </VBox>
+
+                                <VBox spacing="5.0">
+                                    <Label text="Calle *" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtNuevoCalle" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
+                                </VBox>
+
+                                <HBox spacing="10.0">
+                                    <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Ciudad *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoCiudad" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
+                                    </VBox>
+                                    <VBox maxWidth="105.0" minWidth="105.0" prefWidth="105.0" spacing="5.0">
+                                        <Label text="Código Postal *" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="txtNuevoCP" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
+                                    </VBox>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <VBox style="-fx-padding: 10 25 25 25;">
+                    <children>
+                        <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" text="Guardar cliente" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Button>
+                    </children>
                 </VBox>
-
-                <VBox spacing="5.0">
-                    <Label text="Calle *" textFill="#2e1a0e">
-                        <font>
-                            <Font name="System Bold" size="12.0"/>
-                        </font>
-                    </Label>
-                    <TextField fx:id="txtNuevoCalle" prefHeight="35.0" />
-                </VBox>
-
-                <HBox spacing="10.0">
-                    <VBox HBox.hgrow="ALWAYS" spacing="5.0">
-                        <Label text="Ciudad *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoCiudad" prefHeight="35.0" />
-                    </VBox>
-                    <VBox prefWidth="100.0" spacing="5.0">
-                        <Label text="Código Postal *" textFill="#2e1a0e">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Label>
-                        <TextField fx:id="txtNuevoCP" prefHeight="35.0" />
-                    </VBox>
-                </HBox>
-
-                <Region VBox.vgrow="ALWAYS"/>
-
-                <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cliente" textFill="#2e1a0e">
-                    <font>
-                        <Font name="System Bold" size="13.0"/>
-                    </font>
-                </Button>
             </children>
         </VBox>
     </children>
