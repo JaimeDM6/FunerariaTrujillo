@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+
+<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.FichaServicioController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+    <children>
+        <VBox spacing="20.0" StackPane.alignment="TOP_LEFT">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <VBox spacing="2.0">
+                            <Label fx:id="lblTituloFicha" text="Ficha del servicio" textFill="#2e1a0e" wrapText="true">
+                                <font>
+                                    <Font name="Inter 18pt Bold" size="22.0" />
+                                </font>
+                            </Label>
+                            <Label text="Información del servicio y seguimiento del trabajo asignado." textFill="#7a5230" wrapText="true">
+                                <font>
+                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                </font>
+                            </Label>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnVolver" minWidth="180.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4; -fx-cursor: hand;" text="Volver a asignaciones" textFill="#2e1a0e">
+                            <font>
+                                <Font name="Inter 18pt Bold" size="13.0" />
+                            </font>
+                            <graphic>
+                                <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#2e1a0e" />
+                            </graphic>
+                        </Button>
+                    </children>
+                </HBox>
+
+                <HBox spacing="15.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" HBox.hgrow="ALWAYS">
+                            <content>
+                                <VBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="12.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;">
+                                            <padding>
+                                                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                                            </padding>
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT">
+                                                    <children>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label fx:id="lblHeaderServicio" text="Cargando servicio..." textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Bold" size="16.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblHeaderFecha" text="Recepción: --/--/---- · --:--" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                                                            <children>
+                                                                <Label text="Trabajador asignado" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblHeaderTanatopractor" text="Cargando..." textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Bold" size="14.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <Label fx:id="lblHeaderEstado" style="-fx-background-color: #FDF4E5; -fx-padding: 5 10 5 10; -fx-background-radius: 4;" text="● Cargando" textFill="#C68E17">
+                                                            <font>
+                                                                <Font name="Inter 18pt Bold" size="11.0" />
+                                                            </font>
+                                                            <HBox.margin>
+                                                                <Insets left="20.0" />
+                                                            </HBox.margin>
+                                                        </Label>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
+                                        <HBox spacing="15.0">
+                                            <children>
+                                                <VBox spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
+                                                    <padding>
+                                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Datos del difunto" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Bold" size="16.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblDifuntoNombre" text="-" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Fecha de nacimiento" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblDifuntoNacimiento" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Fecha de fallecimiento" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblDifuntoFallecimiento" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Procedencia" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblDifuntoProcedencia" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblDifuntoCausa" text="Causa de muerte: -" textFill="#997A5E">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="10.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" HBox.hgrow="ALWAYS">
+                                                    <padding>
+                                                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Cliente asociado" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Bold" size="16.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblClienteNombre" text="-" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Relación con el difunto" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblClienteRelacion" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Teléfono de contacto" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblClienteTelefono" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label text="Correo electrónico" textFill="#7a5230">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="11.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label fx:id="lblClienteCorreo" text="-" textFill="#2e1a0e">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Medium" size="13.0" />
+                                                                    </font>
+                                                                </Label>
+                                                                <Label text="Persona responsable del servicio" textFill="#997A5E">
+                                                                    <font>
+                                                                        <Font name="Inter 18pt Regular" size="10.0" />
+                                                                    </font>
+                                                                </Label>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+
+                                        <VBox spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;">
+                                            <padding>
+                                                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                                            </padding>
+                                            <children>
+                                                <Label fx:id="lblResumen1" text="-" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblResumen2" text="-" textFill="#7a5230">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblResumen3" text="-" textFill="#7a5230" wrapText="true">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" VBox.vgrow="ALWAYS">
+                                            <padding>
+                                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                            </padding>
+                                            <children>
+                                                <Label text="Indicaciones del servicio" textFill="#2e1a0e">
+                                                    <font>
+                                                        <Font name="Inter 18pt Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label fx:id="lblIndicaciones" text="-" textFill="#2e1a0e" wrapText="true" VBox.vgrow="ALWAYS">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="13.0" />
+                                                    </font>
+                                                </Label>
+                                                <Region VBox.vgrow="ALWAYS" />
+                                                <Region style="-fx-background-color: #E6DEC8; -fx-pref-height: 1;" />
+                                                <HBox spacing="40.0">
+                                                    <VBox spacing="5.0">
+                                                        <Label text="Asignado" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="11.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <Label fx:id="lblFechaAsignado" text="-" textFill="#2e1a0e">
+                                                            <font>
+                                                                <Font name="Inter 18pt Medium" size="13.0" />
+                                                            </font>
+                                                        </Label>
+                                                    </VBox>
+                                                    <VBox spacing="5.0">
+                                                        <Label text="Inicio del trabajo" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="11.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <Label fx:id="lblFechaInicio" text="-" textFill="#2e1a0e">
+                                                            <font>
+                                                                <Font name="Inter 18pt Medium" size="13.0" />
+                                                            </font>
+                                                        </Label>
+                                                    </VBox>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+
+                        <VBox maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;">
+                            <padding>
+                                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                            </padding>
+                            <children>
+                                <VBox spacing="5.0">
+                                    <Label text="Mi trabajo" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="Inter 18pt Bold" size="18.0" />
+                                        </font>
+                                    </Label>
+                                    <Label fx:id="lblPanelTrabajador" text="-" textFill="#7a5230">
+                                        <font>
+                                            <Font name="Inter 18pt Regular" size="12.0" />
+                                        </font>
+                                    </Label>
+                                </VBox>
+
+                                <VBox spacing="5.0">
+                                    <Label text="Estado del servicio" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="Inter 18pt Medium" size="13.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="cmbEstadoServicio" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Pendiente" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;" />
+                                </VBox>
+
+                                <VBox spacing="10.0">
+                                    <Label text="Seguimiento de la preparación" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="Inter 18pt Medium" size="13.0" />
+                                        </font>
+                                    </Label>
+                                    <CheckBox fx:id="chkPaso1" mnemonicParsing="false" text="Comprobar identificación" textFill="#4a3120">
+                                        <font>
+                                            <Font name="Inter 18pt Regular" size="12.0" />
+                                        </font>
+                                    </CheckBox>
+                                    <CheckBox fx:id="chkPaso2" mnemonicParsing="false" text="Realizar conservación temporal" textFill="#4a3120">
+                                        <font>
+                                            <Font name="Inter 18pt Regular" size="12.0" />
+                                        </font>
+                                    </CheckBox>
+                                    <CheckBox fx:id="chkPaso3" mnemonicParsing="false" text="Finalizar preparación estética" textFill="#4a3120">
+                                        <font>
+                                            <Font name="Inter 18pt Regular" size="12.0" />
+                                        </font>
+                                    </CheckBox>
+                                </VBox>
+
+                                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                                    <Label text="Observaciones de trabajo" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="Inter 18pt Medium" size="13.0" />
+                                        </font>
+                                    </Label>
+                                    <TextField fx:id="txtObservaciones" id="txtObservaciones" alignment="TOP_LEFT" prefHeight="100.0" promptText="Escribe observaciones aquí..." style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4;" />
+                                </VBox>
+
+                                <Region VBox.vgrow="ALWAYS" />
+
+                                <VBox spacing="10.0">
+                                    <Label fx:id="lblUltimaActualizacion" text="Última actualización: -" textFill="#7a5230">
+                                        <font>
+                                            <Font name="Inter 18pt Regular" size="11.0" />
+                                        </font>
+                                    </Label>
+                                    <Button fx:id="btnGuardarCambios" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar cambios" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="Inter 18pt Bold" size="13.0" />
+                                        </font>
+                                        <graphic>
+                                            <SVGPath content="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="#2e1a0e" scaleX="0.75" scaleY="0.75" />
+                                        </graphic>
+                                    </Button>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

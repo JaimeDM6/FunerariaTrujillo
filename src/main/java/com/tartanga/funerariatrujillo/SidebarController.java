@@ -146,13 +146,23 @@ public class SidebarController {
         btnFichaServicio.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                mainController.cargarVista("fichaServicio.fxml");
+                mainController.cargarVista("ficha_servicio.fxml");
                 marcarActivo(btnFichaServicio);
             }
         });
     }
 
+    public void activarBotonFichaServicio() {
+        marcarActivo(btnFichaServicio);
+    }
+
     private void marcarActivo(Button botonActivo) {
+        if (botonActivo == btnFichaServicio) {
+            setVisible(btnFichaServicio, true);
+        } else {
+            setVisible(btnFichaServicio, false);
+        }
+
         for (Button btn : navButtons) {
             btn.getStyleClass().remove("button-active");
             if (!btn.getStyleClass().contains("button-inactive")) {
@@ -174,8 +184,8 @@ public class SidebarController {
         setVisible(btnFeretros, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO);
         setVisible(btnUrnas, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO);
         setVisible(btnSalas, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO || rol == Rol.TANATOPRAXIA);
-        setVisible(btnAsignaciones, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO);
-        setVisible(btnFichaServicio, rol != null);
+        setVisible(btnAsignaciones, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO || rol == Rol.TANATOPRAXIA);
+        setVisible(btnFichaServicio, false);
     }
 
     private void setVisible(Button button, boolean visible) {

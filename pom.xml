@@ -148,7 +148,6 @@
                 </configuration> 
             </plugin> 
         </plugins>
-        <directory>C:\Builds_NetBeans\FunerariaTrujillo\target</directory>
     </build>
     <name>FunerariaTrujillo</name>
 </project>

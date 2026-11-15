@@ -6,7 +6,6 @@
   <name>FunerariaTrujillo</name>
   <version>1.0</version>
   <build>
-    <directory>C:\Builds_NetBeans\FunerariaTrujillo\target</directory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
