@@ -44,7 +44,12 @@ public class MainController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(archivoFxml));
             Node vista = loader.load();
-
+            
+            Object controller = loader.getController();
+            if (controller instanceof DifuntosController) {
+                DifuntosController difuntosController = (DifuntosController) controller;
+                difuntosController.setMainController(this);
+            }
             contentArea.getChildren().clear();
             contentArea.getChildren().add(vista);
 

@@ -13,6 +13,10 @@ public class Difunto implements Comparable<Difunto>, Serializable {
         ENTIERRO, CREMACIÓN
     }
 
+    private String id;
+    private String id_cliente;
+    private String id_feretro;
+    private String id_urna;
     private String nombre;
     private String apellidos;
     private Date fecha_nacimiento;
@@ -24,6 +28,10 @@ public class Difunto implements Comparable<Difunto>, Serializable {
     private ArrayList<Servicio> lista_servicios;
 
     public Difunto() {
+        id = "";
+        id_cliente = "";
+        id_feretro = "";
+        id_urna = "";
         nombre = "";
         apellidos = "";
         fecha_nacimiento = new Date();
@@ -36,6 +44,10 @@ public class Difunto implements Comparable<Difunto>, Serializable {
     }
 
     public Difunto(Difunto d) {
+        this.id = d.id;
+        this.id_cliente = d.id_cliente;
+        this.id_feretro = d.id_feretro;
+        this.id_urna = d.id_urna;
         this.nombre = d.nombre;
         this.apellidos = d.apellidos;
         this.fecha_nacimiento = d.fecha_nacimiento;
@@ -47,7 +59,8 @@ public class Difunto implements Comparable<Difunto>, Serializable {
         this.lista_servicios = d.lista_servicios;
     }
 
-    public Difunto(String n, String a, Date fn, Date fm, String c, Servicio s, Feretro f, Urna u, ArrayList<Servicio> l) {
+    public Difunto(String id, String n, String a, Date fn, Date fm, String c, Servicio s, Feretro f, Urna u, ArrayList<Servicio> l) {
+        this.id = id;
         this.nombre = n;
         this.apellidos = a;
         this.fecha_nacimiento = fn;
@@ -60,12 +73,48 @@ public class Difunto implements Comparable<Difunto>, Serializable {
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId_cliente() {
+        return id_cliente;
+    }
+
+    public void setId_cliente(String id_cliente) {
+        this.id_cliente = id_cliente;
+    }
+
+    public String getId_feretro() {
+        return id_feretro;
+    }
+
+    public void setId_feretro(String id_feretro) {
+        this.id_feretro = id_feretro;
+    }
+
+    public String getId_urna() {
+        return id_urna;
+    }
+
+    public void setId_urna(String id_urna) {
+        this.id_urna = id_urna;
+    }
+
     public String getNombre() {
         return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getNombreCompleto() {
+        return (this.nombre + " " + this.apellidos).trim();
     }
 
     public String getApellidos() {
@@ -135,13 +184,13 @@ public class Difunto implements Comparable<Difunto>, Serializable {
     // toString()
     @Override
     public String toString() {
-        return ("Nombre: " + nombre + " " + apellidos + ", fecha de nacimiento: " + fecha_nacimiento + ", fecha de muerte: " + fecha_muerte + ", dirección: " + causa_muerte + ", servicio: " + servicio);
+        return ("ID: " + id + " \n" + "Nombre: " + nombre + " " + apellidos + ", fecha de nacimiento: " + fecha_nacimiento + ", fecha de muerte: " + fecha_muerte + ", dirección: " + causa_muerte + ", servicio: " + servicio);
     }
 
     // hashCode
     @Override
     public int hashCode() {
-        return Objects.hash(nombre, apellidos, fecha_nacimiento, fecha_muerte, causa_muerte, servicio, feretro, urna, lista_servicios);
+        return Objects.hash(id, nombre, apellidos, fecha_nacimiento, fecha_muerte, causa_muerte, servicio, feretro, urna, lista_servicios);
     }
 
     // equals
