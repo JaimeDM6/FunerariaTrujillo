@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -33,6 +34,16 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
 public class UrnasController implements Initializable {
+
+    private final UrnaDAO urnaDAO;
+
+    public UrnasController() {
+        this.urnaDAO = new UrnaDAO();
+    }
+
+    public UrnasController(UrnaDAO urnaDAO) {
+        this.urnaDAO = urnaDAO;
+    }
 
     @FXML
     private VBox vistaTabla;
@@ -215,8 +226,7 @@ public class UrnasController implements Initializable {
         Task<List<Urna>> taskObtenerUrnas = new Task<List<Urna>>() {
             @Override
             protected List<Urna> call() throws Exception {
-                UrnaDAO dao = new UrnaDAO();
-                return dao.obtenerUrnas();
+                return urnaDAO.obtenerUrnas();
             }
         };
 
@@ -233,8 +243,12 @@ public class UrnasController implements Initializable {
         taskObtenerUrnas.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                System.out.println("Error al cargar datos de MongoDB");
                 lblEstadoTabla.setText("Error de conexión");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de conexión");
+                alert.setHeaderText(null);
+                alert.setContentText("No se pudo cargar la lista de urnas desde la base de datos.");
+                alert.showAndWait();
             }
         });
 
@@ -244,9 +258,33 @@ public class UrnasController implements Initializable {
     }
 
     private void guardarNuevaUrna() {
-        if (txtNuevaCapacidad.getText().trim().isEmpty() || txtNuevoMaterial.getText().trim().isEmpty()
-                || txtNuevoPrecio.getText().trim().isEmpty()) {
-            System.out.println("Faltan campos obligatorios");
+        txtNuevaCapacidad.getStyleClass().remove("error");
+        txtNuevoMaterial.getStyleClass().remove("error");
+        txtNuevoPrecio.getStyleClass().remove("error");
+
+        boolean hayError = false;
+
+        if (txtNuevaCapacidad.getText().isBlank()) {
+            txtNuevaCapacidad.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoMaterial.getText().isBlank()) {
+            txtNuevoMaterial.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtNuevoPrecio.getText().isBlank()) {
+            txtNuevoPrecio.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Faltan datos");
+            alert.setHeaderText(null);
+            alert.setContentText("Todos los campos son obligatorios.");
+            alert.showAndWait();
             return;
         }
 
@@ -255,14 +293,19 @@ public class UrnasController implements Initializable {
         nuevaUrna.setMaterial(txtNuevoMaterial.getText().trim());
         nuevaUrna.setPrecio(Double.valueOf(txtNuevoPrecio.getText().trim()));
 
-        UrnaDAO dao = new UrnaDAO();
-        if (dao.insertarUrna(nuevaUrna)) {
+        if (urnaDAO.insertarUrna(nuevaUrna)) {
             masterData.add(nuevaUrna);
             tablaUrnas.sort();
             lblEstadoTabla.setText(masterData.size() + " urnas");
 
             limpiarFormularioNuevo();
             closeForm();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Hubo un problema al guardar la urna en la base de datos.");
+            alert.showAndWait();
         }
     }
 
@@ -274,9 +317,8 @@ public class UrnasController implements Initializable {
 
     private void eliminarUrnaSeleccionada() {
         if (urnaSeleccionada != null) {
-            UrnaDAO dao = new UrnaDAO();
 
-            if (dao.eliminarUrna(urnaSeleccionada.getId())) {
+            if (urnaDAO.eliminarUrna(urnaSeleccionada.getId())) {
                 masterData.remove(urnaSeleccionada);
                 lblEstadoTabla.setText(masterData.size() + " urnas");
 
@@ -286,6 +328,12 @@ public class UrnasController implements Initializable {
                 vistaTabla.setManaged(true);
 
                 urnaSeleccionada = null;
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al eliminar la urna de la base de datos.");
+                alert.showAndWait();
             }
         }
     }
@@ -351,10 +399,9 @@ public class UrnasController implements Initializable {
                 txtDetalleMaterial.setEditable(true);
                 txtDetallePrecio.setEditable(true);
 
-                String estiloEditable = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
-                txtDetalleCapacidad.setStyle(estiloEditable);
-                txtDetalleMaterial.setStyle(estiloEditable);
-                txtDetallePrecio.setStyle(estiloEditable);
+                txtDetalleCapacidad.getStyleClass().remove("error");
+                txtDetalleMaterial.getStyleClass().remove("error");
+                txtDetallePrecio.getStyleClass().remove("error");
 
                 btnEditar.setVisible(false);
                 btnEditar.setManaged(false);
@@ -368,15 +415,50 @@ public class UrnasController implements Initializable {
         btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                txtDetalleCapacidad.getStyleClass().remove("error");
+                txtDetalleMaterial.getStyleClass().remove("error");
+                txtDetallePrecio.getStyleClass().remove("error");
+
+                boolean hayError = false;
+
+                if (txtDetalleCapacidad.getText().isBlank()) {
+                    txtDetalleCapacidad.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetalleMaterial.getText().isBlank()) {
+                    txtDetalleMaterial.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (txtDetallePrecio.getText().isBlank()) {
+                    txtDetallePrecio.getStyleClass().add("error");
+                    hayError = true;
+                }
+
+                if (hayError) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Datos incompletos");
+                    alert.setHeaderText(null);
+                    alert.setContentText("No puedes dejar en blanco los campos.");
+                    alert.showAndWait();
+                    return;
+                }
+
                 if (urnaSeleccionada != null) {
                     urnaSeleccionada.setCapacidad(Double.valueOf(txtDetalleCapacidad.getText()));
                     urnaSeleccionada.setMaterial(txtDetalleMaterial.getText());
                     urnaSeleccionada.setPrecio(Double.valueOf(txtDetallePrecio.getText()));
 
-                    UrnaDAO dao = new UrnaDAO();
-                    dao.actualizarUrna(urnaSeleccionada);
-
-                    tablaUrnas.refresh();
+                    if (urnaDAO.actualizarUrna(urnaSeleccionada)) {
+                        tablaUrnas.refresh();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                        alert.showAndWait();
+                    }
                 }
 
                 bloquearCamposEdicion();
@@ -388,11 +470,6 @@ public class UrnasController implements Initializable {
         txtDetalleCapacidad.setEditable(false);
         txtDetalleMaterial.setEditable(false);
         txtDetallePrecio.setEditable(false);
-
-        String estiloLectura = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
-        txtDetalleCapacidad.setStyle(estiloLectura);
-        txtDetalleMaterial.setStyle(estiloLectura);
-        txtDetallePrecio.setStyle(estiloLectura);
 
         btnGuardarEdicion.setVisible(false);
         btnGuardarEdicion.setManaged(false);

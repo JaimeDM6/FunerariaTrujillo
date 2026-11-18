@@ -8,7 +8,41 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Cargo {
-        TANATOPRACTOR, AGENTE_FUNERARIO, RECEPCIONISTA, DIRECTOR, CONDUCTOR
+        TANATOPRACTOR("Tanatopractor"),
+        AGENTE_FUNERARIO("Agente Funerario"),
+        RECEPCIONISTA("Recepcionista"),
+        DIRECTOR("Director"),
+        CONDUCTOR("Conductor");
+
+        private final String nombreVisible;
+
+        Cargo(String nombreVisible) {
+            this.nombreVisible = nombreVisible;
+        }
+
+        @Override
+        public String toString() {
+            return nombreVisible;
+        }
+    }
+
+    public enum Rol {
+        AGENTE_FUNERARIO("Agente Funerario"),
+        CONTABILIDAD("Contabilidad"),
+        TANATOPRAXIA("Tanatopraxia"),
+        ADMINISTRACION("Administración"),
+        TRANSPORTE("Transporte");
+
+        private final String nombreVisible;
+
+        Rol(String nombreVisible) {
+            this.nombreVisible = nombreVisible;
+        }
+
+        @Override
+        public String toString() {
+            return nombreVisible;
+        }
     }
 
     private String id;
@@ -16,10 +50,13 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     private String apellidos;
     private String dni;
     private String correo_electronico;
+    private String usuario;
+    private String password;
     private Direccion direccion;
     private String numero_ss;
     private String iban;
     private Cargo cargo;
+    private Rol rol;
     private Double salario;
     private String tipo_jornada;
 
@@ -29,10 +66,13 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         apellidos = "";
         dni = "";
         correo_electronico = "";
+        usuario = "";
+        password = "";
         direccion = new Direccion();
         numero_ss = "";
         iban = "";
         cargo = Cargo.AGENTE_FUNERARIO;
+        rol = Rol.AGENTE_FUNERARIO;
         salario = 0.0;
         tipo_jornada = "";
     }
@@ -43,23 +83,30 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         this.apellidos = t.apellidos;
         this.dni = t.dni;
         this.correo_electronico = t.correo_electronico;
+        this.usuario = t.usuario;
+        this.password = t.password;
         this.direccion = t.direccion;
         this.numero_ss = t.numero_ss;
         this.iban = t.iban;
         this.cargo = t.cargo;
+        this.rol = t.rol;
         this.salario = t.salario;
         this.tipo_jornada = t.tipo_jornada;
     }
 
-    public Trabajador(String n, String a, String d, String c, Direccion di, String nu, String i, Cargo ca, Double s, String t) {
+    public Trabajador(String n, String a, String d, String c, String u, String p, Direccion di, String nu, String i,
+            Cargo ca, Double s, String t) {
         this.nombre = n;
         this.apellidos = a;
         this.dni = d;
         this.correo_electronico = c;
+        this.usuario = u;
+        this.password = p;
         this.direccion = di;
         this.numero_ss = nu;
         this.iban = i;
         this.cargo = ca;
+        this.rol = ca == Cargo.TANATOPRACTOR ? Rol.TANATOPRAXIA : Rol.AGENTE_FUNERARIO;
         this.salario = s;
         this.tipo_jornada = t;
     }
@@ -89,6 +136,10 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         this.apellidos = apellidos;
     }
 
+    public String getNombreCompleto() {
+        return (this.nombre + " " + this.apellidos).trim();
+    }
+
     public String getDni() {
         return dni;
     }
@@ -103,6 +154,22 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
 
     public void setCorreo_electronico(String correo_electronico) {
         this.correo_electronico = correo_electronico;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Direccion getDireccion() {
@@ -137,6 +204,14 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
         this.cargo = cargo;
     }
 
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
     public Double getSalario() {
         return salario;
     }
@@ -156,13 +231,16 @@ public class Trabajador implements Comparable<Trabajador>, Serializable {
     // toString()
     @Override
     public String toString() {
-        return ("Nombre: " + nombre + " " + apellidos + ", DNI: " + dni + ", correo electrónico: " + correo_electronico + ", dirección: " + direccion + ", número de la SS: " + numero_ss + ", IBAN: " + iban + ", cargo: " + cargo + ", salario: " + salario + ", tipo de jornada: " + tipo_jornada);
+        return ("Nombre: " + nombre + " " + apellidos + ", DNI: " + dni + ", correo electrónico: " + correo_electronico
+                + ", usuario: " + usuario + ", dirección: " + direccion + ", número de la SS: " + numero_ss + ", IBAN: "
+                + iban + ", cargo: " + cargo + ", salario: " + salario + ", tipo de jornada: " + tipo_jornada);
     }
 
     // hashCode
     @Override
     public int hashCode() {
-        return Objects.hash(nombre, apellidos, dni, correo_electronico, direccion, numero_ss, iban, cargo, salario, tipo_jornada);
+        return Objects.hash(nombre, apellidos, dni, correo_electronico, usuario, password, direccion, numero_ss, iban,
+                cargo, salario, tipo_jornada);
     }
 
     // equals

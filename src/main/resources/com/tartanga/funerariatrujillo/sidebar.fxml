@@ -176,7 +176,7 @@
                         <StackPane>
                             <children>
                                 <Circle fill="#e8d8c0" radius="20.0" stroke="TRANSPARENT" strokeType="INSIDE" />
-                                <Label text="MS" textFill="#c8860a">
+                                <Label fx:id="lblInicialesUsuario" text="?" textFill="#c8860a">
                                     <font>
                                         <Font name="Inter 18pt Bold" size="14.0" />
                                     </font>
@@ -185,12 +185,12 @@
                         </StackPane>
                         <VBox alignment="CENTER_LEFT">
                             <children>
-                                <Label text="Marta Sánchez" textFill="#2E1A0E">
+                                <Label fx:id="lblNombreUsuario" text="Usuario" textFill="#2E1A0E">
                                     <font>
                                         <Font name="Inter 18pt Bold" size="13.0" />
                                     </font>
                                 </Label>
-                                <Label text="Administración" textFill="#7A5230">
+                                <Label fx:id="lblRolUsuario" text="Rol" textFill="#7A5230">
                                     <font>
                                         <Font name="Inter 18pt Regular" size="11.0" />
                                     </font>
