@@ -7,29 +7,41 @@ public class Sala implements Comparable<Sala>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private String nombre;
     private String descripcion;
     private int capacidad;
 
     public Sala() {
+        id = null;
         nombre = "";
         descripcion = "";
         capacidad = 0;
     }
 
     public Sala(Sala s) {
+        this.id = s.id;
         this.nombre = s.nombre;
         this.descripcion = s.descripcion;
         this.capacidad = s.capacidad;
     }
 
     public Sala(String n, String d, int c) {
+        this.id = null;
         this.nombre = n;
         this.descripcion = d;
         this.capacidad = c;
     }
 
-    // Getters and Setters
+    // Getters y setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -54,36 +66,30 @@ public class Sala implements Comparable<Sala>, Serializable {
         this.capacidad = capacidad;
     }
 
-    // toString()
     @Override
     public String toString() {
-        return ("Nombre: " + nombre + ", descripción: " + descripcion + ", capacidad: " + capacidad + " personas");
+        return "Nombre: " + nombre
+                + ", descripción: " + descripcion
+                + ", capacidad: " + capacidad + " personas";
     }
 
-    // hashCode
     @Override
     public int hashCode() {
-        return Objects.hash(nombre, descripcion, capacidad);
+        return Objects.hash(nombre);
     }
 
-    // equals
     @Override
     public boolean equals(Object obj) {
-        // Si es el mismo objeto...
         if (this == obj) {
             return true;
         }
 
-        if (obj == null) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
         Sala other = (Sala) obj;
-
-        return nombre.equals(other.nombre);
+        return Objects.equals(nombre, other.nombre);
     }
 
     @Override

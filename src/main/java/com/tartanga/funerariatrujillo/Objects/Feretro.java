@@ -11,6 +11,7 @@ public class Feretro implements Comparable<Feretro>, Serializable {
     private String material;
     private Double peso;
     private Double precio;
+    private String id;
 
     public Feretro() {
         medidas = "";
@@ -24,6 +25,7 @@ public class Feretro implements Comparable<Feretro>, Serializable {
         this.material = f.material;
         this.peso = f.peso;
         this.precio = f.precio;
+        this.id = f.id;
     }
 
     public Feretro(String me, String ma, Double pe, Double pr) {
@@ -34,6 +36,14 @@ public class Feretro implements Comparable<Feretro>, Serializable {
     }
 
     // Getters and Setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getMedidas() {
         return medidas;
     }
