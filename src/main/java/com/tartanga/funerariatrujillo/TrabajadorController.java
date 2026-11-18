@@ -338,7 +338,62 @@ public class TrabajadorController implements Initializable {
         cmbNuevaJornada.getStyleClass().remove("error");
         cmbNuevoRol.getStyleClass().remove("error");
 
+        String mensaje = validarNuevoTrabajador();
+
+        if (mensaje == null) {
+            Trabajador nuevoTrabajador = new Trabajador();
+            nuevoTrabajador.setNombre(txtNuevoNombre.getText().trim());
+            nuevoTrabajador.setApellidos(txtNuevoApellidos.getText().trim());
+            nuevoTrabajador.setDni(txtNuevoDni.getText().trim().toUpperCase());
+            nuevoTrabajador.setCorreo_electronico(txtNuevoCorreo.getText().trim());
+            nuevoTrabajador.setNumero_ss(txtNuevoSS.getText().trim());
+            nuevoTrabajador.setIban(txtNuevoIban.getText().trim());
+
+            String usuario = generarUsuario(txtNuevoNombre.getText(), txtNuevoApellidos.getText());
+            nuevoTrabajador.setUsuario(usuario);
+
+            String hashPass = BCrypt.hashpw(txtNuevaPassword.getText().trim(), BCrypt.gensalt(12));
+            nuevoTrabajador.setPassword(hashPass);
+
+            nuevoTrabajador.setSalario(Double.valueOf(txtNuevoSalario.getText().trim()));
+            nuevoTrabajador.setCargo(cmbNuevoCargo.getSelectionModel().getSelectedItem());
+            nuevoTrabajador.setTipo_jornada(cmbNuevaJornada.getSelectionModel().getSelectedItem());
+            nuevoTrabajador.setRol(cmbNuevoRol.getSelectionModel().getSelectedItem());
+
+            Direccion dir = new Direccion();
+            dir.setCalle(txtNuevoCalle.getText().trim());
+            dir.setCiudad(txtNuevaCiudad.getText().trim());
+            dir.setCodigoPostal(Integer.parseInt(txtNuevoCP.getText().trim()));
+            nuevoTrabajador.setDireccion(dir);
+
+            if (trabajadorDAO.insertarTrabajador(nuevoTrabajador)) {
+                masterData.add(nuevoTrabajador);
+                tablaTrabajadores.sort();
+                lblEstadoTabla.setText(masterData.size() + " trabajadores");
+
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al guardar el trabajador en la base de datos.");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
+        }
+    }
+
+    private String validarNuevoTrabajador() {
+        String mensaje = null;
         boolean hayError = false;
+        String pass = txtNuevaPassword.getText().trim();
+        String confirm = txtNuevaConfirmarPassword.getText().trim();
 
         if (txtNuevoNombre.getText().trim().isEmpty()) {
             txtNuevoNombre.getStyleClass().add("error");
@@ -380,25 +435,10 @@ public class TrabajadorController implements Initializable {
             txtNuevoSalario.getStyleClass().add("error");
             hayError = true;
         }
-
-        String pass = txtNuevaPassword.getText().trim();
-        String confirm = txtNuevaConfirmarPassword.getText().trim();
-
         if (pass.isEmpty() || pass.length() < 8) {
             txtNuevaPassword.getStyleClass().add("error");
             hayError = true;
-        } else if (!pass.equals(confirm)) {
-            txtNuevaPassword.getStyleClass().add("error");
-            txtNuevaConfirmarPassword.getStyleClass().add("error");
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Contraseñas no coinciden");
-            alert.setHeaderText(null);
-            alert.setContentText("Las contraseñas introducidas no son iguales.");
-            alert.showAndWait();
-            return;
         }
-
         if (cmbNuevoCargo.getSelectionModel().getSelectedIndex() == -1) {
             cmbNuevoCargo.getStyleClass().add("error");
             hayError = true;
@@ -413,88 +453,30 @@ public class TrabajadorController implements Initializable {
         }
 
         if (hayError) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Faltan datos");
-            alert.setHeaderText(null);
-            alert.setContentText("Todos los campos son obligatorios y la contraseña debe tener al menos 8 caracteres.");
-            alert.showAndWait();
-            return;
-        }
-
-        String msg = null;
-        if (!com.tartanga.funerariatrujillo.Utils.Utils.dniValido(txtNuevoDni.getText().trim())) {
+            mensaje = "Todos los campos son obligatorios y la contraseña debe tener al menos 8 caracteres.";
+        } else if (!pass.equals(confirm)) {
+            txtNuevaPassword.getStyleClass().add("error");
+            txtNuevaConfirmarPassword.getStyleClass().add("error");
+            mensaje = "Las contraseñas introducidas no son iguales.";
+        } else if (!Utils.dniValido(txtNuevoDni.getText().trim())) {
             txtNuevoDni.getStyleClass().add("error");
-            msg = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
-        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.correoValido(txtNuevoCorreo.getText().trim())) {
+            mensaje = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
+        } else if (!Utils.correoValido(txtNuevoCorreo.getText().trim())) {
             txtNuevoCorreo.getStyleClass().add("error");
-            msg = "El correo electrónico no tiene un formato válido.";
-        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.cpValido(txtNuevoCP.getText().trim())) {
+            mensaje = "El correo electrónico no tiene un formato válido.";
+        } else if (!Utils.cpValido(txtNuevoCP.getText().trim())) {
             txtNuevoCP.getStyleClass().add("error");
-            msg = "El código postal debe tener 5 números.";
-        }
-        if (msg != null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Datos no válidos");
-            alert.setHeaderText(null);
-            alert.setContentText(msg);
-            alert.showAndWait();
-            return;
-        }
-
-        Trabajador nuevoTrabajador = new Trabajador();
-        nuevoTrabajador.setNombre(txtNuevoNombre.getText().trim());
-        nuevoTrabajador.setApellidos(txtNuevoApellidos.getText().trim());
-        nuevoTrabajador.setDni(txtNuevoDni.getText().trim().toUpperCase());
-        nuevoTrabajador.setCorreo_electronico(txtNuevoCorreo.getText().trim());
-        nuevoTrabajador.setNumero_ss(txtNuevoSS.getText().trim());
-        nuevoTrabajador.setIban(txtNuevoIban.getText().trim());
-
-        String usuario = generarUsuario(txtNuevoNombre.getText(), txtNuevoApellidos.getText());
-        nuevoTrabajador.setUsuario(usuario);
-
-        String hashPass = BCrypt.hashpw(pass, BCrypt.gensalt(12));
-        nuevoTrabajador.setPassword(hashPass);
-
-        try {
-            nuevoTrabajador.setSalario(Double.valueOf(txtNuevoSalario.getText().trim()));
-        } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Formato incorrecto");
-            alert.setHeaderText(null);
-            alert.setContentText("El salario debe ser un valor numérico.");
-            alert.showAndWait();
-            return;
-        }
-
-        nuevoTrabajador.setCargo(cmbNuevoCargo.getSelectionModel().getSelectedItem());
-        nuevoTrabajador.setTipo_jornada(cmbNuevaJornada.getSelectionModel().getSelectedItem());
-        nuevoTrabajador.setRol(cmbNuevoRol.getSelectionModel().getSelectedItem());
-
-        Direccion dir = new Direccion();
-        dir.setCalle(txtNuevoCalle.getText().trim());
-        dir.setCiudad(txtNuevaCiudad.getText().trim());
-        try {
-            dir.setCodigoPostal(
-                    txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
-        } catch (NumberFormatException ex) {
-            dir.setCodigoPostal(0);
-        }
-        nuevoTrabajador.setDireccion(dir);
-
-        if (trabajadorDAO.insertarTrabajador(nuevoTrabajador)) {
-            masterData.add(nuevoTrabajador);
-            tablaTrabajadores.sort();
-            lblEstadoTabla.setText(masterData.size() + " trabajadores");
-
-            limpiarFormularioNuevo();
-            closeForm();
+            mensaje = "El código postal debe tener 5 números.";
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Hubo un problema al guardar el trabajador en la base de datos.");
-            alert.showAndWait();
+            try {
+                Double.valueOf(txtNuevoSalario.getText().trim());
+            } catch (NumberFormatException e) {
+                txtNuevoSalario.getStyleClass().add("error");
+                mensaje = "El salario debe ser un valor numérico.";
+            }
         }
+
+        return mensaje;
     }
 
     private void limpiarFormularioNuevo() {

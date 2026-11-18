@@ -269,114 +269,100 @@ public class ClientesController implements Initializable {
         txtNuevoCiudad.getStyleClass().remove("error");
         txtNuevoCP.getStyleClass().remove("error");
 
+        String mensaje = validarNuevoCliente();
+
+        if (mensaje == null) {
+            Cliente nuevoCliente = new Cliente();
+            nuevoCliente.setNombre(txtNuevoNombre.getText().trim());
+            nuevoCliente.setApellidos(txtNuevoApellidos.getText().trim());
+            nuevoCliente.setDni(txtNuevoDni.getText().trim().toUpperCase());
+            nuevoCliente.setTelefono(txtNuevoTelefono.getText().trim());
+            nuevoCliente.setCorreo_electronico(txtNuevoCorreo.getText().trim());
+            nuevoCliente.setFecha_registro(new Date());
+
+            Direccion dir = new Direccion();
+            dir.setCalle(txtNuevoCalle.getText().trim());
+            dir.setCiudad(txtNuevoCiudad.getText().trim());
+            dir.setCodigoPostal(Integer.parseInt(txtNuevoCP.getText().trim()));
+            nuevoCliente.setDireccion(dir);
+
+            if (clienteDAO.insertarCliente(nuevoCliente)) {
+                masterData.add(nuevoCliente);
+                tablaClientes.sort();
+                lblEstadoTabla.setText(masterData.size() + " clientes");
+
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al guardar el cliente en la base de datos.");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
+        }
+    }
+
+    private String validarNuevoCliente() {
+        String mensaje = null;
         boolean hayError = false;
 
         if (txtNuevoNombre.getText().isBlank()) {
             txtNuevoNombre.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoApellidos.getText().isBlank()) {
             txtNuevoApellidos.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoDni.getText().isBlank()) {
             txtNuevoDni.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoTelefono.getText().isBlank()) {
             txtNuevoTelefono.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoCorreo.getText().isBlank()) {
             txtNuevoCorreo.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoCalle.getText().isBlank()) {
             txtNuevoCalle.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoCiudad.getText().isBlank()) {
             txtNuevoCiudad.getStyleClass().add("error");
             hayError = true;
         }
-
         if (txtNuevoCP.getText().isBlank()) {
             txtNuevoCP.getStyleClass().add("error");
             hayError = true;
         }
 
         if (hayError) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Faltan datos");
-            alert.setHeaderText(null);
-            alert.setContentText("Todos los campos son obligatorios.");
-            alert.showAndWait();
-            return;
-        }
-
-        String msg = null;
-        if (!com.tartanga.funerariatrujillo.Utils.Utils.dniValido(txtNuevoDni.getText().trim())) {
+            mensaje = "Todos los campos son obligatorios.";
+        } else if (!Utils.dniValido(txtNuevoDni.getText().trim())) {
             txtNuevoDni.getStyleClass().add("error");
-            msg = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
-        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.telefonoValido(txtNuevoTelefono.getText().trim())) {
-            txtNuevoTelefono.getStyleClass().add("error");
-            msg = "El teléfono debe tener 9 números.";
-        }else if (!com.tartanga.funerariatrujillo.Utils.Utils.correoValido(txtNuevoCorreo.getText().trim())) {
+            mensaje = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
+        } else if (!Utils.correoValido(txtNuevoCorreo.getText().trim())) {
             txtNuevoCorreo.getStyleClass().add("error");
-            msg = "El correo electrónico no tiene un formato válido.";  
-        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.cpValido(txtNuevoCP.getText().trim())) {
+            mensaje = "El correo electrónico no tiene un formato válido.";
+        } else if (!Utils.telefonoValido(txtNuevoTelefono.getText().trim())) {
+            txtNuevoTelefono.getStyleClass().add("error");
+            mensaje = "El teléfono debe tener 9 números.";
+        } else if (!Utils.cpValido(txtNuevoCP.getText().trim())) {
             txtNuevoCP.getStyleClass().add("error");
-            msg = "El código postal debe tener 5 números.";
-        }
-        if (msg != null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Datos no válidos");
-            alert.setHeaderText(null);
-            alert.setContentText(msg);
-            alert.showAndWait();
-            return;
+            mensaje = "El código postal debe tener 5 números.";
         }
 
-        Cliente nuevoCliente = new Cliente();
-        nuevoCliente.setNombre(txtNuevoNombre.getText().trim());
-        nuevoCliente.setApellidos(txtNuevoApellidos.getText().trim());
-        nuevoCliente.setDni(txtNuevoDni.getText().trim().toUpperCase());
-        nuevoCliente.setTelefono(txtNuevoTelefono.getText().trim());
-        nuevoCliente.setCorreo_electronico(txtNuevoCorreo.getText().trim());
-        nuevoCliente.setFecha_registro(new Date());
-
-        Direccion dir = new Direccion();
-        dir.setCalle(txtNuevoCalle.getText().trim());
-        dir.setCiudad(txtNuevoCiudad.getText().trim());
-
-        try {
-            dir.setCodigoPostal(
-                    txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
-        } catch (NumberFormatException ex) {
-            dir.setCodigoPostal(0);
-        }
-        nuevoCliente.setDireccion(dir);
-
-        if (clienteDAO.insertarCliente(nuevoCliente)) {
-            masterData.add(nuevoCliente);
-            tablaClientes.sort();
-            lblEstadoTabla.setText(masterData.size() + " clientes");
-
-            limpiarFormularioNuevo();
-            closeForm();
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Hubo un problema al guardar el cliente en la base de datos.");
-            alert.showAndWait();
-        }
+        return mensaje;
     }
 
     private void limpiarFormularioNuevo() {
