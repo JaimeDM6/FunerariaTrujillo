@@ -101,7 +101,7 @@
                             </children>
                         </VBox>
 
-                        <VBox fx:id="vistaDetalles" maxHeight="-Infinity" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
+                        <VBox fx:id="vistaDetalles" maxHeight="1.7976931348623157E308" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
                             <padding>
                                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                             </padding>
@@ -144,7 +144,7 @@
                                     </children>
                                 </HBox>
 
-                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="470.0" style="-fx-background-color: transparent; -fx-background: #FFFFFF;">
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: #FFFFFF;">
                                     <content>
                                         <VBox spacing="16.0">
                                             <children>
