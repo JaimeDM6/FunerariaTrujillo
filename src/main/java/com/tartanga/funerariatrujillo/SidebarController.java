@@ -114,7 +114,7 @@ public class SidebarController {
         btnFeretros.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                mainController.cargarVista("feretros.fxml");
+                mainController.cargarVista("feretro.fxml");
                 marcarActivo(btnFeretros);
             }
         });
@@ -130,7 +130,7 @@ public class SidebarController {
         btnSalas.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                mainController.cargarVista("salas.fxml");
+                mainController.cargarVista("sala.fxml");
                 marcarActivo(btnSalas);
             }
         });
