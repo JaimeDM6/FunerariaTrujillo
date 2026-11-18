@@ -1,6 +1,9 @@
 .root {
     -fx-font-family: "Inter 18pt";
     -fx-font-size: 13px;
+}
+
+Text {
     -fx-font-smoothing-type: gray;
 }
 

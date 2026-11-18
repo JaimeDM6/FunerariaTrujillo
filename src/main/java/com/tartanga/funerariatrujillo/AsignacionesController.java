@@ -1,681 +1,573 @@
 package com.tartanga.funerariatrujillo;
 
 import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO;
-import com.tartanga.funerariatrujillo.Objects.Asignacion;
-import com.tartanga.funerariatrujillo.Utils.Utils;
+import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO.ResumenAsignacion;
+import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO.TanatopractorResumen;
+import java.io.IOException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class AsignacionesController implements Initializable {
 
-    private final AsignacionesDAO asignacionesDAO;
+    private final AsignacionesDAO asignacionDAO;
+    private MainController mainController;
+    private Consumer<String> onAbrirFicha;
 
-    public AsignacionesController() {
-        this.asignacionesDAO = new AsignacionesDAO();
-    }
-
-    public AsignacionesController(AsignacionesDAO asignacionesDAO) {
-        this.asignacionesDAO = asignacionesDAO;
-    }
+    private final SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm");
+    private final SimpleDateFormat sdfFechaHora = new SimpleDateFormat("dd/MM/yyyy · HH:mm");
 
     @FXML
-    private VBox vistaTabla;
-    @FXML
-    private VBox vistaDetalles;
-    @FXML
-    private VBox panelFormularioNuevo;
-    @FXML
-    private Region spacerLateral;
-    @FXML
-    private TableView<Asignacion> tablaAsignaciones;
-
-    @FXML
-    private Button btnNuevaAsignacion;
-    @FXML
-    private Button btnCerrarFormulario;
-    @FXML
-    private Button btnVolver;
-    @FXML
-    private Button btnEditar;
-    @FXML
-    private Button btnGuardarEdicion;
-    @FXML
-    private Button btnGuardarNuevo;
-    @FXML
-    private Button btnEliminar;
-
+    private StackPane rootAsignaciones;
     @FXML
     private TextField txtBuscar;
-    @FXML
-    private Label lblEstadoTabla;
 
     @FXML
-    private TableColumn<Asignacion, String> colID;
+    private Label lblBadgePendientes;
     @FXML
-    private TableColumn<Asignacion, String> colDifunto;
+    private TableView<ResumenAsignacion> tablaPendientes;
     @FXML
-    private TableColumn<Asignacion, String> colTrabajador;
+    private TableColumn<ResumenAsignacion, String> colPendDifunto;
     @FXML
-    private TableColumn<Asignacion, String> colEstado;
+    private TableColumn<ResumenAsignacion, String> colPendServicio;
     @FXML
-    private TableColumn<Asignacion, Date> colFechaAsignacion;
+    private TableColumn<ResumenAsignacion, String> colPendTrabajo;
+    @FXML
+    private TableColumn<ResumenAsignacion, Date> colPendLlegada;
+    @FXML
+    private Label lblEstadoPendientes;
 
     @FXML
-    private ComboBox<String> cmbNuevoDifunto;
+    private Label lblTituloAsignados;
     @FXML
-    private ComboBox<String> cmbNuevoTrabajador;
+    private Button btnAbrirFicha;
     @FXML
-    private TextArea txtNuevasIndicaciones;
+    private TableView<ResumenAsignacion> tablaAsignados;
+    @FXML
+    private TableColumn<ResumenAsignacion, String> colAsigDifunto;
+    @FXML
+    private TableColumn<ResumenAsignacion, String> colAsigServicio;
+    @FXML
+    private TableColumn<ResumenAsignacion, String> colAsigResponsable;
+    @FXML
+    private TableColumn<ResumenAsignacion, String> colAsigEstado;
+    @FXML
+    private Label lblEstadoAsignados;
 
     @FXML
-    private ComboBox<String> cmbDetalleDifunto;
+    private Label lblServicioSeleccionado;
     @FXML
-    private ComboBox<String> cmbDetalleTrabajador;
+    private Label lblPanelDifunto;
     @FXML
-    private ComboBox<String> cmbDetalleEstado;
+    private Label lblPanelCliente;
     @FXML
-    private Label lblDetalleFechas;
+    private Label lblPanelTrabajo;
     @FXML
-    private TextArea txtDetalleIndicaciones;
+    private ComboBox<TanatopractorResumen> cmbTanatopractor;
     @FXML
-    private CheckBox chkDetalleIdentificacion;
-    @FXML
-    private CheckBox chkDetalleConservacion;
-    @FXML
-    private CheckBox chkDetalleEstetica;
-    @FXML
-    private TextArea txtDetalleObservaciones;
+    private Button btnConfirmarAsignacion;
 
-    private final ObservableList<Asignacion> masterData = FXCollections.observableArrayList();
-    private final Map<String, String> idsReferencias = new HashMap<String, String>();
-    private final Map<String, String> textosPorId = new HashMap<String, String>();
-    private FilteredList<Asignacion> filteredData;
-    private Asignacion asignacionSeleccionada;
-    private boolean gestionar;
+    @FXML
+    private VBox vboxCargaTrabajo;
+
+    private final ObservableList<ResumenAsignacion> masterPendientes = FXCollections.observableArrayList();
+    private final ObservableList<ResumenAsignacion> masterAsignados = FXCollections.observableArrayList();
+    private final ObservableList<TanatopractorResumen> tanatopractores = FXCollections.observableArrayList();
+
+    private FilteredList<ResumenAsignacion> filteredPendientes;
+    private FilteredList<ResumenAsignacion> filteredAsignados;
+
+    private ResumenAsignacion pendienteSeleccionado;
+    private ResumenAsignacion asignadoSeleccionado;
+
+    public AsignacionesController() {
+        this.asignacionDAO = new AsignacionesDAO();
+    }
+
+    public AsignacionesController(AsignacionesDAO asignacionDAO) {
+        this.asignacionDAO = asignacionDAO;
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public void setOnAbrirFicha(Consumer<String> onAbrirFicha) {
+        this.onAbrirFicha = onAbrirFicha;
+    }
+
+    private static class DatosIniciales {
+
+        final List<ResumenAsignacion> pendientes;
+        final List<ResumenAsignacion> asignados;
+        final List<TanatopractorResumen> tanatopractores;
+
+        DatosIniciales(List<ResumenAsignacion> pendientes,
+                List<ResumenAsignacion> asignados,
+                List<TanatopractorResumen> tanatopractores) {
+            this.pendientes = pendientes;
+            this.asignados = asignados;
+            this.tanatopractores = tanatopractores;
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        gestionar = asignacionesDAO.puedeGestionar();
+        configurarTablas();
+        configurarFiltros();
+        configurarEventos();
+        cargarDatos();
+    }
 
-        panelFormularioNuevo.setTranslateX(400);
-        panelFormularioNuevo.setVisible(false);
-        spacerLateral.setPrefWidth(0);
-        spacerLateral.setMinWidth(0);
+    private void configurarTablas() {
+        colPendDifunto.setReorderable(false);
+        colPendServicio.setReorderable(false);
+        colPendTrabajo.setReorderable(false);
+        colPendLlegada.setReorderable(false);
 
-        btnNuevaAsignacion.setVisible(gestionar);
-        btnNuevaAsignacion.setManaged(gestionar);
+        colPendDifunto.setCellValueFactory(new PropertyValueFactory<>("difuntoNombre"));
+        colPendServicio.setCellValueFactory(new PropertyValueFactory<>("codigoServicio"));
+        colPendTrabajo.setCellValueFactory(new PropertyValueFactory<>("trabajoSolicitado"));
+        colPendLlegada.setCellValueFactory(new PropertyValueFactory<>("fechaLlegada"));
 
-        btnNuevaAsignacion.setOnAction(new EventHandler<ActionEvent>() {
+        colPendLlegada.setCellFactory(new Callback<TableColumn<ResumenAsignacion, Date>, TableCell<ResumenAsignacion, Date>>() {
             @Override
-            public void handle(ActionEvent event) {
-                openForm();
+            public TableCell<ResumenAsignacion, Date> call(TableColumn<ResumenAsignacion, Date> param) {
+                return new TableCell<ResumenAsignacion, Date>() {
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(formatearFechaLlegada(item));
+                        }
+                    }
+                };
             }
         });
 
-        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+        colAsigDifunto.setReorderable(false);
+        colAsigServicio.setReorderable(false);
+        colAsigResponsable.setReorderable(false);
+        colAsigEstado.setReorderable(false);
+
+        colAsigDifunto.setCellValueFactory(new PropertyValueFactory<>("difuntoNombre"));
+        colAsigServicio.setCellValueFactory(new PropertyValueFactory<>("codigoServicio"));
+        colAsigResponsable.setCellValueFactory(new PropertyValueFactory<>("responsableDetalle"));
+        colAsigEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        colAsigEstado.setCellFactory(new Callback<TableColumn<ResumenAsignacion, String>, TableCell<ResumenAsignacion, String>>() {
             @Override
-            public void handle(ActionEvent event) {
-                guardarNuevaAsignacion();
+            public TableCell<ResumenAsignacion, String> call(TableColumn<ResumenAsignacion, String> param) {
+                return new TableCell<ResumenAsignacion, String>() {
+                    @Override
+                    protected void updateItem(String estado, boolean empty) {
+                        super.updateItem(estado, empty);
+                        if (empty || estado == null) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            Label badge = new Label("● " + estado);
+                            badge.setFont(Font.font("Inter 18pt Bold", 11.0));
+                            if ("Completado".equalsIgnoreCase(estado)) {
+                                badge.setStyle("-fx-background-color: #E8F5E9; -fx-text-fill: #2E7D32; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
+                            } else if ("En curso".equalsIgnoreCase(estado)) {
+                                badge.setStyle("-fx-background-color: #FDF4E5; -fx-text-fill: #C68E17; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
+                            } else {
+                                badge.setStyle("-fx-background-color: #EDE3D0; -fx-text-fill: #7A5230; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
+                            }
+                            setText(null);
+                            setGraphic(badge);
+                        }
+                    }
+                };
             }
         });
 
-        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                eliminarAsignacionSeleccionada();
-            }
-        });
+        tablaPendientes.setPlaceholder(new Label("Cargando servicios pendientes..."));
+        tablaAsignados.setPlaceholder(new Label("Cargando trabajo asignado..."));
+    }
 
-        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                closeForm();
-            }
-        });
+    private void configurarFiltros() {
+        filteredPendientes = new FilteredList<>(masterPendientes, item -> true);
+        filteredAsignados = new FilteredList<>(masterAsignados, item -> true);
 
-        filteredData = new FilteredList<>(masterData, new Predicate<Asignacion>() {
-            @Override
-            public boolean test(Asignacion asignacion) {
-                return true;
-            }
-        });
+        tablaPendientes.setItems(filteredPendientes);
+        tablaAsignados.setItems(filteredAsignados);
 
         txtBuscar.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                filteredData.setPredicate(new Predicate<Asignacion>() {
-                    @Override
-                    public boolean test(Asignacion asignacion) {
-                        boolean coincide = true;
+                aplicarFiltroBusqueda(newValue);
+            }
+        });
+    }
 
-                        if (newValue != null && !newValue.trim().isEmpty()) {
-                            String filtro = newValue.trim().toLowerCase();
-
-                            coincide = textoSinNulos(asignacion.getId()).toLowerCase().contains(filtro)
-                                    || codigoCorto(asignacion.getId()).toLowerCase().contains(filtro)
-                                    || textoSinNulos(asignacion.getDifuntoNombre()).toLowerCase().contains(filtro)
-                                    || textoSinNulos(asignacion.getTrabajadorNombre()).toLowerCase().contains(filtro)
-                                    || textoSinNulos(asignacion.getEstado()).toLowerCase().contains(filtro);
-                        }
-
-                        return coincide;
-                    }
-                });
-                actualizarEstadoBusqueda(newValue);
+    private void configurarEventos() {
+        tablaPendientes.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ResumenAsignacion>() {
+            @Override
+            public void changed(ObservableValue<? extends ResumenAsignacion> observable,
+                    ResumenAsignacion oldValue,
+                    ResumenAsignacion newValue) {
+                pendienteSeleccionado = newValue;
+                mostrarPendienteEnPanel(newValue);
             }
         });
 
-        SortedList<Asignacion> sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(tablaAsignaciones.comparatorProperty());
-        tablaAsignaciones.setItems(sortedData);
-
-        colFechaAsignacion.setSortType(TableColumn.SortType.DESCENDING);
-        tablaAsignaciones.getSortOrder().add(colFechaAsignacion);
-
-        colID.setReorderable(false);
-        colDifunto.setReorderable(false);
-        colTrabajador.setReorderable(false);
-        colEstado.setReorderable(false);
-        colFechaAsignacion.setReorderable(false);
-
-        colID.setCellValueFactory(new PropertyValueFactory<Asignacion, String>("id"));
-        colDifunto.setCellValueFactory(new PropertyValueFactory<Asignacion, String>("difuntoNombre"));
-        colTrabajador.setCellValueFactory(new PropertyValueFactory<Asignacion, String>("trabajadorNombre"));
-        colEstado.setCellValueFactory(new PropertyValueFactory<Asignacion, String>("estado"));
-        colFechaAsignacion.setCellValueFactory(new PropertyValueFactory<Asignacion, Date>("fechaAsignacion"));
-
-        Utils.columnID(colID);
-        Utils.columnDate(colFechaAsignacion);
-
-        tablaAsignaciones.setPlaceholder(new Label("Cargando asignaciones..."));
-        lblEstadoTabla.setText("Cargando asignaciones...");
-
-        cmbDetalleEstado.getItems().setAll("Pendiente", "En curso", "Completado");
-
-        cargarReferencias();
-        cargarDatos();
-        configurarSeleccionDeTabla();
-        configurarModoEdicion();
-        bloquearCamposEdicion();
-    }
-
-    private void cargarReferencias() {
-        idsReferencias.clear();
-        textosPorId.clear();
-
-        List<String> difuntos = registrarReferencias(asignacionesDAO.obtenerDifuntos());
-        List<String> trabajadores = registrarReferencias(asignacionesDAO.obtenerTrabajadores());
-
-        cmbNuevoDifunto.getItems().setAll(difuntos);
-        cmbNuevoTrabajador.getItems().setAll(trabajadores);
-        cmbDetalleDifunto.getItems().setAll(difuntos);
-        cmbDetalleTrabajador.getItems().setAll(trabajadores);
-    }
-
-    private List<String> registrarReferencias(List<String> referencias) {
-        List<String> textos = new ArrayList<>();
-
-        for (String referencia : referencias) {
-            int separador = referencia.indexOf(" - ");
-
-            if (separador > 0) {
-                String id = referencia.substring(0, separador);
-                String nombre = referencia.substring(separador + 3);
-                String texto = crearTextoReferencia(id, nombre);
-
-                idsReferencias.put(texto, id);
-                textosPorId.put(id, texto);
-                textos.add(texto);
+        tablaAsignados.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ResumenAsignacion>() {
+            @Override
+            public void changed(ObservableValue<? extends ResumenAsignacion> observable,
+                    ResumenAsignacion oldValue,
+                    ResumenAsignacion newValue) {
+                asignadoSeleccionado = newValue;
             }
-        }
+        });
 
-        return textos;
-    }
+        tablaAsignados.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getClickCount() == 2 && asignadoSeleccionado != null) {
+                    abrirFichaSeleccionada();
+                }
+            }
+        });
 
-    private String crearTextoReferencia(String id, String nombre) {
-        return nombre + " (" + codigoCorto(id) + ")";
-    }
+        cmbTanatopractor.valueProperty().addListener(new ChangeListener<TanatopractorResumen>() {
+            @Override
+            public void changed(ObservableValue<? extends TanatopractorResumen> observable,
+                    TanatopractorResumen oldValue,
+                    TanatopractorResumen newValue) {
+                if (newValue != null) {
+                    cmbTanatopractor.getStyleClass().remove("error");
+                }
+            }
+        });
 
-    private String obtenerTextoReferencia(String id, String nombre) {
-        String texto = textosPorId.get(id);
+        btnConfirmarAsignacion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                confirmarAsignacion();
+            }
+        });
 
-        if (texto == null) {
-            texto = crearTextoReferencia(id, nombre);
-        }
-
-        return texto;
-    }
-
-    private String obtenerNombreDeReferencia(String texto) {
-        String nombre = textoSinNulos(texto);
-        int posicion = nombre.lastIndexOf(" (");
-
-        if (posicion > 0) {
-            nombre = nombre.substring(0, posicion);
-        }
-
-        return nombre;
-    }
-
-    private String codigoCorto(String id) {
-        String codigo = textoSinNulos(id);
-
-        if (codigo.length() > 6) {
-            codigo = codigo.substring(codigo.length() - 6).toUpperCase();
-        }
-
-        return codigo;
-    }
-
-    private String textoSinNulos(String texto) {
-        String resultado = "";
-        if (texto != null) {
-            resultado = texto;
-        }
-        return resultado;
-    }
-
-    private void actualizarEstadoBusqueda(String textoBusqueda) {
-        if (filteredData.size() > 0) {
-            lblEstadoTabla.setText(filteredData.size() + " asignaciones");
-            tablaAsignaciones.setPlaceholder(new Label("No hay asignaciones"));
-        } else if (masterData.isEmpty()) {
-            lblEstadoTabla.setText("0 asignaciones");
-            tablaAsignaciones.setPlaceholder(new Label("No hay asignaciones"));
-        } else if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
-            lblEstadoTabla.setText("0 asignaciones");
-            tablaAsignaciones.setPlaceholder(new Label("No hay asignaciones"));
-        } else {
-            lblEstadoTabla.setText("Asignación no encontrada");
-            tablaAsignaciones.setPlaceholder(new Label("Asignación no encontrada"));
-        }
+        btnAbrirFicha.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                abrirFichaSeleccionada();
+            }
+        });
     }
 
     private void cargarDatos() {
-        Task<List<Asignacion>> taskObtenerAsignaciones = new Task<List<Asignacion>>() {
+        Task<DatosIniciales> taskCarga = new Task<DatosIniciales>() {
             @Override
-            protected List<Asignacion> call() throws Exception {
-                return asignacionesDAO.obtenerAsignaciones();
+            protected DatosIniciales call() {
+                List<ResumenAsignacion> pendientes = asignacionDAO.obtenerPendientesDeAsignar();
+                List<ResumenAsignacion> asignados = asignacionDAO.obtenerTrabajoAsignado();
+                List<TanatopractorResumen> listaTanato = asignacionDAO.obtenerTanatopractores();
+                return new DatosIniciales(
+                        pendientes != null ? pendientes : new ArrayList<>(),
+                        asignados != null ? asignados : new ArrayList<>(),
+                        listaTanato != null ? listaTanato : new ArrayList<>()
+                );
             }
         };
 
-        taskObtenerAsignaciones.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        taskCarga.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                masterData.setAll(taskObtenerAsignaciones.getValue());
-                tablaAsignaciones.sort();
-                actualizarEstadoBusqueda(txtBuscar.getText());
+                DatosIniciales datos = taskCarga.getValue();
+                masterPendientes.setAll(datos.pendientes);
+                masterAsignados.setAll(datos.asignados);
+                tanatopractores.setAll(datos.tanatopractores);
+                cmbTanatopractor.setItems(tanatopractores);
+
+                tablaPendientes.setPlaceholder(new Label("No hay servicios pendientes de asignar"));
+                tablaAsignados.setPlaceholder(new Label("No hay trabajos asignados"));
+
+                actualizarContadores();
+                actualizarCargaTrabajo();
+
+                if (!filteredPendientes.isEmpty()) {
+                    tablaPendientes.getSelectionModel().selectFirst();
+                } else {
+                    mostrarPendienteEnPanel(null);
+                }
             }
         });
 
-        taskObtenerAsignaciones.setOnFailed(new EventHandler<WorkerStateEvent>() {
+        taskCarga.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                lblEstadoTabla.setText("Error de conexión");
+                tablaPendientes.setPlaceholder(new Label("Error al cargar servicios"));
+                tablaAsignados.setPlaceholder(new Label("Error al cargar asignaciones"));
                 mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión",
-                        "No se pudo cargar la lista de asignaciones desde la base de datos.");
+                        "No se han podido cargar las asignaciones desde la base de datos.");
             }
         });
 
-        Thread hiloSecundario = new Thread(taskObtenerAsignaciones);
-        hiloSecundario.setDaemon(true);
-        hiloSecundario.start();
+        Thread hilo = new Thread(taskCarga);
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
-    private void guardarNuevaAsignacion() {
-        cmbNuevoDifunto.getStyleClass().remove("error");
-        cmbNuevoTrabajador.getStyleClass().remove("error");
+    private void aplicarFiltroBusqueda(String texto) {
+        final String filtro = texto == null ? "" : texto.trim().toLowerCase();
 
-        String mensaje = validarNuevaAsignacion();
+        Predicate<ResumenAsignacion> predicado = new Predicate<ResumenAsignacion>() {
+            @Override
+            public boolean test(ResumenAsignacion item) {
+                if (filtro.isEmpty()) {
+                    return true;
+                }
+                String difunto = textoSeguro(item.getDifuntoNombre()).toLowerCase();
+                String codigo = textoSeguro(item.getCodigoServicio()).toLowerCase();
+                String trabajo = textoSeguro(item.getTrabajoSolicitado()).toLowerCase();
+                String responsable = textoSeguro(item.getResponsableDetalle()).toLowerCase();
+                return difunto.contains(filtro)
+                        || codigo.contains(filtro)
+                        || trabajo.contains(filtro)
+                        || responsable.contains(filtro);
+            }
+        };
 
-        if (mensaje == null) {
-            Asignacion nueva = new Asignacion();
-            nueva.setIdDifunto(idsReferencias.get(cmbNuevoDifunto.getValue()));
-            nueva.setIdTrabajador(idsReferencias.get(cmbNuevoTrabajador.getValue()));
-            nueva.setDifuntoNombre(obtenerNombreDeReferencia(cmbNuevoDifunto.getValue()));
-            nueva.setTrabajadorNombre(obtenerNombreDeReferencia(cmbNuevoTrabajador.getValue()));
-            nueva.setIndicacionesFamilia(txtNuevasIndicaciones.getText().trim());
+        filteredPendientes.setPredicate(predicado);
+        filteredAsignados.setPredicate(predicado);
 
-            if (asignacionesDAO.insertarAsignacion(nueva)) {
-                masterData.add(nueva);
-                tablaAsignaciones.sort();
-                actualizarEstadoBusqueda(txtBuscar.getText());
+        if (filteredPendientes.isEmpty()) {
+            tablaPendientes.setPlaceholder(new Label(filtro.isEmpty()
+                    ? "No hay servicios pendientes de asignar"
+                    : "No se encontraron servicios pendientes"));
+        }
+        if (filteredAsignados.isEmpty()) {
+            tablaAsignados.setPlaceholder(new Label(filtro.isEmpty()
+                    ? "No hay trabajos asignados"
+                    : "No se encontraron trabajos asignados"));
+        }
 
-                limpiarFormularioNuevo();
-                closeForm();
+        actualizarContadores();
+    }
+
+    private void mostrarPendienteEnPanel(ResumenAsignacion item) {
+        if (item == null) {
+            lblServicioSeleccionado.setText("Ningún servicio seleccionado");
+            lblPanelDifunto.setText("-");
+            lblPanelCliente.setText("-");
+            lblPanelTrabajo.setText("-");
+            lblEstadoPendientes.setText("Ningún servicio pendiente seleccionado");
+        } else {
+            lblServicioSeleccionado.setText("Servicio seleccionado · " + item.getCodigoServicio());
+            lblPanelDifunto.setText(textoSeguro(item.getDifuntoNombre()));
+            lblPanelCliente.setText(textoSeguro(item.getClienteInfo()));
+            lblPanelTrabajo.setText(textoSeguro(item.getTrabajoSolicitado()));
+            lblEstadoPendientes.setText("Seleccionado: " + item.getCodigoServicio() + " · Sin responsable");
+        }
+    }
+
+    private void confirmarAsignacion() {
+        cmbTanatopractor.getStyleClass().remove("error");
+
+        if (pendienteSeleccionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Servicio requerido",
+                    "Selecciona primero un servicio pendiente de asignar.");
+            return;
+        }
+
+        TanatopractorResumen tanatopractor = cmbTanatopractor.getValue();
+        if (tanatopractor == null) {
+            if (!cmbTanatopractor.getStyleClass().contains("error")) {
+                cmbTanatopractor.getStyleClass().add("error");
+            }
+            mostrarAlerta(Alert.AlertType.WARNING, "Tanatopractor requerido",
+                    "Debes seleccionar un tanatopractor responsable antes de confirmar.");
+            return;
+        }
+
+        ResumenAsignacion servicioAAsignar = pendienteSeleccionado;
+        if (asignacionDAO.confirmarAsignacion(servicioAAsignar, tanatopractor)) {
+            masterPendientes.remove(servicioAAsignar);
+            masterAsignados.add(0, servicioAAsignar);
+
+            cmbTanatopractor.setValue(null);
+            actualizarContadores();
+            actualizarCargaTrabajo();
+
+            if (!filteredPendientes.isEmpty()) {
+                tablaPendientes.getSelectionModel().selectFirst();
             } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error",
-                        "Hubo un problema al guardar la asignación en la base de datos.");
+                tablaPendientes.getSelectionModel().clearSelection();
+                mostrarPendienteEnPanel(null);
             }
         } else {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
+            mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                    "No se pudo guardar la asignación en la base de datos.");
         }
     }
 
-    private String validarNuevaAsignacion() {
-        String mensaje = null;
-        boolean hayError = false;
-
-        if (cmbNuevoDifunto.getValue() == null || !idsReferencias.containsKey(cmbNuevoDifunto.getValue())) {
-            cmbNuevoDifunto.getStyleClass().add("error");
-            hayError = true;
+    private void abrirFichaSeleccionada() {
+        if (asignadoSeleccionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida",
+                    "Selecciona un trabajo asignado para abrir su ficha del servicio.");
+            return;
         }
 
-        if (cmbNuevoTrabajador.getValue() == null || !idsReferencias.containsKey(cmbNuevoTrabajador.getValue())) {
-            cmbNuevoTrabajador.getStyleClass().add("error");
-            hayError = true;
+        String idAsignacion = asignadoSeleccionado.getId();
+        if (onAbrirFicha != null) {
+            onAbrirFicha.accept(idAsignacion);
+            return;
         }
 
-        if (hayError) {
-            mensaje = "Debes seleccionar un difunto y un trabajador.";
-        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/ficha_servicio.fxml"));
+            Parent vistaFicha = loader.load();
+            FichaServicioController fichaController = loader.getController();
+            fichaController.setMainController(mainController);
+            fichaController.cargarServicioDesdeBD(idAsignacion);
 
-        return mensaje;
-    }
-
-    private String validarDetalleAsignacion() {
-        String mensaje = null;
-        boolean hayError = false;
-
-        if (gestionar) {
-            if (cmbDetalleDifunto.getValue() == null) {
-                cmbDetalleDifunto.getStyleClass().add("error");
-                hayError = true;
-            }
-
-            if (cmbDetalleTrabajador.getValue() == null) {
-                cmbDetalleTrabajador.getStyleClass().add("error");
-                hayError = true;
-            }
-        }
-
-        if (cmbDetalleEstado.getValue() == null) {
-            cmbDetalleEstado.getStyleClass().add("error");
-            hayError = true;
-        }
-
-        if (hayError) {
-            mensaje = "No puedes dejar en blanco los campos obligatorios.";
-        }
-
-        return mensaje;
-    }
-
-    private void limpiarFormularioNuevo() {
-        cmbNuevoDifunto.getStyleClass().remove("error");
-        cmbNuevoTrabajador.getStyleClass().remove("error");
-        cmbNuevoDifunto.setValue(null);
-        cmbNuevoTrabajador.setValue(null);
-        txtNuevasIndicaciones.clear();
-    }
-
-    private void eliminarAsignacionSeleccionada() {
-        if (asignacionSeleccionada != null && gestionar) {
-            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacion.setTitle("Eliminar asignación");
-            confirmacion.setHeaderText(null);
-            confirmacion.setContentText("¿Seguro que quieres eliminar la asignación de "
-                    + asignacionSeleccionada.getDifuntoNombre()
-                    + "? Se eliminará también su seguimiento. El difunto y el trabajador no se verán afectados.");
-
-            Optional<ButtonType> respuesta = confirmacion.showAndWait();
-
-            if (respuesta.isPresent() && respuesta.get() == ButtonType.OK) {
-                String id = asignacionSeleccionada.getId();
-
-                if (asignacionesDAO.eliminarAsignacion(id)) {
-                    int posicion = buscarPosicionPorId(id);
-                    if (posicion >= 0) {
-                        masterData.remove(posicion);
+            if (rootAsignaciones != null && rootAsignaciones.getParent() instanceof StackPane) {
+                StackPane contenedor = (StackPane) rootAsignaciones.getParent();
+                fichaController.setOnVolver(() -> {
+                    try {
+                        FXMLLoader asigLoader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
+                        Parent vistaAsig = asigLoader.load();
+                        AsignacionesController asigCtrl = asigLoader.getController();
+                        asigCtrl.setMainController(mainController);
+                        contenedor.getChildren().setAll(vistaAsig);
+                    } catch (IOException ex) {
+                        mostrarAlerta(Alert.AlertType.ERROR, "Error de navegación",
+                                "No se pudo volver a asignaciones: " + ex.getMessage());
                     }
-                    actualizarEstadoBusqueda(txtBuscar.getText());
-
-                    vistaDetalles.setVisible(false);
-                    vistaDetalles.setManaged(false);
-                    vistaTabla.setVisible(true);
-                    vistaTabla.setManaged(true);
-
-                    asignacionSeleccionada = null;
-                } else {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Error",
-                            "Hubo un problema al eliminar la asignación de la base de datos.");
-                }
+                });
+                contenedor.getChildren().setAll(vistaFicha);
+            } else if (rootAsignaciones != null && rootAsignaciones.getScene() != null) {
+                rootAsignaciones.getScene().setRoot(vistaFicha);
             }
+        } catch (IOException e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error de navegación",
+                    "No se pudo abrir la ficha del servicio: " + e.getMessage());
         }
     }
 
-    private int buscarPosicionPorId(String id) {
-        int posicion = -1;
-        int i = 0;
+    private void actualizarContadores() {
+        lblBadgePendientes.setText("● Pendiente · " + filteredPendientes.size());
+        lblTituloAsignados.setText("Trabajo asignado · " + filteredAsignados.size());
+    }
 
-        while (posicion == -1 && i < masterData.size()) {
-            if (id != null && id.equals(masterData.get(i).getId())) {
-                posicion = i;
-            }
-            i++;
+    private void actualizarCargaTrabajo() {
+        vboxCargaTrabajo.getChildren().clear();
+
+        if (tanatopractores.isEmpty()) {
+            Label vacio = new Label("Sin tanatopractores registrados");
+            vacio.setFont(Font.font("Inter 18pt Regular", 12.0));
+            vacio.setStyle("-fx-text-fill: #7a5230;");
+            vboxCargaTrabajo.getChildren().add(vacio);
+            return;
         }
 
-        return posicion;
-    }
+        for (TanatopractorResumen tanato : tanatopractores) {
+            int enCurso = 0;
+            int pendientes = 0;
 
-    private void openForm() {
-        Utils.openForm(panelFormularioNuevo, spacerLateral);
-    }
-
-    private void closeForm() {
-        Utils.closeForm(panelFormularioNuevo, spacerLateral);
-    }
-
-    private String formatearFecha(Date fecha) {
-        String texto = "Sin registrar";
-
-        if (fecha != null) {
-            texto = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(fecha);
-        }
-
-        return texto;
-    }
-
-    private void mostrarDetalles(Asignacion asignacion) {
-        asignacionSeleccionada = asignacion;
-
-        cmbDetalleDifunto.setValue(obtenerTextoReferencia(asignacion.getIdDifunto(), asignacion.getDifuntoNombre()));
-        cmbDetalleTrabajador.setValue(obtenerTextoReferencia(asignacion.getIdTrabajador(), asignacion.getTrabajadorNombre()));
-        cmbDetalleEstado.setValue(asignacion.getEstado());
-        txtDetalleIndicaciones.setText(textoSinNulos(asignacion.getIndicacionesFamilia()));
-        chkDetalleIdentificacion.setSelected(asignacion.isPasoIdentificacion());
-        chkDetalleConservacion.setSelected(asignacion.isPasoConservacion());
-        chkDetalleEstetica.setSelected(asignacion.isPasoEstetica());
-        txtDetalleObservaciones.setText(textoSinNulos(asignacion.getObservaciones()));
-        lblDetalleFechas.setText("Fecha de asignación: " + formatearFecha(asignacion.getFechaAsignacion())
-                + "\nInicio del trabajo: " + formatearFecha(asignacion.getFechaInicioTrabajo())
-                + "\nFinalización: " + formatearFecha(asignacion.getFechaFinalizacion())
-                + "\nÚltima actualización: " + formatearFecha(asignacion.getUltimaActualizacion()));
-
-        panelFormularioNuevo.setTranslateX(400);
-        panelFormularioNuevo.setVisible(false);
-        spacerLateral.setPrefWidth(0);
-        spacerLateral.setMinWidth(0);
-        vistaTabla.setVisible(false);
-        vistaTabla.setManaged(false);
-        vistaDetalles.setVisible(true);
-        vistaDetalles.setManaged(true);
-        tablaAsignaciones.getSelectionModel().clearSelection();
-
-        bloquearCamposEdicion();
-    }
-
-    private void configurarSeleccionDeTabla() {
-        tablaAsignaciones.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Asignacion newSelection = tablaAsignaciones.getSelectionModel().getSelectedItem();
-
-                if (newSelection != null) {
-                    mostrarDetalles(newSelection);
-                }
-            }
-        });
-
-        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                vistaDetalles.setVisible(false);
-                vistaDetalles.setManaged(false);
-
-                vistaTabla.setVisible(true);
-                vistaTabla.setManaged(true);
-
-                bloquearCamposEdicion();
-            }
-        });
-    }
-
-    private void configurarModoEdicion() {
-        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                cambiarEstadoCamposEdicion(true);
-
-                cmbDetalleDifunto.getStyleClass().remove("error");
-                cmbDetalleTrabajador.getStyleClass().remove("error");
-                cmbDetalleEstado.getStyleClass().remove("error");
-
-                btnEditar.setVisible(false);
-                btnEditar.setManaged(false);
-                btnEliminar.setVisible(false);
-                btnEliminar.setManaged(false);
-                btnGuardarEdicion.setVisible(true);
-                btnGuardarEdicion.setManaged(true);
-            }
-        });
-
-        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                guardarEdicion();
-            }
-        });
-    }
-
-    private void guardarEdicion() {
-        cmbDetalleDifunto.getStyleClass().remove("error");
-        cmbDetalleTrabajador.getStyleClass().remove("error");
-        cmbDetalleEstado.getStyleClass().remove("error");
-
-        String mensaje = validarDetalleAsignacion();
-
-        if (mensaje == null) {
-            if (asignacionSeleccionada != null) {
-                Asignacion modificada = new Asignacion(asignacionSeleccionada);
-                modificada.setEstado(cmbDetalleEstado.getValue());
-                modificada.setPasoIdentificacion(chkDetalleIdentificacion.isSelected());
-                modificada.setPasoConservacion(chkDetalleConservacion.isSelected());
-                modificada.setPasoEstetica(chkDetalleEstetica.isSelected());
-                modificada.setObservaciones(txtDetalleObservaciones.getText().trim());
-
-                if (gestionar) {
-                    aplicarReferenciasEditadas(modificada);
-                    modificada.setIndicacionesFamilia(txtDetalleIndicaciones.getText().trim());
-                }
-
-                if (asignacionesDAO.actualizarAsignacion(modificada)) {
-                    int posicion = buscarPosicionPorId(modificada.getId());
-                    if (posicion >= 0) {
-                        masterData.set(posicion, modificada);
+            for (ResumenAsignacion asig : masterAsignados) {
+                if (tanato.getId() != null && tanato.getId().equals(asig.getIdTrabajador())) {
+                    if ("En curso".equalsIgnoreCase(asig.getEstado())) {
+                        enCurso++;
+                    } else if (!"Completado".equalsIgnoreCase(asig.getEstado())) {
+                        pendientes++;
                     }
-                    tablaAsignaciones.sort();
-                    actualizarEstadoBusqueda(txtBuscar.getText());
-                    mostrarDetalles(modificada);
-                } else {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Error",
-                            "Hubo un error al actualizar los datos en la base de datos.");
                 }
             }
-        } else {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
+
+            HBox fila = new HBox(10.0);
+            fila.setAlignment(Pos.CENTER_LEFT);
+
+            Label lblNombre = new Label(tanato.getNombreCompleto());
+            lblNombre.setFont(Font.font("Inter 18pt Bold", 13.0));
+            lblNombre.setStyle("-fx-text-fill: #2e1a0e;");
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            Label lblResumen = new Label(construirTextoCarga(enCurso, pendientes));
+            lblResumen.setFont(Font.font("Inter 18pt Regular", 12.0));
+            lblResumen.setStyle("-fx-text-fill: #7a5230;");
+
+            fila.getChildren().addAll(lblNombre, spacer, lblResumen);
+            vboxCargaTrabajo.getChildren().add(fila);
         }
     }
 
-    private void aplicarReferenciasEditadas(Asignacion modificada) {
-        String idDifunto = idsReferencias.get(cmbDetalleDifunto.getValue());
-        String idTrabajador = idsReferencias.get(cmbDetalleTrabajador.getValue());
-
-        if (idDifunto != null) {
-            modificada.setIdDifunto(idDifunto);
-            modificada.setDifuntoNombre(obtenerNombreDeReferencia(cmbDetalleDifunto.getValue()));
+    private String construirTextoCarga(int enCurso, int pendientes) {
+        if (enCurso == 0 && pendientes == 0) {
+            return "Disponible";
         }
-
-        if (idTrabajador != null) {
-            modificada.setIdTrabajador(idTrabajador);
-            modificada.setTrabajadorNombre(obtenerNombreDeReferencia(cmbDetalleTrabajador.getValue()));
+        List<String> partes = new ArrayList<>();
+        if (enCurso > 0) {
+            partes.add(enCurso + " en curso");
         }
+        if (pendientes > 0) {
+            partes.add(pendientes + (pendientes == 1 ? " asignado" : " asignados"));
+        }
+        return String.join(" · ", partes);
     }
 
-    private void cambiarEstadoCamposEdicion(boolean editar) {
-        boolean editarReferencias = editar && gestionar;
-
-        cmbDetalleDifunto.setDisable(!editarReferencias);
-        cmbDetalleTrabajador.setDisable(!editarReferencias);
-        txtDetalleIndicaciones.setEditable(editarReferencias);
-        cmbDetalleEstado.setDisable(!editar);
-        chkDetalleIdentificacion.setDisable(!editar);
-        chkDetalleConservacion.setDisable(!editar);
-        chkDetalleEstetica.setDisable(!editar);
-        txtDetalleObservaciones.setEditable(editar);
+    private String formatearFechaLlegada(Date fecha) {
+        LocalDate fechaLocal = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        if (fechaLocal.equals(LocalDate.now())) {
+            return "Hoy · " + sdfHora.format(fecha);
+        }
+        return sdfFechaHora.format(fecha);
     }
 
-    private void bloquearCamposEdicion() {
-        cambiarEstadoCamposEdicion(false);
-
-        btnGuardarEdicion.setVisible(false);
-        btnGuardarEdicion.setManaged(false);
-        btnEditar.setVisible(true);
-        btnEditar.setManaged(true);
-        btnEliminar.setVisible(gestionar);
-        btnEliminar.setManaged(gestionar);
+    private String textoSeguro(String texto) {
+        return texto != null ? texto : "";
     }
-    
+
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        Alert alerta = new Alert(tipo);
-        alerta.setTitle(titulo);
-        alerta.setHeaderText(null);
-        alerta.setContentText(mensaje);
-        alerta.showAndWait();
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

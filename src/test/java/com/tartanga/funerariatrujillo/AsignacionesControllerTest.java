@@ -1,15 +1,14 @@
 package com.tartanga.funerariatrujillo;
 
 import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO;
-import com.tartanga.funerariatrujillo.Objects.Asignacion;
-import javafx.application.Platform;
+import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO.ResumenAsignacion;
+import com.tartanga.funerariatrujillo.DAO.AsignacionesDAO.TanatopractorResumen;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -17,94 +16,127 @@ import javafx.util.Callback;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.testfx.api.FxAssert.verifyThat;
-import static org.testfx.matcher.base.NodeMatchers.*;
-import static org.testfx.matcher.control.TextInputControlMatchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AsignacionesControllerTest extends ApplicationTest {
 
-    public static class MockAsignacionesDAO extends AsignacionesDAO {
+    public static class MockAsignacionDAO extends AsignacionesDAO {
+
+        private boolean asignacionConfirmada = false;
 
         @Override
-        public boolean puedeGestionar() {
-            return true;
-        }
+        public List<ResumenAsignacion> obtenerPendientesDeAsignar() {
+            List<ResumenAsignacion> lista = new ArrayList<>();
 
-        @Override
-        public List<Asignacion> obtenerAsignaciones() {
-            List<Asignacion> lista = new ArrayList<>();
-            Asignacion a = new Asignacion();
-            a.setId("6afe0ad6fa01503da7765c10");
-            a.setIdDifunto("6afe0ad6fa01503da7765c01");
-            a.setIdTrabajador("6afe0ad6fa01503da7765c02");
-            a.setDifuntoNombre("Juan Perez");
-            a.setTrabajadorNombre("Maria Gomez");
-            a.setEstado("En curso");
-            a.setFechaAsignacion(new Date());
-            a.setFechaInicioTrabajo(new Date());
-            a.setIndicacionesFamilia("Presentacion sencilla");
-            a.setPasoIdentificacion(true);
-            a.setObservaciones("Sin novedades");
-            lista.add(a);
+            ResumenAsignacion p1 = new ResumenAsignacion();
+            p1.setIdDifunto("650000000000000000000044");
+            p1.setCodigoServicio("SV-0044");
+            p1.setDifuntoNombre("Pilar Fernández Mora");
+            p1.setClienteInfo("Lucía Fernández Gil · CL-0188");
+            p1.setTrabajoSolicitado("Tanatoestética");
+            p1.setFechaLlegada(new Date());
+            p1.setEstado("Pendiente");
+            lista.add(p1);
+
+            ResumenAsignacion p2 = new ResumenAsignacion();
+            p2.setIdDifunto("650000000000000000000045");
+            p2.setCodigoServicio("SV-0045");
+            p2.setDifuntoNombre("Antonio Ruiz León");
+            p2.setClienteInfo("Carlos Ruiz · CL-0190");
+            p2.setTrabajoSolicitado("Conservación temporal");
+            p2.setFechaLlegada(new Date());
+            p2.setEstado("Pendiente");
+            lista.add(p2);
+
             return lista;
         }
 
         @Override
-        public List<String> obtenerDifuntos() {
-            List<String> lista = new ArrayList<>();
-            lista.add("6afe0ad6fa01503da7765c01 - Juan Perez");
-            lista.add("6afe0ad6fa01503da7765c03 - Pedro Ruiz");
+        public List<ResumenAsignacion> obtenerTrabajoAsignado() {
+            List<ResumenAsignacion> lista = new ArrayList<>();
+
+            ResumenAsignacion a1 = new ResumenAsignacion();
+            a1.setId("asig-0042");
+            a1.setIdDifunto("650000000000000000000042");
+            a1.setCodigoServicio("SV-0042");
+            a1.setDifuntoNombre("Manuel García Pérez");
+            a1.setIdTrabajador("trab-0001");
+            a1.setTrabajadorNombre("Ana Martín");
+            a1.setCodigoTrabajador("TR-0001");
+            a1.setTrabajadorCargo("TANATOPRACTOR");
+            a1.setEstado("En curso");
+            lista.add(a1);
+
+            ResumenAsignacion a2 = new ResumenAsignacion();
+            a2.setId("asig-0043");
+            a2.setIdDifunto("650000000000000000000043");
+            a2.setCodigoServicio("SV-0043");
+            a2.setDifuntoNombre("Carmen López Díaz");
+            a2.setIdTrabajador("trab-0002");
+            a2.setTrabajadorNombre("Luis Ortega");
+            a2.setCodigoTrabajador("TR-0002");
+            a2.setTrabajadorCargo("TANATOPRACTOR");
+            a2.setEstado("Pendiente");
+            lista.add(a2);
+
             return lista;
         }
 
         @Override
-        public List<String> obtenerTrabajadores() {
-            List<String> lista = new ArrayList<>();
-            lista.add("6afe0ad6fa01503da7765c02 - Maria Gomez");
-            lista.add("6afe0ad6fa01503da7765c04 - Laura Diaz");
+        public List<TanatopractorResumen> obtenerTanatopractores() {
+            List<TanatopractorResumen> lista = new ArrayList<>();
+            lista.add(new TanatopractorResumen("trab-0001", "Ana Martín", "TR-0001", "TANATOPRACTOR"));
+            lista.add(new TanatopractorResumen("trab-0002", "Luis Ortega", "TR-0002", "TANATOPRACTOR"));
             return lista;
         }
 
         @Override
-        public boolean insertarAsignacion(Asignacion a) {
-            a.setId("6afe0ad6fa01503da7765c20");
-            a.setEstado("Pendiente");
-            a.setFechaAsignacion(new Date());
+        public boolean confirmarAsignacion(ResumenAsignacion pendiente, TanatopractorResumen tanatopractor) {
+            pendiente.setId("asig-nueva-0044");
+            pendiente.setIdTrabajador(tanatopractor.getId());
+            pendiente.setTrabajadorNombre(tanatopractor.getNombreCompleto());
+            pendiente.setCodigoTrabajador(tanatopractor.getCodigo());
+            pendiente.setTrabajadorCargo(tanatopractor.getCargo());
+            pendiente.setEstado("Pendiente");
+            pendiente.setFechaAsignacion(new Date());
+            asignacionConfirmada = true;
             return true;
         }
 
-        @Override
-        public boolean actualizarAsignacion(Asignacion a) {
-            a.setUltimaActualizacion(new Date());
-            return true;
-        }
-
-        @Override
-        public boolean eliminarAsignacion(String id) {
-            return true;
+        public boolean isAsignacionConfirmada() {
+            return asignacionConfirmada;
         }
     }
 
-    @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
+    private MockAsignacionDAO mockDAO;
+    private AsignacionesController controlador;
+    private AtomicReference<String> fichaAbiertaId;
 
+    @Override
+    public void start(Stage stage) throws Exception {
+        mockDAO = new MockAsignacionDAO();
+        fichaAbiertaId = new AtomicReference<>();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
         loader.setControllerFactory(new Callback<Class<?>, Object>() {
             @Override
             public Object call(Class<?> type) {
                 if (type == AsignacionesController.class) {
-                    return new AsignacionesController(new MockAsignacionesDAO());
+                    controlador = new AsignacionesController(mockDAO);
+                    controlador.setOnAbrirFicha(id -> fichaAbiertaId.set(id));
+                    return controlador;
                 }
                 try {
                     return type.getDeclaredConstructor().newInstance();
@@ -118,236 +150,100 @@ public class AsignacionesControllerTest extends ApplicationTest {
         stage.setScene(new Scene(root, 1000, 700));
         stage.show();
     }
-
-    private void abrirFichaDeLaPrimeraFila() {
+    
+    @BeforeEach
+    public void esperarCargaInicial() throws Exception {
+        WaitForAsyncUtils.waitFor(5, TimeUnit.SECONDS,
+                () -> !lookup("#tablaPendientes").queryTableView().getItems().isEmpty());
         WaitForAsyncUtils.waitForFxEvents();
-
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                tabla.getSelectionModel().select(0);
-            }
-        });
-        WaitForAsyncUtils.waitForFxEvents();
-
-        clickOn(tabla);
     }
 
     @Test
     @Order(1)
-    public void testInitialState() {
-        verifyThat("#vistaTabla", isVisible());
-        verifyThat("#vistaDetalles", isInvisible());
-        verifyThat("#btnNuevaAsignacion", isVisible());
+    public void testCargaInicialTablasYPanel() {
+        TableView<?> tablaPendientes = lookup("#tablaPendientes").queryTableView();
+        TableView<?> tablaAsignados = lookup("#tablaAsignados").queryTableView();
+        Label lblBadge = lookup("#lblBadgePendientes").queryAs(Label.class);
+        Label lblTituloAsig = lookup("#lblTituloAsignados").queryAs(Label.class);
+        Label lblPanelDifunto = lookup("#lblPanelDifunto").queryAs(Label.class);
+        Label lblServicioSel = lookup("#lblServicioSeleccionado").queryAs(Label.class);
+        VBox vboxCarga = lookup("#vboxCargaTrabajo").queryAs(VBox.class);
 
-        VBox panelFormulario = lookup("#panelFormularioNuevo").queryAs(VBox.class);
-        assertFalse(panelFormulario.isVisible(), "El formulario de nueva asignación debe estar oculto al inicio.");
+        assertEquals(2, tablaPendientes.getItems().size());
+        assertEquals(2, tablaAsignados.getItems().size());
+        assertEquals("● Pendiente · 2", lblBadge.getText());
+        assertEquals("Trabajo asignado · 2", lblTituloAsig.getText());
+        assertEquals("Pilar Fernández Mora", lblPanelDifunto.getText());
+        assertEquals("Servicio seleccionado · SV-0044", lblServicioSel.getText());
+        assertEquals(2, vboxCarga.getChildren().size());
     }
 
     @Test
     @Order(2)
-    public void testLoadedData() {
-        sleep(300);
+    public void testFiltroBusqueda() {
+        TableView<?> tablaPendientes = lookup("#tablaPendientes").queryTableView();
+        TableView<?> tablaAsignados = lookup("#tablaAsignados").queryTableView();
+
+        clickOn("#txtBuscar").write("Antonio");
         WaitForAsyncUtils.waitForFxEvents();
 
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
+        assertEquals(1, tablaPendientes.getItems().size());
+        assertEquals(0, tablaAsignados.getItems().size());
 
-        assertEquals(1, tabla.getItems().size());
-        assertEquals("1 asignaciones", lblEstado.getText());
+        clickOn("#txtBuscar");
+        push(KeyCode.CONTROL, KeyCode.A);
+        push(KeyCode.BACK_SPACE);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertEquals(2, tablaPendientes.getItems().size());
+        assertEquals(2, tablaAsignados.getItems().size());
     }
 
     @Test
     @Order(3)
-    public void testOpenForm() {
-        clickOn("#btnNuevaAsignacion");
-        sleep(450);
+    public void testConfirmarSinTanatopractorMuestraError() {
+        ComboBox<?> cmb = lookup("#cmbTanatopractor").queryComboBox();
+        TableView<?> tablaPendientes = lookup("#tablaPendientes").queryTableView();
 
-        VBox panelFormulario = lookup("#panelFormularioNuevo").queryAs(VBox.class);
-        assertTrue(panelFormulario.isVisible());
-        assertEquals(0.0, panelFormulario.getTranslateX(), 0.01);
+        clickOn("#btnConfirmarAsignacion");
+        sleep(400);
+        type(KeyCode.ENTER);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertTrue(cmb.getStyleClass().contains("error"));
+        assertFalse(mockDAO.isAsignacionConfirmada());
+        assertEquals(2, tablaPendientes.getItems().size());
     }
 
     @Test
     @Order(4)
-    public void testCloseForm() {
-        clickOn("#btnNuevaAsignacion");
-        sleep(450);
+    public void testConfirmarAsignacionExitosa() {
+        ComboBox<TanatopractorResumen> cmb = lookup("#cmbTanatopractor").queryComboBox();
+        TableView<?> tablaPendientes = lookup("#tablaPendientes").queryTableView();
+        TableView<?> tablaAsignados = lookup("#tablaAsignados").queryTableView();
 
-        clickOn("#btnCerrarFormulario");
-        sleep(450);
+        interact(() -> cmb.getSelectionModel().select(1));
+        assertNotNull(cmb.getValue());
 
-        VBox panelFormulario = lookup("#panelFormularioNuevo").queryAs(VBox.class);
-        assertFalse(panelFormulario.isVisible());
-        assertEquals(400.0, panelFormulario.getTranslateX(), 0.01);
+        clickOn("#btnConfirmarAsignacion");
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertTrue(mockDAO.isAsignacionConfirmada());
+        assertEquals(1, tablaPendientes.getItems().size());
+        assertEquals(3, tablaAsignados.getItems().size());
+        assertEquals("● Pendiente · 1", lookup("#lblBadgePendientes").queryAs(Label.class).getText());
+        assertEquals("Trabajo asignado · 3", lookup("#lblTituloAsignados").queryAs(Label.class).getText());
     }
 
     @Test
     @Order(5)
-    public void testBlankForm() {
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        int initialSize = tabla.getItems().size();
+    public void testAbrirFichaSeleccionada() {
+        TableView<?> tablaAsignados = lookup("#tablaAsignados").queryTableView();
 
-        clickOn("#btnNuevaAsignacion");
-        sleep(400);
-
-        clickOn("#btnGuardarNuevo");
-        push(KeyCode.ENTER);
-
-        verifyThat("#panelFormularioNuevo", isVisible());
-        assertEquals(initialSize, tabla.getItems().size(), "No debe crearse una asignación sin difunto ni trabajador.");
-    }
-
-    @Test
-    @Order(6)
-    public void testSearchFilter() {
-        WaitForAsyncUtils.waitForFxEvents();
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
-
-        clickOn("#txtBuscar").write("Texto de prueba");
-        verifyThat("#txtBuscar", hasText("Texto de prueba"));
-        assertEquals(0, tabla.getItems().size());
-        assertEquals("Asignación no encontrada", lblEstado.getText());
-
-        clickOn("#txtBuscar").eraseText(15);
-        assertEquals(1, tabla.getItems().size());
-        assertEquals("1 asignaciones", lblEstado.getText());
-
-        clickOn("#txtBuscar").write("curso");
-        assertEquals(1, tabla.getItems().size(), "La búsqueda debe encontrar por estado.");
-
-        clickOn("#txtBuscar").eraseText(5);
-        clickOn("#txtBuscar").write("765C10");
-        assertEquals(1, tabla.getItems().size(), "La búsqueda debe encontrar por código abreviado.");
-    }
-
-    @Test
-    @Order(7)
-    public void testCompleteFlow() {
-        abrirFichaDeLaPrimeraFila();
-
-        verifyThat("#vistaTabla", isInvisible());
-        verifyThat("#vistaDetalles", isVisible());
-
-        ComboBox<String> cmbEstado = lookup("#cmbDetalleEstado").queryComboBox();
-        assertTrue(cmbEstado.isDisabled(), "El estado no debe ser editable al entrar a la ficha.");
-        assertEquals("En curso", cmbEstado.getValue());
-
-        clickOn("#btnEditar");
-
-        assertFalse(cmbEstado.isDisabled(), "El estado debe ser editable tras pulsar Editar.");
-
-        verifyThat("#btnEditar", isInvisible());
-        verifyThat("#btnEliminar", isInvisible());
-        verifyThat("#btnGuardarEdicion", isVisible());
-
-        clickOn("#btnGuardarEdicion");
+        interact(() -> tablaAsignados.getSelectionModel().selectFirst());
+        clickOn("#btnAbrirFicha");
         WaitForAsyncUtils.waitForFxEvents();
 
-        assertTrue(cmbEstado.isDisabled(), "Los campos deben volver a bloquearse tras guardar.");
-        verifyThat("#btnGuardarEdicion", isInvisible());
-        verifyThat("#btnEditar", isVisible());
-
-        clickOn("#btnVolver");
-        verifyThat("#vistaDetalles", isInvisible());
-        verifyThat("#vistaTabla", isVisible());
-    }
-
-    @Test
-    @Order(8)
-    public void testEditStatus() {
-        abrirFichaDeLaPrimeraFila();
-
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        ComboBox<String> cmbEstado = lookup("#cmbDetalleEstado").queryComboBox();
-        TextArea txtObservaciones = lookup("#txtDetalleObservaciones").queryAs(TextArea.class);
-
-        clickOn("#btnEditar");
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                cmbEstado.setValue("Completado");
-                txtObservaciones.setText("Servicio finalizado");
-            }
-        });
-        WaitForAsyncUtils.waitForFxEvents();
-
-        clickOn("#btnGuardarEdicion");
-        WaitForAsyncUtils.waitForFxEvents();
-
-        assertEquals("Completado", tabla.getItems().get(0).getEstado());
-        assertEquals("Servicio finalizado", tabla.getItems().get(0).getObservaciones());
-    }
-
-    @Test
-    @Order(9)
-    public void testCreateAssignment() {
-        WaitForAsyncUtils.waitForFxEvents();
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        int initialSize = tabla.getItems().size();
-
-        ComboBox<String> cmbDifunto = lookup("#cmbNuevoDifunto").queryComboBox();
-        ComboBox<String> cmbTrabajador = lookup("#cmbNuevoTrabajador").queryComboBox();
-        TextArea txtIndicaciones = lookup("#txtNuevasIndicaciones").queryAs(TextArea.class);
-
-        clickOn("#btnNuevaAsignacion");
-        sleep(450);
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                cmbDifunto.setValue(cmbDifunto.getItems().get(1));
-                cmbTrabajador.setValue(cmbTrabajador.getItems().get(1));
-                txtIndicaciones.setText("Peinado especial");
-            }
-        });
-        WaitForAsyncUtils.waitForFxEvents();
-
-        clickOn("#btnGuardarNuevo");
-        sleep(450);
-
-        assertEquals(initialSize + 1, tabla.getItems().size(), "La tabla debe tener una asignación más.");
-        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
-        assertEquals((initialSize + 1) + " asignaciones", lblEstado.getText());
-    }
-
-    @Test
-    @Order(10)
-    public void testCancelDelete() {
-        abrirFichaDeLaPrimeraFila();
-
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        int initialSize = tabla.getItems().size();
-
-        clickOn("#btnEliminar");
-        push(KeyCode.ESCAPE);
-
-        verifyThat("#vistaDetalles", isVisible());
-        assertEquals(initialSize, tabla.getItems().size(), "Cancelar la confirmación no debe eliminar la asignación.");
-    }
-
-    @Test
-    @Order(11)
-    public void testDeleteAssignment() {
-        abrirFichaDeLaPrimeraFila();
-
-        TableView<Asignacion> tabla = lookup("#tablaAsignaciones").queryTableView();
-        int initialSize = tabla.getItems().size();
-
-        verifyThat("#vistaDetalles", isVisible());
-
-        clickOn("#btnEliminar");
-        push(KeyCode.ENTER);
-        WaitForAsyncUtils.waitForFxEvents();
-
-        verifyThat("#vistaTabla", isVisible());
-        verifyThat("#vistaDetalles", isInvisible());
-        assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener una asignación menos.");
-        Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
-        assertEquals((initialSize - 1) + " asignaciones", lblEstado.getText());
+        assertEquals("asig-0042", fichaAbiertaId.get());
     }
 }

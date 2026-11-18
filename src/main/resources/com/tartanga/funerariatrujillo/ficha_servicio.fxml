@@ -36,7 +36,7 @@
                             </Label>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="btnVolver" minWidth="180.0" mnemonicParsing="false" prefHeight="35.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4; -fx-cursor: hand;" text="Volver a asignaciones" textFill="#2e1a0e">
+                        <Button fx:id="btnVolver" minWidth="180.0" mnemonicParsing="false" prefHeight="35.0" styleClass="button-back" text="Volver a asignaciones" textFill="#2e1a0e">
                             <font>
                                 <Font name="Inter 18pt Bold" size="13.0" />
                             </font>

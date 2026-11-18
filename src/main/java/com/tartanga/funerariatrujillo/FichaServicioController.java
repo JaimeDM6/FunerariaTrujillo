@@ -2,6 +2,7 @@ package com.tartanga.funerariatrujillo;
 
 import com.tartanga.funerariatrujillo.DAO.FichaServicioDAO;
 import com.tartanga.funerariatrujillo.Objects.Servicio;
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -17,6 +18,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 public class FichaServicioController implements Initializable {
 
@@ -51,12 +54,23 @@ public class FichaServicioController implements Initializable {
     @FXML
     private Button btnVolver, btnGuardarCambios;
 
+    private MainController mainController;
+    private Runnable onVolver;
+
     public FichaServicioController() {
         this.servicioDAO = new FichaServicioDAO();
     }
 
     public FichaServicioController(FichaServicioDAO servicioDAO) {
         this.servicioDAO = servicioDAO;
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    public void setOnVolver(Runnable onVolver) {
+        this.onVolver = onVolver;
     }
 
     @Override
@@ -66,7 +80,7 @@ public class FichaServicioController implements Initializable {
         btnVolver.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("Navegando de vuelta a Asignaciones...");
+                volverAAsignaciones();
             }
         });
 
@@ -76,6 +90,26 @@ public class FichaServicioController implements Initializable {
                 guardarSeguimiento();
             }
         });
+    }
+
+    private void volverAAsignaciones() {
+        if (mainController != null) {
+            mainController.cargarVista("asignaciones.fxml");
+        } else if (onVolver != null) {
+            onVolver.run();
+        } else {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
+                Parent vistaAsignaciones = loader.load();
+                btnVolver.getScene().setRoot(vistaAsignaciones);
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error de navegación");
+                alert.setHeaderText(null);
+                alert.setContentText("No se pudo volver a la vista de asignaciones.");
+                alert.showAndWait();
+            }
+        }
     }
 
     public void cargarServicioDesdeBD(String idAsignacion) {
