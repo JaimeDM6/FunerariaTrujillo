@@ -21,6 +21,13 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
+/**
+ * Controlador de la ficha de servicio. Muestra los datos del difunto, del cliente y de los
+ * servicios contratados de una asignación y permite actualizar el estado y el seguimiento del
+ * trabajo.
+ *
+ * @author Jaime
+ */
 public class FichaServicioController implements Initializable {
 
     private final FichaServicioDAO servicioDAO;
@@ -57,10 +64,19 @@ public class FichaServicioController implements Initializable {
     private MainController mainController;
     private Runnable onVolver;
 
+    /**
+     * Crea el controlador con el acceso a datos de la ficha por defecto.
+     */
     public FichaServicioController() {
         this.servicioDAO = new FichaServicioDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param servicioDAO DAO que se utilizará para obtener y guardar la ficha
+     */
     public FichaServicioController(FichaServicioDAO servicioDAO) {
         this.servicioDAO = servicioDAO;
     }
@@ -73,6 +89,12 @@ public class FichaServicioController implements Initializable {
         this.onVolver = onVolver;
     }
 
+    /**
+     * Inicializa la ficha: carga los estados posibles y asigna las acciones de los botones.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         cmbEstadoServicio.setItems(FXCollections.observableArrayList("Pendiente", "En curso", "Completado"));
@@ -112,6 +134,12 @@ public class FichaServicioController implements Initializable {
         }
     }
 
+    /**
+     * Carga desde la base de datos la ficha de una asignación y la muestra. Si no existe, muestra un
+     * aviso de error.
+     *
+     * @param idAsignacion identificador de la asignación
+     */
     public void cargarServicioDesdeBD(String idAsignacion) {
         Servicio s = servicioDAO.obtenerServicioPorId(idAsignacion);
         if (s != null) {
@@ -126,6 +154,10 @@ public class FichaServicioController implements Initializable {
         }
     }
 
+    /**
+     * Muestra en los campos de la ficha los datos del servicio actual: cabecera, difunto, cliente,
+     * servicios contratados y seguimiento.
+     */
     private void cargarDatosUI() {
         if (servicioActual == null) {
             return;
@@ -187,6 +219,10 @@ public class FichaServicioController implements Initializable {
         lblUltimaActualizacion.setText(servicioActual.getUltimaActualizacion() != null ? "Última actualización: " + sdfDateTime.format(servicioActual.getUltimaActualizacion()) : "Sin actualizaciones previas");
     }
 
+    /**
+     * Guarda en la base de datos el estado, los pasos y las observaciones del seguimiento. Registra
+     * las fechas de inicio y de finalización cuando el estado cambia, y avisa del resultado.
+     */
     private void guardarSeguimiento() {
         if (servicioActual != null) {
             String nuevoEstado = cmbEstadoServicio.getValue();

@@ -10,6 +10,12 @@ import javafx.scene.control.Label;
 import com.tartanga.funerariatrujillo.Objects.Trabajador.Rol;
 import com.tartanga.funerariatrujillo.Security.UserSession;
 
+/**
+ * Controlador de la barra lateral de navegación. Muestra los módulos disponibles según el rol del
+ * trabajador que ha iniciado sesión, marca el módulo activo y muestra los datos del usuario.
+ *
+ * @author Aritz
+ */
 public class SidebarController {
 
     private MainController mainController;
@@ -42,6 +48,13 @@ public class SidebarController {
 
     private List<Button> navButtons;
 
+    /**
+     * Establece el controlador principal y prepara la barra lateral: asigna la navegación de los
+     * botones, aplica los permisos según el rol del usuario, muestra su nombre, su rol y sus
+     * iniciales, y marca clientes como módulo activo si está disponible.
+     *
+     * @param mainController controlador principal de la aplicación
+     */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
 
@@ -78,6 +91,10 @@ public class SidebarController {
         }
     }
 
+    /**
+     * Asigna a cada botón de la barra la acción de cargar su vista en el controlador principal y
+     * marcarse como activo.
+     */
     private void navegacion() {
         btnClientes.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -152,10 +169,19 @@ public class SidebarController {
         });
     }
 
+    /**
+     * Marca como activo el botón de la ficha de servicio, mostrándolo en la barra.
+     */
     public void activarBotonFichaServicio() {
         marcarActivo(btnFichaServicio);
     }
 
+    /**
+     * Marca un botón como activo y el resto como inactivos. El botón de la ficha de servicio solo es
+     * visible mientras está activo.
+     *
+     * @param botonActivo botón que se marca como activo
+     */
     private void marcarActivo(Button botonActivo) {
         if (botonActivo == btnFichaServicio) {
             setVisible(btnFichaServicio, true);
@@ -176,6 +202,11 @@ public class SidebarController {
         }
     }
 
+    /**
+     * Muestra u oculta los botones de la barra según el rol del trabajador.
+     *
+     * @param rol rol del trabajador que ha iniciado sesión
+     */
     private void aplicarPermisos(Rol rol) {
         setVisible(btnClientes, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO || rol == Rol.CONTABILIDAD);
         setVisible(btnDifuntos, rol == Rol.ADMINISTRACION || rol == Rol.AGENTE_FUNERARIO || rol == Rol.TANATOPRAXIA);
@@ -188,11 +219,24 @@ public class SidebarController {
         setVisible(btnFichaServicio, false);
     }
 
+    /**
+     * Muestra u oculta un botón, de modo que ocupe o no espacio en la barra.
+     *
+     * @param button botón que se modifica
+     * @param visible {@code true} para mostrarlo; {@code false} para ocultarlo
+     */
     private void setVisible(Button button, boolean visible) {
         button.setVisible(visible);
         button.setManaged(visible);
     }
 
+    /**
+     * Obtiene las iniciales de un nombre: la del primer y la del último término, o solo la primera si
+     * hay un único término.
+     *
+     * @param nombre nombre completo
+     * @return iniciales en mayúsculas, o {@code ?} si el nombre está vacío
+     */
     private String iniciales(String nombre) {
         String[] partes = nombre.trim().split("\\s+");
         if (partes.length == 0 || partes[0].isBlank()) {

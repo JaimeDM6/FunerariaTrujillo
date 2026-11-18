@@ -9,8 +9,22 @@ import java.util.List;
 import java.util.ArrayList;
 import static com.mongodb.client.model.Filters.eq;
 
+/**
+ * Acceso a datos de la ficha de servicio. Reúne en un {@link Servicio} la información de las
+ * colecciones {@code asignacion}, {@code trabajador}, {@code difunto}, {@code cliente}, {@code
+ * feretro}, {@code urna} y {@code servicios}, y guarda el seguimiento del trabajo.
+ *
+ * @author Jaime
+ */
 public class FichaServicioDAO {
 
+    /**
+     * Obtiene la ficha de una asignación reuniendo los datos del trabajador, del difunto, del cliente
+     * y de lo contratado.
+     *
+     * @param idAsignacion identificador de la asignación
+     * @return ficha del servicio, o {@code null} si no existe o se produce un error
+     */
     public Servicio obtenerServicioPorId(String idAsignacion) {
         try {
             MongoCollection<Document> asigColl = MongoConfig.getCollection("asignacion");
@@ -111,6 +125,12 @@ public class FichaServicioDAO {
         return null;
     }
 
+    /**
+     * Guarda el estado y el seguimiento de una asignación.
+     *
+     * @param s ficha con el estado y el seguimiento nuevos
+     * @return {@code true} si se guardó correctamente
+     */
     public boolean actualizarSeguimientoServicio(Servicio s) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("asignacion");

@@ -9,10 +9,20 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Acceso a datos de la colección {@code sala} de MongoDB.
+ *
+ * @author Aritz
+ */
 public class SalasDAO {
 
     private static final String COLLECTION_NAME = "sala";
 
+    /**
+     * Obtiene todas las salas de la base de datos.
+     *
+     * @return lista de salas; vacía si se produce un error
+     */
     public List<Sala> obtenerSalas() {
         List<Sala> resultado = new ArrayList<>();
         MongoCollection<Document> collection = MongoConfig.getCollection(COLLECTION_NAME);
@@ -34,6 +44,12 @@ public class SalasDAO {
         return resultado;
     }
 
+    /**
+     * Lee la capacidad de una sala de su documento.
+     *
+     * @param doc documento de la sala
+     * @return capacidad de la sala, o 0 si no existe o no es numérica
+     */
     private int obtenerCapacidad(Document doc) {
         Object valor = doc.get("capacidad");
         int resultado = 0;
@@ -45,6 +61,12 @@ public class SalasDAO {
         return resultado;
     }
 
+    /**
+     * Convierte una sala en el documento que se guarda en MongoDB.
+     *
+     * @param objeto sala que se convierte
+     * @return documento con los datos de la sala
+     */
     private Document crearDocumento(Sala objeto) {
         return new Document()
                 .append("nombre", objeto.getNombre())
@@ -52,6 +74,12 @@ public class SalasDAO {
                 .append("capacidad", objeto.getCapacidad());
     }
 
+    /**
+     * Inserta una nueva sala.
+     *
+     * @param objeto sala que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarSala(Sala objeto) {
         boolean insertado = false;
 
@@ -71,6 +99,12 @@ public class SalasDAO {
         return insertado;
     }
 
+    /**
+     * Actualiza los datos de una sala.
+     *
+     * @param objeto sala con los datos nuevos; su identificador indica el documento que se modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarSala(Sala objeto) {
         boolean actualizado = false;
 
@@ -88,6 +122,12 @@ public class SalasDAO {
         return actualizado;
     }
 
+    /**
+     * Elimina una sala.
+     *
+     * @param id identificador de la sala
+     * @return {@code true} si se eliminó correctamente
+     */
     public boolean eliminarSala(String id) {
         boolean eliminado = false;
 

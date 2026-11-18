@@ -34,14 +34,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de servicios. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de los servicios que ofrece la funeraria.
+ *
+ * @author Iker
+ */
 public class ServiciosController implements Initializable {
 
     private final ServiciosDAO serviciosDAO;
 
+    /**
+     * Crea el controlador con el ServiciosDAO por defecto.
+     */
     public ServiciosController() {
         this.serviciosDAO = new ServiciosDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param serviciosDAO DAO que se utilizará para acceder a la base de datos
+     */
     public ServiciosController(ServiciosDAO serviciosDAO) {
         this.serviciosDAO = serviciosDAO;
     }
@@ -103,6 +118,13 @@ public class ServiciosController implements Initializable {
     private Servicios servicioSeleccionado;
     private FilteredList<Servicios> filteredData;
 
+    /**
+     * Inicializa la vista de servicios: configura la tabla, el buscador y los formularios de alta y de
+     * detalle, y carga los datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         panelFormularioNuevo.setTranslateX(400);
@@ -198,6 +220,10 @@ public class ServiciosController implements Initializable {
         configurarModoEdicion();
     }
 
+    /**
+     * Configura la columna de precio para mostrar los importes con dos decimales y el símbolo del
+     * euro.
+     */
     private void configurarColumnaPrecio() {
         colPrecio.setCellFactory(new Callback<TableColumn<Servicios, Double>, TableCell<Servicios, Double>>() {
             @Override
@@ -217,6 +243,11 @@ public class ServiciosController implements Initializable {
         });
     }
 
+    /**
+     * Actualiza el contador y el texto de la tabla según el resultado de la búsqueda.
+     *
+     * @param textoBusqueda texto escrito en el buscador, que puede ser nulo
+     */
     private void actualizarEstadoBusqueda(String textoBusqueda) {
         if (filteredData.size() > 0) {
             lblEstadoTabla.setText(filteredData.size() + " servicios");
@@ -233,6 +264,10 @@ public class ServiciosController implements Initializable {
         }
     }
 
+    /**
+     * Carga los servicios desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         Task<List<Servicios>> taskObtenerServicios = new Task<List<Servicios>>() {
             @Override
@@ -267,6 +302,10 @@ public class ServiciosController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta el servicio en la base de
+     * datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevoServicio() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevaDescripcion.getStyleClass().remove("error");
@@ -303,6 +342,12 @@ public class ServiciosController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos del formulario de alta de servicio y marca como erróneos los que no son
+     * válidos.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarNuevoServicio() {
         String mensaje = null;
         boolean hayError = false;
@@ -331,6 +376,11 @@ public class ServiciosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Comprueba los campos del panel de detalle antes de guardar la edición del servicio.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarDetalleServicio() {
         String mensaje = null;
         boolean hayError = false;
@@ -359,6 +409,13 @@ public class ServiciosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Comprueba que el precio sea un número válido y no negativo, y marca el campo como erróneo si no
+     * lo es.
+     *
+     * @param campoPrecio campo de texto que contiene el precio
+     * @return mensaje de error, o {@code null} si el precio es válido
+     */
     private String validarPrecio(TextField campoPrecio) {
         String mensaje = null;
 
@@ -376,6 +433,12 @@ public class ServiciosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSinNulos(String texto) {
         String resultado = "";
         if (texto != null) {
@@ -384,16 +447,29 @@ public class ServiciosController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Convierte un texto en un precio, admitiendo la coma como separador decimal.
+     *
+     * @param texto texto con el precio
+     * @return precio como número
+     * @throws NumberFormatException si el texto no es un número
+     */
     private Double convertirPrecio(String texto) {
         return Double.valueOf(texto.trim().replace(",", "."));
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevaDescripcion.clear();
         txtNuevoPrecio.clear();
     }
 
+    /**
+     * Elimina de la base de datos el servicio seleccionado en la tabla y recarga los datos.
+     */
     private void eliminarServicioSeleccionado() {
         if (servicioSeleccionado != null) {
             if (serviciosDAO.eliminarServicio(servicioSeleccionado.getId())) {
@@ -416,14 +492,24 @@ public class ServiciosController implements Initializable {
         }
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Configura la selección de la tabla: al elegir un servicio se muestran sus datos en el panel de
+     * detalle.
+     */
     private void configurarSeleccionDeTabla() {
         tablaServicios.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -474,6 +560,10 @@ public class ServiciosController implements Initializable {
         });
     }
 
+    /**
+     * Configura los botones del panel de detalle para editar el servicio seleccionado y guardar o
+     * descartar los cambios.
+     */
     private void configurarModoEdicion() {
         btnEditar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -531,6 +621,12 @@ public class ServiciosController implements Initializable {
         });
     }
 
+    /**
+     * Habilita o deshabilita la edición de los campos del panel de detalle.
+     *
+     * @param editable {@code true} para permitir la edición; {@code false} para dejar los campos en
+     *         solo lectura
+     */
     private void cambiarEstadoCamposEdicion(boolean editable) {
         txtDetalleNombre.setEditable(editable);
         txtDetalleDescripcion.setEditable(editable);
@@ -548,6 +644,9 @@ public class ServiciosController implements Initializable {
         txtDetallePrecio.setStyle(estilo);
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         cambiarEstadoCamposEdicion(false);
 

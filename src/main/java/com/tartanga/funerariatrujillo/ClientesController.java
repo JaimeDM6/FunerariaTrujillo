@@ -33,14 +33,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de clientes. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de clientes.
+ *
+ * @author Jaime
+ */
 public class ClientesController implements Initializable {
 
     private final ClienteDAO clienteDAO;
 
+    /**
+     * Crea el controlador con el ClienteDAO por defecto.
+     */
     public ClientesController() {
         this.clienteDAO = new ClienteDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param clienteDAO DAO que se utilizará para acceder a la base de datos
+     */
     public ClientesController(ClienteDAO clienteDAO) {
         this.clienteDAO = clienteDAO;
     }
@@ -127,6 +142,13 @@ public class ClientesController implements Initializable {
     private final ObservableList<Cliente> masterData = FXCollections.observableArrayList();
     private Cliente clienteSeleccionado;
 
+    /**
+     * Inicializa la vista de clientes: configura la tabla, el buscador y los formularios de alta y de
+     * detalle, y carga los datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         panelFormularioNuevo.setTranslateX(400);
@@ -224,6 +246,10 @@ public class ClientesController implements Initializable {
         configurarModoEdicion();
     }
 
+    /**
+     * Carga los clientes desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         Task<List<Cliente>> taskObtenerClientes = new Task<List<Cliente>>() {
             @Override
@@ -259,6 +285,10 @@ public class ClientesController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta el cliente en la base de
+     * datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevoCliente() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevoApellidos.getStyleClass().remove("error");
@@ -309,6 +339,12 @@ public class ClientesController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos del formulario de alta de cliente y marca como erróneos los que no son
+     * válidos.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarNuevoCliente() {
         String mensaje = null;
         boolean hayError = false;
@@ -365,6 +401,9 @@ public class ClientesController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevoApellidos.clear();
@@ -376,6 +415,9 @@ public class ClientesController implements Initializable {
         txtNuevoCP.clear();
     }
 
+    /**
+     * Elimina de la base de datos el cliente seleccionado en la tabla y recarga los datos.
+     */
     private void eliminarClienteSeleccionado() {
         if (clienteSeleccionado != null) {
             if (clienteDAO.eliminarCliente(clienteSeleccionado.getId())) {
@@ -398,14 +440,24 @@ public class ClientesController implements Initializable {
         }
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Configura la selección de la tabla: al elegir un cliente se muestran sus datos en el panel de
+     * detalle.
+     */
     private void configurarSeleccionDeTabla() {
         tablaClientes.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -468,6 +520,10 @@ public class ClientesController implements Initializable {
         });
     }
 
+    /**
+     * Configura los botones del panel de detalle para editar el cliente seleccionado y guardar o
+     * descartar los cambios.
+     */
     private void configurarModoEdicion() {
         btnEditar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -598,6 +654,9 @@ public class ClientesController implements Initializable {
         });
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         txtDetalleNombre.setEditable(false);
         txtDetalleApellidos.setEditable(false);

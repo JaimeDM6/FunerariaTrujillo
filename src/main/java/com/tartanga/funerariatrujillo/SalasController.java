@@ -32,14 +32,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de salas. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de salas.
+ *
+ * @author Aritz
+ */
 public class SalasController implements Initializable {
 
     private final SalasDAO salasDAO;
 
+    /**
+     * Crea el controlador con el SalasDAO por defecto.
+     */
     public SalasController() {
         this.salasDAO = new SalasDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param salasDAO DAO que se utilizará para acceder a la base de datos
+     */
     public SalasController(SalasDAO salasDAO) {
         this.salasDAO = salasDAO;
     }
@@ -101,6 +116,13 @@ public class SalasController implements Initializable {
     private final ObservableList<Sala> masterData = FXCollections.observableArrayList();
     private Sala salaSeleccionada;
 
+    /**
+     * Inicializa la vista de las salas: configura los botones, la tabla y el buscador, y carga los
+     * datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ocultarFormularioNuevo();
@@ -116,6 +138,10 @@ public class SalasController implements Initializable {
         cargarDatos();
     }
 
+    /**
+     * Asigna las acciones de los botones de la vista: abrir y cerrar el formulario de alta, guardar,
+     * editar, eliminar y volver al listado.
+     */
     private void configurarBotones() {
         btnNuevaSala.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -178,6 +204,9 @@ public class SalasController implements Initializable {
         });
     }
 
+    /**
+     * Configura las columnas de la tabla, su origen de datos y la selección de filas.
+     */
     private void configurarTabla() {
         colID.setCellValueFactory(new PropertyValueFactory<Sala, String>("id"));
         Utils.columnID(colID);
@@ -191,6 +220,10 @@ public class SalasController implements Initializable {
         colCapacidad.setReorderable(false);
     }
 
+    /**
+     * Configura el buscador para filtrar la tabla mientras se escribe y actualiza el contador de
+     * resultados.
+     */
     private void configurarBusqueda() {
         FilteredList<Sala> filtradas = new FilteredList<>(masterData, new Predicate<Sala>() {
             @Override
@@ -222,6 +255,12 @@ public class SalasController implements Initializable {
         tablaSalas.setItems(ordenadas);
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSinNulos(String texto) {
         String resultado = "";
         if (texto != null) {
@@ -230,6 +269,10 @@ public class SalasController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Carga las salas desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         lblEstadoTabla.setText("Cargando salas...");
         vistaTabla.setDisable(true);
@@ -266,6 +309,10 @@ public class SalasController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta la sala en la base de datos
+     * y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevaSala() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevaDescripcion.getStyleClass().remove("error");
@@ -294,6 +341,10 @@ public class SalasController implements Initializable {
         }
     }
 
+    /**
+     * Valida los datos del panel de detalle y, si son correctos, actualiza la sala en la base de datos
+     * y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarEdicion() {
         txtDetalleNombre.getStyleClass().remove("error");
         txtDetalleDescripcion.getStyleClass().remove("error");
@@ -328,6 +379,9 @@ public class SalasController implements Initializable {
         }
     }
 
+    /**
+     * Elimina de la base de datos la sala seleccionada en la tabla y recarga los datos.
+     */
     private void eliminarSalaSeleccionada() {
         if (salaSeleccionada != null) {
             String id = salaSeleccionada.getId();
@@ -346,6 +400,14 @@ public class SalasController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos de un formulario de sala y marca como erróneos los que no son válidos.
+     *
+     * @param txtNombre campo del nombre
+     * @param txtDescripcion campo de la descripción
+     * @param txtCapacidad campo de la capacidad
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarDatos(TextField txtNombre, TextArea txtDescripcion, TextField txtCapacidad) {
         String mensaje = null;
         boolean hayError = false;
@@ -384,6 +446,12 @@ public class SalasController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Muestra el detalle de la sala indicada: lo guarda como sala seleccionada, rellena los campos,
+     * cambia del listado al panel de detalle y deja los campos en solo lectura.
+     *
+     * @param sala sala cuyos datos se van a mostrar
+     */
     private void mostrarDetalles(Sala sala) {
         salaSeleccionada = sala;
 
@@ -401,6 +469,9 @@ public class SalasController implements Initializable {
         bloquearCamposEdicion();
     }
 
+    /**
+     * Vuelve del panel de detalle al listado, bloquea los campos y descarta la selección.
+     */
     private void volverAListado() {
         vistaDetalles.setVisible(false);
         vistaDetalles.setManaged(false);
@@ -411,10 +482,19 @@ public class SalasController implements Initializable {
         salaSeleccionada = null;
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         configurarCamposEdicion(false);
     }
 
+    /**
+     * Habilita o deshabilita la edición de los campos del panel de detalle.
+     *
+     * @param editable {@code true} para permitir la edición; {@code false} para dejar los campos en
+     *         solo lectura
+     */
     private void configurarCamposEdicion(boolean editable) {
         txtDetalleNombre.setEditable(editable);
         txtDetalleDescripcion.setEditable(editable);
@@ -439,14 +519,23 @@ public class SalasController implements Initializable {
         btnGuardarEdicion.setManaged(editable);
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Oculta el panel lateral del formulario de alta sin modificar sus campos.
+     */
     private void ocultarFormularioNuevo() {
         panelFormularioNuevo.setTranslateX(400);
         panelFormularioNuevo.setVisible(false);
@@ -454,12 +543,21 @@ public class SalasController implements Initializable {
         spacerLateral.setMinWidth(0);
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevaDescripcion.clear();
         txtNuevaCapacidad.clear();
     }
 
+    /**
+     * Busca la posición de un elemento en la lista de datos a partir de su identificador.
+     *
+     * @param id identificador que se busca
+     * @return posición del elemento en la lista, o -1 si no se encuentra
+     */
     private int buscarPosicionPorId(String id) {
         int posicion = -1;
         int i = 0;
@@ -474,10 +572,20 @@ public class SalasController implements Initializable {
         return posicion;
     }
 
+    /**
+     * Actualiza el contador de resultados y el texto de la tabla según los elementos visibles.
+     */
     private void actualizarEstadoTabla() {
         lblEstadoTabla.setText(tablaSalas.getItems().size() + " salas");
     }
 
+    /**
+     * Muestra una ventana de aviso y espera a que el usuario la cierre.
+     *
+     * @param tipo tipo de aviso
+     * @param titulo título de la ventana
+     * @param mensaje mensaje que se muestra
+     */
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);

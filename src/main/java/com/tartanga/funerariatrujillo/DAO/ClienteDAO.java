@@ -7,8 +7,18 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Acceso a datos de la colección {@code cliente} de MongoDB.
+ *
+ * @author Jaime
+ */
 public class ClienteDAO {
 
+    /**
+     * Obtiene todos los clientes de la base de datos.
+     *
+     * @return lista de clientes; vacía si se produce un error
+     */
     public List<Cliente> obtenerClientes() {
         List<Cliente> clientes = new ArrayList<>();
 
@@ -53,6 +63,12 @@ public class ClienteDAO {
         return clientes;
     }
 
+    /**
+     * Actualiza los datos de un cliente.
+     *
+     * @param c cliente con los datos nuevos; su identificador indica el documento que se modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarCliente(Cliente c) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("cliente");
@@ -74,6 +90,12 @@ public class ClienteDAO {
         }
     }
 
+    /**
+     * Inserta un nuevo cliente.
+     *
+     * @param c cliente que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarCliente(Cliente c) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("cliente");
@@ -102,6 +124,12 @@ public class ClienteDAO {
         }
     }
 
+    /**
+     * Elimina un cliente.
+     *
+     * @param id identificador del cliente
+     * @return {@code true} si se eliminó correctamente
+     */
     public boolean eliminarCliente(String id) {
         try {
             Document filtro = new Document("_id", new org.bson.types.ObjectId(id));
