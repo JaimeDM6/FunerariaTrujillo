@@ -21,7 +21,7 @@ public class App extends Application {
         scene = new Scene(loadFXML("login"), 1000, 700);
         stage.setScene(scene);
         stage.setTitle("Funeraria Trujillo");
-        stage.getIcons().add(new Image(App.class.getResourceAsStream("images/icon.png")));
+        stage.getIcons().add(new Image(App.class.getResourceAsStream("images/Icon.png")));
         stage.show();
     }
 
