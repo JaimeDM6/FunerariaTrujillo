@@ -31,6 +31,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 
 import java.net.URL;
 import java.util.List;
@@ -122,6 +123,18 @@ public class TrabajadorController implements Initializable {
     private PasswordField txtNuevaPassword;
     @FXML
     private PasswordField txtNuevaConfirmarPassword;
+    @FXML
+    private TextField txtNuevaPasswordVisible;
+    @FXML
+    private TextField txtNuevaConfirmarPasswordVisible;
+    @FXML
+    private Button btnMostrarNuevaPassword;
+    @FXML
+    private Button btnMostrarNuevaConfirmarPassword;
+    @FXML
+    private SVGPath svgOjoNuevaPassword;
+    @FXML
+    private SVGPath svgOjoNuevaConfirmarPassword;
 
     @FXML
     private ComboBox<Rol> cmbNuevoRol;
@@ -153,6 +166,9 @@ public class TrabajadorController implements Initializable {
     @FXML
     private ComboBox<Rol> cmbDetalleRol;
 
+    private static final String OJO_ABIERTO = "M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z";
+    private static final String OJO_TACHADO = "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z";
+
     private final ObservableList<Trabajador> masterData = FXCollections.observableArrayList();
     private Trabajador trabajadorSeleccionado;
 
@@ -172,6 +188,30 @@ public class TrabajadorController implements Initializable {
 
         cmbNuevoRol.setItems(FXCollections.observableArrayList(Rol.values()));
         cmbDetalleRol.setItems(FXCollections.observableArrayList(Rol.values()));
+
+        txtNuevaPasswordVisible.textProperty().bindBidirectional(txtNuevaPassword.textProperty());
+        txtNuevaConfirmarPasswordVisible.textProperty().bindBidirectional(txtNuevaConfirmarPassword.textProperty());
+
+        btnMostrarNuevaPassword.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                alternarVisibilidadPassword(txtNuevaPassword, txtNuevaPasswordVisible, svgOjoNuevaPassword);
+            }
+        });
+
+        btnMostrarNuevaConfirmarPassword.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                alternarVisibilidadPassword(txtNuevaConfirmarPassword, txtNuevaConfirmarPasswordVisible, svgOjoNuevaConfirmarPassword);
+            }
+        });
+
+        cmbNuevoCargo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Cargo>() {
+            @Override
+            public void changed(ObservableValue<? extends Cargo> observable, Cargo valorAnterior, Cargo valorNuevo) {
+                actualizarRolesNuevo();
+            }
+        });
 
         btnNuevoTrabajador.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -334,6 +374,8 @@ public class TrabajadorController implements Initializable {
         txtNuevoSalario.getStyleClass().remove("error");
         txtNuevaPassword.getStyleClass().remove("error");
         txtNuevaConfirmarPassword.getStyleClass().remove("error");
+        txtNuevaPasswordVisible.getStyleClass().remove("error");
+        txtNuevaConfirmarPasswordVisible.getStyleClass().remove("error");
         cmbNuevoCargo.getStyleClass().remove("error");
         cmbNuevaJornada.getStyleClass().remove("error");
         cmbNuevoRol.getStyleClass().remove("error");
@@ -437,6 +479,7 @@ public class TrabajadorController implements Initializable {
         }
         if (pass.isEmpty() || pass.length() < 8) {
             txtNuevaPassword.getStyleClass().add("error");
+            txtNuevaPasswordVisible.getStyleClass().add("error");
             hayError = true;
         }
         if (cmbNuevoCargo.getSelectionModel().getSelectedIndex() == -1) {
@@ -456,7 +499,9 @@ public class TrabajadorController implements Initializable {
             mensaje = "Todos los campos son obligatorios y la contraseña debe tener al menos 8 caracteres.";
         } else if (!pass.equals(confirm)) {
             txtNuevaPassword.getStyleClass().add("error");
+            txtNuevaPasswordVisible.getStyleClass().add("error");
             txtNuevaConfirmarPassword.getStyleClass().add("error");
+            txtNuevaConfirmarPasswordVisible.getStyleClass().add("error");
             mensaje = "Las contraseñas introducidas no son iguales.";
         } else if (!Utils.dniValido(txtNuevoDni.getText().trim())) {
             txtNuevoDni.getStyleClass().add("error");
@@ -477,6 +522,47 @@ public class TrabajadorController implements Initializable {
         }
 
         return mensaje;
+    }
+
+    private void alternarVisibilidadPassword(PasswordField campoOculto, TextField campoVisible, SVGPath icono) {
+        boolean mostrar = !campoVisible.isVisible();
+
+        campoOculto.setVisible(!mostrar);
+        campoOculto.setManaged(!mostrar);
+        campoVisible.setVisible(mostrar);
+        campoVisible.setManaged(mostrar);
+
+        if (mostrar) {
+            icono.setContent(OJO_TACHADO);
+        } else {
+            icono.setContent(OJO_ABIERTO);
+        }
+    }
+
+    private void actualizarRolesNuevo() {
+        Cargo cargo = cmbNuevoCargo.getSelectionModel().getSelectedItem();
+        ObservableList<Rol> roles = FXCollections.observableArrayList();
+
+        if (cargo == Cargo.TANATOPRACTOR) {
+            roles.add(Rol.TANATOPRAXIA);
+            roles.add(Rol.AGENTE_FUNERARIO);
+        } else if (cargo == Cargo.AGENTE_FUNERARIO) {
+            roles.add(Rol.AGENTE_FUNERARIO);
+        } else if (cargo == Cargo.RECEPCIONISTA) {
+            roles.add(Rol.CONTABILIDAD);
+            roles.add(Rol.ADMINISTRACION);
+        } else if (cargo == Cargo.CONDUCTOR) {
+            roles.add(Rol.TRANSPORTE);
+        } else {
+            roles.addAll(Rol.values());
+        }
+
+        cmbNuevoRol.setItems(roles);
+        cmbNuevoRol.getSelectionModel().clearSelection();
+
+        if (roles.size() == 1) {
+            cmbNuevoRol.getSelectionModel().select(0);
+        }
     }
 
     private void limpiarFormularioNuevo() {
