@@ -1,0 +1,1028 @@
+db.createCollection("cliente", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["nombre", "apellidos", "dni", "correo_electronico", "direccion", "telefono", "fecha_registro"],
+			properties: {
+				nombre: {
+					bsonType: "string",
+					description: "Debe ser una cadena de texto y es obligatorio"
+				},
+				apellidos: {
+					bsonType: "string",
+					description: "Debe ser una cadena de texto y es obligatorio"
+				},
+				dni: {
+					bsonType: "string",
+					pattern: "^[0-9]{8}[A-Z]$",
+					description: "Debe ser un DNI válido (8 números y 1 letra) y es obligatorio"
+				},
+				correo_electronico: {
+					bsonType: "string",
+					pattern: "^.+@.+\\..+$",
+					description: "Debe ser un correo válido y es obligatorio"
+				},
+				direccion: {
+					bsonType: "object",
+					required: ["calle", "ciudad", "codigo_postal"],
+					properties: {
+						calle: {
+							bsonType: "string"
+						},
+						ciudad: {
+							bsonType: "string"
+						},
+						codigo_postal: {
+							bsonType: "string",
+							pattern: "^[0-9]{5}$"
+						}
+					}
+				},
+				telefono: {
+					bsonType: "string",
+					description: "Debe ser una cadena de texto y es obligatorio"
+				},
+				fecha_registro: {
+					bsonType: 'date',
+					description: 'Debe ser una fecha y es obligatoria'
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("feretro", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["medidas", "material", "peso", "precio"],
+			properties: {
+				medidas: {
+					bsonType: "string",
+					description: "Ej: '190x60x50 cm'"
+				},
+				material: {
+					bsonType: "string",
+					description: "Ej: 'Madera de roble', 'pino'"
+				},
+				peso: {
+					bsonType: ["double", "int", "decimal"],
+					description: "Debe ser numérico"
+				},
+				precio: {
+					bsonType: ["double", "int", "decimal"],
+					description: "Debe ser numérico"
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("urna", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["capacidad", "material", "precio"],
+			properties: {
+				capacidad: {
+					bsonType: ["double", "int"],
+					description: "Capacidad en litros, debe ser numérico"
+				},
+				material: {
+					bsonType: "string",
+					description: "Ej: 'Oro', 'plata', 'cerámica'"
+				},
+				precio: {
+					bsonType: ["double", "int", "decimal"],
+					description: "Debe ser numérico"
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("servicios", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["nombre", "precio"],
+			properties: {
+				nombre: {
+					bsonType: "string"
+				},
+				descripcion: {
+					bsonType: "string"
+				},
+				precio: {
+					bsonType: ["double", "int", "decimal"]
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("difunto", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["id_cliente", "nombre", "apellidos", "fecha_nacimiento", "fecha_muerte", "servicio", "id_feretro"],
+			properties: {
+				id_cliente: {
+					bsonType: "objectId",
+					description: "Referencia al cliente que contrata el servicio"
+				},
+				nombre: {
+					bsonType: "string"
+				},
+				apellidos: {
+					bsonType: "string"
+				},
+				fecha_nacimiento: {
+					bsonType: "date",
+					description: "Debe ser una fecha y es obligatoria"
+				},
+				fecha_muerte: {
+					bsonType: "date",
+					description: "Debe ser una fecha y es obligatoria"
+				},
+				causa_de_muerte: {
+					bsonType: "string"
+				},
+				procedencia: {
+					bsonType: "string",
+					description: "Lugar del que proviene el cuerpo (ej. Hospital San Pedro de Alcántara)"
+				},
+				relacion_cliente: {
+					bsonType: "string",
+					description: "Parentesco o relación del cliente con el difunto (ej. Hija, Viudo)"
+				},
+				servicio: {
+					enum: ["ENTIERRO", "CREMACIÓN"]
+				},
+				id_feretro: {
+					bsonType: "objectId",
+					description: "Obligatorio siempre, incluso en cremaciones"
+				},
+				id_urna: {
+					bsonType: "objectId",
+					description: "Opcional, solo para cremaciones"
+				},
+				lista_servicios: {
+					bsonType: "array",
+					items: {
+						bsonType: "objectId"
+					}
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("trabajador", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["nombre", "apellidos", "dni", "correo_electronico", "usuario", "password", "cargo", "rol", "salario", "tipo_jornada"],
+			properties: {
+				nombre: {
+					bsonType: "string"
+				},
+				apellidos: {
+					bsonType: "string"
+				},
+				dni: {
+					bsonType: "string",
+					pattern: "^[0-9]{8}[A-Z]$"
+				},
+				correo_electronico: {
+					bsonType: "string",
+					pattern: "^.+@.+\\..+$"
+				},
+				usuario: {
+					bsonType: "string"
+				},
+				password: {
+					bsonType: "string"
+				},
+				direccion: {
+					bsonType: "object",
+					required: ["calle", "ciudad", "codigo_postal"],
+					properties: {
+						calle: {
+							bsonType: "string"
+						},
+						ciudad: {
+							bsonType: "string"
+						},
+						codigo_postal: {
+							bsonType: "string",
+							pattern: "^[0-9]{5}$"
+						}
+					}
+				},
+				numero_ss: {
+					bsonType: "string",
+					description: "Número de la Seguridad Social"
+				},
+				datos_bancarios: {
+					bsonType: "object",
+					required: ["iban", "banco"],
+					properties: {
+						iban: {
+							bsonType: "string",
+							pattern: "^[A-Z]{2}[0-9]{22}$",
+							description: "Formato IBAN válido"
+						},
+						banco: {
+							bsonType: "string"
+						}
+					}
+				},
+				cargo: {
+					enum: ["TANATOPRACTOR", "AGENTE_FUNERARIO", "RECEPCIONISTA", "DIRECTOR", "CONDUCTOR"],
+					description: "Debe coincidir exactamente con uno de los cargos"
+				},
+				rol: {
+					enum: ["AGENTE_FUNERARIO", "CONTABILIDAD", "TANATOPRAXIA", "ADMINISTRACION", "TRANSPORTE"],
+					description: "Debe coincidir exactamente con uno de los roles"
+				},
+				salario: {
+					bsonType: ["double", "int", "decimal"]
+				},
+				tipo_jornada: {
+					bsonType: "string",
+					description: "Ej: 'Completa', 'Parcial', 'Nocturna'"
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("asignacion", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["id_difunto", "id_trabajador", "estado", "fecha_asignacion"],
+			properties: {
+				id_difunto: {
+					bsonType: "objectId",
+					description: "Referencia al difunto al que pertenece el servicio (obligatorio)"
+				},
+				id_trabajador: {
+					bsonType: "objectId",
+					description: "Referencia al trabajador asignado al servicio (obligatorio)"
+				},
+				estado: {
+					enum: ["Pendiente", "En curso", "Completado"],
+					description: "Estado general del servicio (obligatorio)"
+				},
+				fecha_asignacion: {
+					bsonType: "date",
+					description: "Fecha y hora en la que se le asignó el trabajo al empleado (obligatorio)"
+				},
+				fecha_inicio_trabajo: {
+					bsonType: "date",
+					description: "Fecha y hora en la que el trabajador cambia el estado a 'En curso'"
+				},
+				fecha_finalizacion: {
+					bsonType: "date",
+					description: "Fecha y hora en la que se marca como 'Completado'"
+				},
+				indicaciones_familia: {
+					bsonType: "string",
+					description: "Texto libre con las indicaciones del servicio (ej. 'La familia solicita presentación sencilla')"
+				},
+				seguimiento: {
+					bsonType: "object",
+					properties: {
+						paso_identificacion: {
+							bsonType: "bool",
+							description: "Equivale al checkbox: 'Comprobar identificación'"
+						},
+						paso_conservacion: {
+							bsonType: "bool",
+							description: "Equivale al checkbox: 'Realizar conservación temporal'"
+						},
+						paso_estetica: {
+							bsonType: "bool",
+							description: "Equivale al checkbox: 'Finalizar preparación estética'"
+						},
+						observaciones: {
+							bsonType: "string",
+							description: "Caja de texto de 'Observaciones de trabajo' escritas por el trabajador"
+						},
+						ultima_actualizacion: {
+							bsonType: "date",
+							description: "Fecha en la que el trabajador hizo el último clic en 'Guardar cambios'"
+						}
+					}
+				}
+			}
+		}
+	}
+});
+
+db.createCollection("sala", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["nombre", "capacidad"],
+			properties: {
+				nombre: {
+					bsonType: "string"
+				},
+				descripcion: {
+					bsonType: "string"
+				},
+				capacidad: {
+					bsonType: ["int", "double"],
+					description: "Número de personas"
+				}
+			}
+		}
+	}
+});
+
+db.sala.insertMany([
+	{
+		nombre: "Sala Txurdinaga",
+		descripcion: "Sala principal con capacidad máxima",
+		capacidad: 80
+	},
+	{
+		nombre: "Sala Santutxu",
+		descripcion: "Sala estándar muy luminosa",
+		capacidad: 40
+	},
+	{
+		nombre: "Sala Begoña",
+		descripcion: "Sala íntima y recogida",
+		capacidad: 20
+	},
+	{
+		nombre: "Sala Artxanda",
+		descripcion: "Sala VIP con catering integrado",
+		capacidad: 50
+	}
+]);
+
+db.feretro.insertMany([
+	{
+		medidas: "190x60x50 cm",
+		material: "Madera de roble",
+		peso: 45.5, precio: 1200.00
+	},
+	{
+		medidas: "195x65x55 cm",
+		material: "Madera de pino",
+		peso: 35.0, precio: 850.00
+	},
+	{
+		medidas: "200x70x60 cm",
+		material: "Caoba maciza",
+		peso: 55.2, precio: 2500.00
+	},
+	{
+		medidas: "185x55x45 cm",
+		material: "Madera de cerezo",
+		peso: 42.0, precio: 1500.00
+	},
+	{
+		medidas: "190x60x50 cm", material:
+			"DM contrachapado",
+		peso: 30.0,
+		precio: 600.00
+	},
+	{
+		medidas: "210x75x65 cm",
+		material: "Madera de fresno (Talla especial)",
+		peso: 50.0, precio: 1800.00
+	},
+	{
+		medidas: "190x60x50 cm",
+		material: "Acero inoxidable",
+		peso: 70.0, precio: 3200.00
+	},
+	{
+		medidas: "195x65x55 cm",
+		material: "Madera de haya",
+		peso: 40.0, precio: 1100.00
+	},
+	{
+		medidas: "190x60x50 cm",
+		material: "Cartón ecológico reforzado",
+		peso: 15.0, precio: 400.00
+	},
+	{
+		medidas: "200x65x55 cm",
+		material: "Madera de nogal",
+		peso: 48.0, precio: 2100.00
+	}
+]);
+
+db.urna.insertMany([
+	{
+		capacidad: 3.5,
+		material: "Cerámica artesanal",
+		precio: 150.00
+	},
+	{
+		capacidad: 4.0,
+		material: "Acero inoxidable",
+		precio: 250.00
+	},
+	{
+		capacidad: 3.0,
+		material: "Madera de olivo",
+		precio: 180.00
+	},
+	{
+		capacidad: 3.5,
+		material: "Bronce fundido",
+		precio: 450.00
+	},
+	{
+		capacidad: 4.0,
+		material: "Mármol blanco",
+		precio: 380.00
+	},
+	{
+		capacidad: 3.5,
+		material: "Latón con grabados",
+		precio: 220.00
+	},
+	{
+		capacidad: 5.0,
+		material: "Cristal soplado",
+		precio: 300.00
+	},
+	{
+		capacidad: 3.5,
+		material: "Sal marina (Biodegradable)",
+		precio: 120.00
+	},
+	{
+		capacidad: 4.0,
+		material: "Arena compactada (Biodegradable)",
+		precio: 130.00
+	},
+	{
+		capacidad: 3.0,
+		material: "Arcilla sin cocer (Biodegradable)",
+		precio: 110.00
+	},
+	{
+		capacidad: 3.5,
+		material: "Plata de ley",
+		precio: 850.00
+	},
+	{
+		capacidad: 4.0,
+		material: "Cobre oxidado",
+		precio: 200.00
+	},
+	{
+		capacidad: 3.5,
+		material: "Madera de caoba",
+		precio: 260.00
+	},
+	{
+		capacidad: 3.0,
+		material: "Granito pulido",
+		precio: 320.00
+	},
+	{
+		capacidad: 4.5,
+		material: "Fibra de vidrio",
+		precio: 160.00
+	}
+]);
+
+db.servicios.insertMany([
+	{
+		nombre: "Sala velatorio",
+		descripcion: "Uso de sala estándar por 24 horas",
+		precio: 450.00
+	},
+	{
+		nombre: "Arte floral",
+		descripcion: "Corona grande de rosas y lirios",
+		precio: 250.00
+	},
+	{
+		nombre: "Ceremonia religiosa",
+		descripcion: "Oficio en capilla",
+		precio: 300.00
+	},
+	{
+		nombre: "Ceremonia laica",
+		descripcion: "Maestro de ceremonias para acto civil",
+		precio: 250.00
+	},
+	{
+		nombre: "Catering",
+		descripcion: "Servicio de café, agua y pastas",
+		precio: 180.00
+	},
+	{
+		nombre: "Música en vivo",
+		descripcion: "Dúo de cuerda (violín y violonchelo)",
+		precio: 400.00
+	},
+	{
+		nombre: "Recordatorios",
+		descripcion: "100 estampas impresas con foto",
+		precio: 85.00
+	},
+	{
+		nombre: "Libro de firmas",
+		descripcion: "Libro encuadernado en cuero",
+		precio: 60.00
+	},
+	{
+		nombre: "Repatriación",
+		descripcion: "Gestión y traslado internacional",
+		precio: 1500.00
+	},
+	{
+		nombre: "Diamante con cenizas",
+		descripcion: "Transformación de cenizas en joya",
+		precio: 2500.00
+	}
+]);
+
+db.trabajador.insertMany([
+	{
+		nombre: "Maite",
+		apellidos: "Ruiz",
+		dni: "11223344A",
+		correo_electronico: "m.ruiz@funerariatrujillo.com",
+		usuario: "m.ruiz",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Avenida Txurdinaga 12",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "481111111111",
+		datos_bancarios: {
+			iban: "ES1234567890123456789011",
+			banco: "Kutxabank"
+		},
+		cargo: "DIRECTOR",
+		rol: "ADMINISTRACION",
+		salario: 3500.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Gorka",
+		apellidos: "Ibarretxe",
+		dni: "22334455B",
+		correo_electronico: "g.ibarretxe@funerariatrujillo.com",
+		usuario: "g.ibarretxe",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Santutxu 45",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "482222222222",
+		datos_bancarios: {
+			iban: "ES1234567890123456789012",
+			banco: "BBVA"
+		},
+		cargo: "TANATOPRACTOR",
+		rol: "TANATOPRAXIA",
+		salario: 2400.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Ane",
+		apellidos: "López",
+		dni: "33445566C",
+		correo_electronico: "a.lopez@funerariatrujillo.com",
+		usuario: "a.lopez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Avenida Begoña 33",
+			ciudad: "Bilbao",
+			codigo_postal: "48006"
+		},
+		numero_ss: "483333333333",
+		datos_bancarios: {
+			iban: "ES1234567890123456789013",
+			banco: "Laboral Kutxa"
+		},
+		cargo: "AGENTE_FUNERARIO",
+		rol: "AGENTE_FUNERARIO",
+		salario: 2100.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Jon",
+		apellidos: "Uriarte",
+		dni: "44556677D",
+		correo_electronico: "j.uriarte@funerariatrujillo.com",
+		usuario: "j.uriarte",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Somera 10",
+			ciudad: "Bilbao",
+			codigo_postal: "48005"
+		},
+		numero_ss: "484444444444",
+		datos_bancarios: {
+			iban: "ES1234567890123456789014",
+			banco: "Kutxabank"
+		},
+		cargo: "CONDUCTOR",
+		rol: "TRANSPORTE",
+		salario: 1800.00,
+		tipo_jornada: "Nocturna"
+	},
+	{
+		nombre: "Leire",
+		apellidos: "García",
+		dni: "55667788E",
+		correo_electronico: "l.garcia@funerariatrujillo.com",
+		usuario: "l.garcia",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Ercilla 22",
+			ciudad: "Bilbao",
+			codigo_postal: "48011"
+		},
+		numero_ss: "485555555555",
+		datos_bancarios: {
+			iban: "ES1234567890123456789015",
+			banco: "CaixaBank"
+		},
+		cargo: "RECEPCIONISTA",
+		rol: "CONTABILIDAD",
+		salario: 1600.00,
+		tipo_jornada: "Parcial"
+	},
+	{
+		nombre: "Aitor",
+		apellidos: "Fernández",
+		dni: "66778899F",
+		correo_electronico: "a.fernandez@funerariatrujillo.com",
+		usuario: "a.fernandez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Avenida Lehendakari Aguirre 50",
+			ciudad: "Bilbao",
+			codigo_postal: "48014"
+		},
+		numero_ss: "486666666666",
+		datos_bancarios: {
+			iban: "ES1234567890123456789016",
+			banco: "Santander"
+		},
+		cargo: "CONDUCTOR",
+		rol: "TRANSPORTE",
+		salario: 1900.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Nerea",
+		apellidos: "Zubizarreta",
+		dni: "77889900G",
+		correo_electronico: "n.zubizarreta@funerariatrujillo.com",
+		usuario: "n.zubizarreta",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Avenida Gabriel Aresti 8",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "487777777777",
+		datos_bancarios: {
+			iban: "ES1234567890123456789017",
+			banco: "Kutxabank"
+		},
+		cargo: "TANATOPRACTOR",
+		rol: "TANATOPRAXIA",
+		salario: 2400.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Mikel",
+		apellidos: "Aguirre",
+		dni: "88990011H",
+		correo_electronico: "m.aguirre@funerariatrujillo.com",
+		usuario: "m.aguirre",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Iturriaga 15",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "488888888888",
+		datos_bancarios: {
+			iban: "ES1234567890123456789018",
+			banco: "BBVA"
+		},
+		cargo: "AGENTE_FUNERARIO",
+		rol: "AGENTE_FUNERARIO",
+		salario: 2100.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Oihane",
+		apellidos: "Etxebarria",
+		dni: "99001122I",
+		correo_electronico: "o.etxebarria@funerariatrujillo.com",
+		usuario: "o.etxebarria",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Virgen de Begoña 2",
+			ciudad: "Bilbao",
+			codigo_postal: "48006"
+		},
+		numero_ss: "489999999999",
+		datos_bancarios: {
+			iban: "ES1234567890123456789019",
+			banco: "Laboral Kutxa"
+		},
+		cargo: "RECEPCIONISTA",
+		rol: "CONTABILIDAD",
+		salario: 1500.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Asier",
+		apellidos: "Bilbao",
+		dni: "10112233J",
+		correo_electronico: "a.bilbao@funerariatrujillo.com",
+		usuario: "a.bilbao",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Plaza Nueva 4",
+			ciudad: "Bilbao",
+			codigo_postal: "48005"
+		},
+		numero_ss: "480000000000",
+		datos_bancarios: {
+			iban: "ES1234567890123456789020",
+			banco: "Kutxabank"
+		},
+		cargo: "CONDUCTOR",
+		rol: "TRANSPORTE",
+		salario: 1800.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Irati",
+		apellidos: "Martínez",
+		dni: "21223344K",
+		correo_electronico: "i.martinez@funerariatrujillo.com",
+		usuario: "i.martinez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Txomin Garat 12",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "481212121212",
+		datos_bancarios: {
+			iban: "ES1234567890123456789021",
+			banco: "BBVA"
+		},
+		cargo: "AGENTE_FUNERARIO",
+		rol: "AGENTE_FUNERARIO",
+		salario: 2200.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Xabier",
+		apellidos: "Pérez",
+		dni: "32334455L",
+		correo_electronico: "x.perez@funerariatrujillo.com",
+		usuario: "x.perez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Karmelo 6",
+			ciudad: "Bilbao",
+			codigo_postal: "48004"
+		},
+		numero_ss: "482323232323",
+		datos_bancarios: {
+			iban: "ES1234567890123456789022",
+			banco: "Kutxabank"
+		},
+		cargo: "TANATOPRACTOR",
+		rol: "TANATOPRAXIA",
+		salario: 2500.00,
+		tipo_jornada: "Completa"
+	},
+	{
+		nombre: "Amaia",
+		apellidos: "Gómez",
+		dni: "43445566M",
+		correo_electronico: "a.gomez@funerariatrujillo.com",
+		usuario: "a.gomez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Avenida Zumalacarregui 20",
+			ciudad: "Bilbao",
+			codigo_postal: "48006"
+		},
+		numero_ss: "483434343434",
+		datos_bancarios: {
+			iban: "ES1234567890123456789023",
+			banco: "Santander"
+		},
+		cargo: "RECEPCIONISTA",
+		rol: "ADMINISTRACION",
+		salario: 1600.00,
+		tipo_jornada: "Parcial"
+	},
+	{
+		nombre: "Ander",
+		apellidos: "Sánchez",
+		dni: "54556677N",
+		correo_electronico: "a.sanchez@funerariatrujillo.com",
+		usuario: "a.sanchez",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Barrenkale 15",
+			ciudad: "Bilbao",
+			codigo_postal: "48005"
+		},
+		numero_ss: "484545454545",
+		datos_bancarios: {
+			iban: "ES1234567890123456789024",
+			banco: "Laboral Kutxa"
+		},
+		cargo: "CONDUCTOR",
+		rol: "TRANSPORTE",
+		salario: 1800.00,
+		tipo_jornada: "Nocturna"
+	},
+	{
+		nombre: "Iker",
+		apellidos: "Martín",
+		dni: "65667788O",
+		correo_electronico: "i.martin@funerariatrujillo.com",
+		usuario: "i.martin",
+		password: "$2a$12$vU86DPbwH4/2BCcahtXTb.JgjhLNwCEWN5lD4UC7mhU0tlgDjT6U6",
+		direccion: {
+			calle: "Calle Blas de Otero 30",
+			ciudad: "Bilbao",
+			codigo_postal: "48014"
+		},
+		numero_ss: "485656565656",
+		datos_bancarios: {
+			iban: "ES1234567890123456789025",
+			banco: "Kutxabank"
+		},
+		cargo: "AGENTE_FUNERARIO",
+		rol: "AGENTE_FUNERARIO",
+		salario: 2100.00,
+		tipo_jornada: "Completa"
+	}
+]);
+
+const nombres = ["Aitor", "Ane", "Jon", "Maite", "Gorka", "Leire", "Mikel", "Oihane", "Asier", "Irati", "Xabier", "Amaia", "Iker", "Nerea", "Eneko"];
+const apellidos = ["García", "Fernández", "López", "Uriarte", "Ruiz", "Ibarretxe", "Etxebarria", "Aguirre", "Bilbao", "Zubizarreta", "Martínez", "Pérez"];
+const causas = ["Paro cardíaco", "Insuficiencia respiratoria", "Accidente de tráfico", "Cáncer", "Derrame cerebral", "Fallo multiorgánico", "Causas naturales"];
+const procedencias = ["Hospital de Basurto", "Hospital de Cruces", "Hospital San Pedro de Alcántara", "Residencia DomusVi", "Domicilio Particular", "Hospital Quirónsalud Bizkaia", "Hospital de Galdakao"];
+const relaciones = ["Hijo/a", "Viudo/a", "Hermano/a", "Sobrino/a", "Padre/Madre", "Nieto/a", "Amigo/a íntimo/a"];
+const calles = ["Calle Autonomía", "Avenida Lehendakari Aguirre", "Plaza Moyúa", "Calle Santutxu", "Avenida Txurdinaga", "Calle Gran Vía"];
+
+const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const getRandomDate = (start, end) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+
+let clientes = [];
+for (let i = 0; i < 200; i++) {
+	let fechaRegistro = getRandomDate(new Date(2021, 0, 1), new Date(2026, 9, 21));
+	let dniNum = Math.floor(10000000 + Math.random() * 90000000);
+	let letrasDNI = "TRWAGMYFPDXBNJZSQVHLCKE";
+	let letra = letrasDNI[dniNum % 23];
+
+	clientes.push({
+		nombre: getRandom(nombres),
+		apellidos: `${getRandom(apellidos)} ${getRandom(apellidos)}`,
+		dni: `${dniNum}${letra}`,
+		correo_electronico: `cliente${i}@email.com`,
+		direccion: {
+			calle: `${getRandom(calles)} ${Math.floor(Math.random() * 100) + 1}`,
+			ciudad: "Bilbao",
+			codigo_postal: `4800${Math.floor(Math.random() * 9) + 1}`
+		},
+		telefono: `6${Math.floor(10000000 + Math.random() * 90000000)}`,
+		fecha_registro: fechaRegistro
+	});
+}
+db.cliente.insertMany(clientes);
+print("200 Clientes insertados con éxito.");
+
+const clientesInsertados = db.cliente.find().toArray();
+const feretros = db.feretro.find().toArray();
+const urnas = db.urna.find().toArray();
+const servicios = db.servicios.find().toArray();
+
+if (feretros.length === 0 || clientesInsertados.length === 0) {
+	print("ERROR: Faltan féretros o clientes en la base de datos.");
+} else {
+	let difuntos = [];
+	for (let i = 0; i < 225; i++) {
+		let tipoServicio = Math.random() > 0.5 ? "ENTIERRO" : "CREMACIÓN";
+		let fechaMuerte = getRandomDate(new Date(2021, 0, 1), new Date(2026, 9, 21));
+		let edadMilisegundos = (Math.random() * 55 + 40) * 365.25 * 24 * 60 * 60 * 1000;
+		let fechaNacimiento = new Date(fechaMuerte.getTime() - edadMilisegundos);
+		let numServicios = Math.floor(Math.random() * 3) + 1;
+		let serviciosAsignados = [];
+
+		for (let j = 0; j < numServicios; j++) {
+			serviciosAsignados.push(getRandom(servicios)._id);
+		}
+
+		let difunto = {
+			id_cliente: getRandom(clientesInsertados)._id,
+			nombre: getRandom(nombres),
+			apellidos: `${getRandom(apellidos)} ${getRandom(apellidos)}`,
+			fecha_nacimiento: fechaNacimiento,
+			fecha_muerte: fechaMuerte,
+			causa_de_muerte: getRandom(causas),
+			procedencia: getRandom(procedencias),
+			relacion_cliente: getRandom(relaciones),
+			servicio: tipoServicio,
+			id_feretro: getRandom(feretros)._id,
+			lista_servicios: [...new Set(serviciosAsignados)]
+		};
+
+		if (tipoServicio === "CREMACIÓN" && urnas.length > 0) {
+			difunto.id_urna = getRandom(urnas)._id;
+		}
+
+		difuntos.push(difunto);
+	}
+
+	db.difunto.insertMany(difuntos);
+	print("225 Difuntos insertados con éxito.");
+}
+
+const difuntosInsertados = db.difunto.find().toArray();
+
+const trabajadoresAsignables = db.trabajador.find({
+	cargo: { $in: ["TANATOPRACTOR"] }
+}).toArray();
+
+if (difuntosInsertados.length === 0 || trabajadoresAsignables.length === 0) {
+	print("ERROR: Faltan difuntos o trabajadores válidos para crear las asignaciones.");
+} else {
+	let asignaciones = [];
+	const indicacionesBase = [
+		"La familia solicita una presentación sencilla y respetuosa.",
+		"Conservación temporal estándar requerida antes de la cremación.",
+		"Se solicita cuidado especial en el peinado.",
+		"Reconstrucción facial parcial necesaria debido a accidente.",
+		"Sin indicaciones especiales, preparación estándar."
+	];
+
+	for (let difunto of difuntosInsertados) {
+		let trabajadorAsignado = getRandom(trabajadoresAsignables);
+		let horasAsignacionMilisegundos = (Math.random() * 4 + 1) * 60 * 60 * 1000;
+		let fechaAsignacion = new Date(difunto.fecha_muerte.getTime() + horasAsignacionMilisegundos);
+		let ahora = new Date();
+		let diferenciaDias = (ahora.getTime() - difunto.fecha_muerte.getTime()) / (1000 * 3600 * 24);
+		let estadoActual;
+
+		if (diferenciaDias > 5) {
+			estadoActual = "Completado";
+		} else if (diferenciaDias >= 1 && diferenciaDias <= 5) {
+			estadoActual = "En curso";
+		} else {
+			estadoActual = "Pendiente";
+		}
+
+		let asignacion = {
+			id_difunto: difunto._id,
+			id_trabajador: trabajadorAsignado._id,
+			estado: estadoActual,
+			fecha_asignacion: fechaAsignacion,
+			indicaciones_familia: getRandom(indicacionesBase),
+			seguimiento: {
+				paso_identificacion: estadoActual !== "Pendiente",
+				paso_conservacion: estadoActual === "Completado" || Math.random() > 0.5,
+				paso_estetica: estadoActual === "Completado",
+				observaciones: estadoActual === "Completado" ? "Servicio finalizado con éxito." : "Esperando instrucciones de la familia.",
+				ultima_actualizacion: estadoActual === "Completado" ? new Date(fechaAsignacion.getTime() + (24 * 60 * 60 * 1000)) : ahora
+			}
+		};
+
+		if (estadoActual !== "Pendiente") {
+			asignacion.fecha_inicio_trabajo = new Date(fechaAsignacion.getTime() + (Math.random() * 2 * 60 * 60 * 1000));
+		}
+		if (estadoActual === "Completado") {
+			asignacion.fecha_finalizacion = asignacion.seguimiento.ultima_actualizacion;
+		}
+
+		asignaciones.push(asignacion);
+	}
+
+	db.asignacion.insertMany(asignaciones);
+	print(asignaciones.length + " Asignaciones de servicio insertadas con éxito.");
+}
