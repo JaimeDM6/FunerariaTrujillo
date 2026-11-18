@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import javafx.scene.control.Control;
 
 public class DifuntosController implements Initializable {
 
@@ -713,6 +714,8 @@ public class DifuntosController implements Initializable {
                 txtDetalleNombre.getStyleClass().remove("error");
                 txtDetalleApellidos.getStyleClass().remove("error");
                 txtDetalleCausa.getStyleClass().remove("error");
+                dpDetalleNacimiento.getStyleClass().remove("error");
+                dpDetalleMuerte.getStyleClass().remove("error");
                 cmbDetalleMaterialFeretro.getStyleClass().remove("error");
 
                 btnEditar.setVisible(false);
@@ -784,26 +787,30 @@ public class DifuntosController implements Initializable {
     private void cambiarEstadoCamposEdicion(boolean editable) {
         txtDetalleNombre.setEditable(editable);
         txtDetalleApellidos.setEditable(editable);
+        txtDetalleCausa.setEditable(editable);
+
         dpDetalleNacimiento.setDisable(!editable);
         dpDetalleMuerte.setDisable(!editable);
-        txtDetalleCausa.setEditable(editable);
         rbDetalleEntierro.setDisable(!editable);
         rbDetalleCremacion.setDisable(!editable);
         cmbDetalleMaterialFeretro.setDisable(!editable);
         cmbDetalleMaterialUrna.setDisable(!editable);
 
-        String estilo;
-        if (editable) {
-            estilo = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
-        } else {
-            estilo = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
-        }
+        Control[] campos = {
+            txtDetalleNombre, txtDetalleApellidos, txtDetalleCausa,
+            dpDetalleNacimiento, dpDetalleMuerte,
+            cmbDetalleMaterialFeretro, cmbDetalleMaterialUrna
+        };
 
-        txtDetalleNombre.setStyle(estilo);
-        txtDetalleApellidos.setStyle(estilo);
-        txtDetalleCausa.setStyle(estilo);
-        cmbDetalleMaterialFeretro.setStyle(estilo);
-        cmbDetalleMaterialUrna.setStyle(estilo);
+        for (Control campo : campos) {
+            if (editable) {
+                if (!campo.getStyleClass().contains("campo-edicion")) {
+                    campo.getStyleClass().add("campo-edicion");
+                }
+            } else {
+                campo.getStyleClass().remove("campo-edicion");
+            }
+        }
     }
 
     private void bloquearCamposEdicion() {
