@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css"
+           xmlns="http://javafx.com/javafx/25"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.AsignacionesController">
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+    <children>
+        <HBox spacing="0.0">
+            <children>
+                <StackPane HBox.hgrow="ALWAYS">
+                    <children>
+                        <VBox fx:id="vistaTabla" spacing="20.0" StackPane.alignment="TOP_LEFT">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Gestión de asignaciones" textFill="#2e1a0e" wrapText="true">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label text="Asigna los servicios a los trabajadores y consulta el seguimiento de cada trabajo." textFill="#7a5230" wrapText="true">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="14.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="40.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 4; -fx-background-radius: 4;" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#7a5230" scaleX="0.8" scaleY="0.8">
+                                                    <HBox.margin>
+                                                        <Insets left="10.0" right="5.0" />
+                                                    </HBox.margin>
+                                                </SVGPath>
+                                                <TextField fx:id="txtBuscar" promptText="Buscar por código, difunto, trabajador o estado" HBox.hgrow="ALWAYS">
+                                                    <font>
+                                                        <Font name="Inter 18pt Regular" size="14.0" />
+                                                    </font>
+                                                </TextField>
+                                            </children>
+                                        </HBox>
+                                        <Button fx:id="btnNuevaAsignacion" minWidth="170.0" mnemonicParsing="false" prefHeight="40.0" text="Nueva asignación" textFill="#2e1a0e">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="14.0" />
+                                            </font>
+                                            <graphic>
+                                                <SVGPath content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#2e1a0e" scaleX="0.7" scaleY="0.7" />
+                                            </graphic>
+                                            <padding>
+                                                <Insets left="15.0" right="15.0" />
+                                            </padding>
+                                        </Button>
+                                    </children>
+                                </HBox>
+
+                                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <TableView fx:id="tablaAsignaciones" prefHeight="350.0" style="-fx-border-color: #C8B99A; -fx-border-radius: 4; -fx-background-radius: 4; -fx-background-color: #FFFFFF;" VBox.vgrow="ALWAYS">
+                                            <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                            </columnResizePolicy>
+                                            <columns>
+                                                <TableColumn fx:id="colID" maxWidth="800.0" minWidth="55.0" prefWidth="0.0" text="ID" />
+                                                <TableColumn fx:id="colDifunto" maxWidth="2000.0" minWidth="120.0" prefWidth="0.0" text="Difunto" />
+                                                <TableColumn fx:id="colTrabajador" maxWidth="2000.0" minWidth="120.0" prefWidth="0.0" text="Trabajador" />
+                                                <TableColumn fx:id="colEstado" maxWidth="1100.0" minWidth="90.0" prefWidth="0.0" text="Estado" />
+                                                <TableColumn fx:id="colFechaAsignacion" maxWidth="1300.0" minWidth="110.0" prefWidth="0.0" text="Fecha de asignación" />
+                                            </columns>
+                                        </TableView>
+                                        <Label fx:id="lblEstadoTabla" text="0 asignaciones" textFill="#7a5230">
+                                            <font>
+                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox fx:id="vistaDetalles" maxHeight="-Infinity" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8;" visible="false" StackPane.alignment="TOP_LEFT">
+                            <padding>
+                                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                            </padding>
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                    <children>
+                                        <Button fx:id="btnVolver" mnemonicParsing="false" styleClass="button-back">
+                                            <graphic>
+                                                <SVGPath content="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#7a5230" />
+                                            </graphic>
+                                        </Button>
+                                        <VBox spacing="2.0">
+                                            <Label text="Ficha de la asignación" textFill="#2e1a0e" wrapText="true">
+                                                <font>
+                                                    <Font name="Inter 18pt Bold" size="22.0" />
+                                                </font>
+                                            </Label>
+                                            <Label text="Referencias, estado, indicaciones de la familia y seguimiento del trabajo." textFill="#7a5230" wrapText="true">
+                                                <font>
+                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                </font>
+                                            </Label>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button fx:id="btnEliminar" minWidth="120.0" mnemonicParsing="false" prefHeight="35.0" styleClass="button-delete" text="Eliminar asignación" textFill="#C9302C">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                            </font>
+                                        </Button>
+                                        <Button fx:id="btnEditar" minWidth="110.0" mnemonicParsing="false" prefHeight="35.0" styleClass="button-edit" text="Editar datos" textFill="#7a5230">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                            </font>
+                                        </Button>
+                                        <Button fx:id="btnGuardarEdicion" managed="false" minWidth="130.0" mnemonicParsing="false" prefHeight="35.0" text="Guardar cambios" textFill="#2e1a0e" visible="false">
+                                            <font>
+                                                <Font name="Inter 18pt Bold" size="13.0" />
+                                            </font>
+                                        </Button>
+                                    </children>
+                                </HBox>
+
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="470.0" style="-fx-background-color: transparent; -fx-background: #FFFFFF;">
+                                    <content>
+                                        <VBox spacing="16.0">
+                                            <children>
+                                                <VBox spacing="12.0" style="-fx-background-color: #FAF7F2; -fx-border-color: #E6DEC8; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                                    <padding>
+                                                        <Insets bottom="15.0" left="18.0" right="18.0" top="14.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <Label text="ASIGNACIÓN" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Bold" size="11.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <VBox spacing="5.0">
+                                                            <Label text="Difunto" textFill="#7a5230">
+                                                                <font>
+                                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                                </font>
+                                                            </Label>
+                                                            <ComboBox fx:id="cmbDetalleDifunto" disable="true" maxWidth="1.7976931348623157E308" prefHeight="38.0" />
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <Label text="Trabajador asignado" textFill="#7a5230">
+                                                                <font>
+                                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                                </font>
+                                                            </Label>
+                                                            <ComboBox fx:id="cmbDetalleTrabajador" disable="true" maxWidth="1.7976931348623157E308" prefHeight="38.0" />
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <Label text="Estado" textFill="#7a5230">
+                                                                <font>
+                                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                                </font>
+                                                            </Label>
+                                                            <ComboBox fx:id="cmbDetalleEstado" disable="true" maxWidth="1.7976931348623157E308" prefHeight="38.0" />
+                                                        </VBox>
+                                                        <Label fx:id="lblDetalleFechas" textFill="#7a5230" wrapText="true">
+                                                            <font>
+                                                                <Font name="Inter 18pt Regular" size="12.0" />
+                                                            </font>
+                                                        </Label>
+                                                    </children>
+                                                </VBox>
+                                                <VBox spacing="12.0" style="-fx-background-color: #FAF7F2; -fx-border-color: #E6DEC8; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                                    <padding>
+                                                        <Insets bottom="15.0" left="18.0" right="18.0" top="14.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <Label text="INDICACIONES DE LA FAMILIA" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Bold" size="11.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <TextArea fx:id="txtDetalleIndicaciones" editable="false" prefRowCount="3" wrapText="true" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox spacing="12.0" style="-fx-background-color: #FAF7F2; -fx-border-color: #E6DEC8; -fx-border-radius: 6; -fx-background-radius: 6;">
+                                                    <padding>
+                                                        <Insets bottom="15.0" left="18.0" right="18.0" top="14.0" />
+                                                    </padding>
+                                                    <children>
+                                                        <Label text="SEGUIMIENTO DEL TRABAJO" textFill="#7a5230">
+                                                            <font>
+                                                                <Font name="Inter 18pt Bold" size="11.0" />
+                                                            </font>
+                                                        </Label>
+                                                        <CheckBox fx:id="chkDetalleIdentificacion" disable="true" text="Comprobar identificación" textFill="#2e1a0e" />
+                                                        <CheckBox fx:id="chkDetalleConservacion" disable="true" text="Realizar conservación temporal" textFill="#2e1a0e" />
+                                                        <CheckBox fx:id="chkDetalleEstetica" disable="true" text="Finalizar preparación estética" textFill="#2e1a0e" />
+                                                        <VBox spacing="5.0">
+                                                            <Label text="Observaciones de trabajo" textFill="#7a5230">
+                                                                <font>
+                                                                    <Font name="Inter 18pt Regular" size="12.0" />
+                                                                </font>
+                                                            </Label>
+                                                            <TextArea fx:id="txtDetalleObservaciones" editable="false" prefRowCount="3" wrapText="true" />
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
+                <Region fx:id="spacerLateral" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
+            </children>
+        </HBox>
+
+        <VBox fx:id="panelFormularioNuevo" maxWidth="350.0" minWidth="350.0" prefWidth="350.0" spacing="0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D6CCBD; -fx-border-radius: 8; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, -3, 0);" translateX="400.0" visible="false">
+            <children>
+                <HBox alignment="CENTER_LEFT" style="-fx-padding: 25 25 10 25;">
+                    <VBox spacing="5.0">
+                        <children>
+                            <Label text="Registrar asignación" textFill="#2e1a0e" wrapText="true">
+                                <font>
+                                    <Font name="Inter 18pt Bold" size="18.0" />
+                                </font>
+                            </Label>
+                            <TextFlow>
+                                <children>
+                                    <Text fill="#7a5230" text="Los campos con " />
+                                    <Text fill="#d9534f" text="*" />
+                                    <Text fill="#7a5230" text=" son obligatorios." />
+                                </children>
+                            </TextFlow>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnCerrarFormulario" mnemonicParsing="false" styleClass="button-back">
+                        <graphic>
+                            <SVGPath content="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#7a5230" />
+                        </graphic>
+                    </Button>
+                </HBox>
+
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #FFFFFF;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="15.0" style="-fx-padding: 10 25 15 25;">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <Label text="Difunto *" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="cmbNuevoDifunto" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Trabajador asignado *" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <ComboBox fx:id="cmbNuevoTrabajador" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Indicaciones de la familia" textFill="#2e1a0e">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <TextArea fx:id="txtNuevasIndicaciones" prefRowCount="4" wrapText="true" />
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <VBox style="-fx-padding: 10 25 25 25;">
+                    <children>
+                        <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" text="Guardar asignación" textFill="#2e1a0e">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

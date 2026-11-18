@@ -11,8 +11,12 @@ public class MongoConfig {
     private static final String URI = "mongodb://localhost:27017";
     private static final String DB_NAME = "FunerariaTrujillo";
 
-    public static MongoCollection<Document> getCollection(String collectionName) {
-        MongoClient mongoClient = MongoClients.create(URI);
+    private static MongoClient mongoClient;
+
+    public static synchronized MongoCollection<Document> getCollection(String collectionName) {
+        if (mongoClient == null) {
+            mongoClient = MongoClients.create(URI);
+        }
         MongoDatabase database = mongoClient.getDatabase(DB_NAME);
         return database.getCollection(collectionName);
     }
