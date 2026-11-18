@@ -12,10 +12,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Acceso a datos de la colección {@code difunto} de MongoDB. Resuelve también el féretro y la urna
+ * asociados a cada difunto y ofrece las listas de clientes y materiales para los formularios.
+ *
+ * @author Iker
+ */
 public class DifuntoDAO {
 
     private static final String COLLECTION_NAME = "difunto";
 
+    /**
+     * Obtiene todos los difuntos de la base de datos con su féretro y su urna.
+     *
+     * @return lista de difuntos; vacía si se produce un error
+     */
     public List<Difunto> obtenerDifuntos() {
         List<Difunto> difuntos = new ArrayList<>();
 
@@ -41,6 +52,14 @@ public class DifuntoDAO {
         return difuntos;
     }
 
+    /**
+     * Convierte un documento de MongoDB en un difunto, incluidos su féretro y su urna.
+     *
+     * @param doc documento del difunto
+     * @param feretros documentos de féretros indexados por identificador
+     * @param urnas documentos de urnas indexados por identificador
+     * @return difunto con los datos del documento
+     */
     private Difunto convertirDocumento(Document doc, Map<String, Document> feretros, Map<String, Document> urnas) {
         Difunto difunto = new Difunto();
 
@@ -65,6 +84,13 @@ public class DifuntoDAO {
         return difunto;
     }
 
+    /**
+     * Lee un campo identificador de un documento como texto.
+     *
+     * @param doc documento de MongoDB
+     * @param campo nombre del campo
+     * @return identificador como texto, o una cadena vacía si no existe
+     */
     private String obtenerIdComoTexto(Document doc, String campo) {
         Object valor = doc.get(campo);
 
@@ -80,6 +106,12 @@ public class DifuntoDAO {
         return "";
     }
 
+    /**
+     * Convierte el texto guardado en la base de datos en un tipo de servicio.
+     *
+     * @param valor texto del servicio
+     * @return cremación si el texto es {@code Cremación}; en otro caso, entierro
+     */
     private Difunto.Servicio convertirServicio(String valor) {
         if (valor != null && valor.equalsIgnoreCase("Cremación")) {
             return Difunto.Servicio.CREMACIÓN;
@@ -88,6 +120,13 @@ public class DifuntoDAO {
         return Difunto.Servicio.ENTIERRO;
     }
 
+    /**
+     * Construye el féretro de un difunto a partir de los documentos cargados.
+     *
+     * @param id identificador del féretro
+     * @param documentos documentos de féretros indexados por identificador
+     * @return féretro con sus datos, o vacío si no se encuentra
+     */
     private Feretro obtenerFeretro(String id, Map<String, Document> documentos) {
         Feretro feretro = new Feretro();
 
@@ -106,6 +145,13 @@ public class DifuntoDAO {
         return feretro;
     }
 
+    /**
+     * Construye la urna de un difunto a partir de los documentos cargados.
+     *
+     * @param id identificador de la urna
+     * @param documentos documentos de urnas indexados por identificador
+     * @return urna con sus datos, o vacía si no se encuentra
+     */
     private Urna obtenerUrna(String id, Map<String, Document> documentos) {
         Urna urna = new Urna();
 
@@ -124,6 +170,12 @@ public class DifuntoDAO {
         return urna;
     }
 
+    /**
+     * Convierte un valor numérico de MongoDB en un {@link Double}.
+     *
+     * @param valor valor leído de la base de datos
+     * @return valor numérico, o {@code null} si no se puede convertir
+     */
     private Double obtenerDouble(Object valor) {
         if (valor instanceof Number) {
             Number numero = (Number) valor;
@@ -138,6 +190,12 @@ public class DifuntoDAO {
         return 0.0;
     }
 
+    /**
+     * Carga todos los documentos de una colección indexados por su identificador.
+     *
+     * @param coleccion nombre de la colección
+     * @return mapa de documentos por identificador en texto
+     */
     private Map<String, Document> cargarDocumentosPorId(String coleccion) {
         Map<String, Document> documentos = new HashMap<>();
 
@@ -151,14 +209,29 @@ public class DifuntoDAO {
         return documentos;
     }
 
+    /**
+     * Obtiene los materiales distintos de los féretros.
+     *
+     * @return lista de materiales
+     */
     public List<String> obtenerMaterialesFeretros() {
         return obtenerMateriales("feretro");
     }
 
+    /**
+     * Obtiene los materiales distintos de las urnas.
+     *
+     * @return lista de materiales
+     */
     public List<String> obtenerMaterialesUrnas() {
         return obtenerMateriales("urna");
     }
 
+    /**
+     * Obtiene los clientes para elegir el responsable de un difunto.
+     *
+     * @return lista de textos con el formato {@code identificador - nombre apellidos}
+     */
     public List<String> obtenerClientes() {
         List<String> clientes = new ArrayList<>();
 
@@ -179,6 +252,13 @@ public class DifuntoDAO {
         return clientes;
     }
 
+    /**
+     * Busca el identificador del primer documento de una colección con el material indicado.
+     *
+     * @param coleccion nombre de la colección
+     * @param material material que se busca
+     * @return identificador encontrado, o una cadena vacía si no hay coincidencia
+     */
     public String obtenerIdPorMaterial(String coleccion, String material) {
         if (material == null || material.isEmpty()) {
             return "";
@@ -195,6 +275,12 @@ public class DifuntoDAO {
         return "";
     }
 
+    /**
+     * Obtiene los materiales distintos de una colección.
+     *
+     * @param coleccion nombre de la colección
+     * @return lista de materiales sin repetir
+     */
     private List<String> obtenerMateriales(String coleccion) {
         List<String> materiales = new ArrayList<>();
 
@@ -212,6 +298,12 @@ public class DifuntoDAO {
         return materiales;
     }
 
+    /**
+     * Inserta un nuevo difunto.
+     *
+     * @param difunto difunto que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarDifunto(Difunto difunto) {
         try {
             if (!esObjectIdValido(difunto.getId_cliente())
@@ -244,6 +336,13 @@ public class DifuntoDAO {
         }
     }
 
+    /**
+     * Actualiza los datos de un difunto y el material de su féretro y de su urna.
+     *
+     * @param difunto difunto con los datos nuevos; su identificador indica el documento que se
+     *         modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarDifunto(Difunto difunto) {
         try {
             if (!esObjectIdValido(difunto.getId())) {
@@ -284,6 +383,11 @@ public class DifuntoDAO {
         }
     }
 
+    /**
+     * Actualiza el material del féretro y de la urna asociados a un difunto.
+     *
+     * @param difunto difunto cuyos materiales se actualizan
+     */
     private void actualizarMaterialRelacionado(Difunto difunto) {
         if (esObjectIdValido(difunto.getId_feretro()) && difunto.getFeretro() != null) {
             Document cambiosFeretro = new Document()
@@ -302,6 +406,12 @@ public class DifuntoDAO {
         }
     }
 
+    /**
+     * Elimina un difunto.
+     *
+     * @param id identificador del difunto
+     * @return {@code true} si se eliminó algún documento
+     */
     public boolean eliminarDifunto(String id) {
         try {
             if (!esObjectIdValido(id)) {
@@ -319,6 +429,12 @@ public class DifuntoDAO {
         }
     }
 
+    /**
+     * Obtiene el texto con el que se guarda un tipo de servicio en la base de datos.
+     *
+     * @param servicio tipo de servicio
+     * @return {@code CREMACIÓN} o {@code ENTIERRO}
+     */
     private String obtenerNombreServicio(Difunto.Servicio servicio) {
         if (servicio == Difunto.Servicio.CREMACIÓN) {
             return "CREMACIÓN";
@@ -327,6 +443,12 @@ public class DifuntoDAO {
         return "ENTIERRO";
     }
 
+    /**
+     * Comprueba que un texto sea un identificador válido de MongoDB.
+     *
+     * @param id texto que se comprueba
+     * @return {@code true} si es un identificador válido
+     */
     private boolean esObjectIdValido(String id) {
         if (id == null || id.isEmpty()) {
             return false;

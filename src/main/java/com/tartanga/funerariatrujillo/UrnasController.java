@@ -33,14 +33,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de urnas. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de urnas.
+ *
+ * @author Jaime
+ */
 public class UrnasController implements Initializable {
 
     private final UrnaDAO urnaDAO;
 
+    /**
+     * Crea el controlador con el UrnaDAO por defecto.
+     */
     public UrnasController() {
         this.urnaDAO = new UrnaDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param urnaDAO DAO que se utilizará para acceder a la base de datos
+     */
     public UrnasController(UrnaDAO urnaDAO) {
         this.urnaDAO = urnaDAO;
     }
@@ -100,6 +115,13 @@ public class UrnasController implements Initializable {
     private final ObservableList<Urna> masterData = FXCollections.observableArrayList();
     private Urna urnaSeleccionada;
 
+    /**
+     * Inicializa la vista de urnas: configura la tabla, el buscador y los formularios de alta y de
+     * detalle, y carga los datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         panelFormularioNuevo.setTranslateX(400);
@@ -222,6 +244,10 @@ public class UrnasController implements Initializable {
         configurarModoEdicion();
     }
 
+    /**
+     * Carga los urnas desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         Task<List<Urna>> taskObtenerUrnas = new Task<List<Urna>>() {
             @Override
@@ -257,6 +283,10 @@ public class UrnasController implements Initializable {
         hiloSecundario.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta la urna en la base de datos
+     * y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevaUrna() {
         txtNuevaCapacidad.getStyleClass().remove("error");
         txtNuevoMaterial.getStyleClass().remove("error");
@@ -309,12 +339,18 @@ public class UrnasController implements Initializable {
         }
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevaCapacidad.clear();
         txtNuevoMaterial.clear();
         txtNuevoPrecio.clear();
     }
 
+    /**
+     * Elimina de la base de datos la urna seleccionada en la tabla y recarga los datos.
+     */
     private void eliminarUrnaSeleccionada() {
         if (urnaSeleccionada != null) {
 
@@ -338,14 +374,24 @@ public class UrnasController implements Initializable {
         }
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Configura la selección de la tabla: al elegir una urna se muestran sus datos en el panel de
+     * detalle.
+     */
     private void configurarSeleccionDeTabla() {
         tablaUrnas.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -391,6 +437,10 @@ public class UrnasController implements Initializable {
         });
     }
 
+    /**
+     * Configura los botones del panel de detalle para editar la urna seleccionada y guardar o
+     * descartar los cambios.
+     */
     private void configurarModoEdicion() {
         btnEditar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -466,6 +516,9 @@ public class UrnasController implements Initializable {
         });
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         txtDetalleCapacidad.setEditable(false);
         txtDetalleMaterial.setEditable(false);

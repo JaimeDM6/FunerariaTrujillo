@@ -14,8 +14,20 @@ import javafx.util.Callback;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Utilidades compartidas por las vistas: apertura y cierre del panel lateral de formularios,
+ * formato de columnas de tabla y validaciones de datos comunes.
+ *
+ * @author Aritz
+ */
 public class Utils {
 
+    /**
+     * Muestra el panel lateral del formulario y oculta el espaciador.
+     *
+     * @param panelFormulario panel del formulario
+     * @param spacerLateral espaciador lateral que ocupa su sitio mientras el panel está cerrado
+     */
     public static void openForm(VBox panelFormulario, Region spacerLateral) {
         if (panelFormulario.getTranslateX() != 0) {
             panelFormulario.setVisible(true);
@@ -33,6 +45,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Oculta el panel lateral del formulario y vuelve a mostrar el espaciador.
+     *
+     * @param panelFormulario panel del formulario
+     * @param spacerLateral espaciador lateral que ocupa su sitio mientras el panel está cerrado
+     */
     public static void closeForm(VBox panelFormulario, Region spacerLateral) {
         Timeline slide = new Timeline(
                 new KeyFrame(Duration.ZERO,
@@ -54,6 +72,12 @@ public class Utils {
         slide.play();
     }
 
+    /**
+     * Configura una columna para mostrar solo los seis últimos caracteres del identificador, en
+     * mayúsculas.
+     *
+     * @param columna columna de identificadores
+     */
     public static <T> void columnID(TableColumn<T, String> columna) {
         columna.setCellFactory(new Callback<TableColumn<T, String>, TableCell<T, String>>() {
             @Override
@@ -73,6 +97,11 @@ public class Utils {
         });
     }
 
+    /**
+     * Configura una columna para mostrar las fechas con el formato dd/MM/yyyy.
+     *
+     * @param columna columna de fechas
+     */
     public static <T> void columnDate(TableColumn<T, Date> columna) {
         columna.setCellFactory(new Callback<TableColumn<T, Date>, TableCell<T, Date>>() {
             @Override
@@ -90,18 +119,42 @@ public class Utils {
         });
     }
 
+    /**
+     * Comprueba que un DNI tenga ocho dígitos seguidos de una letra.
+     *
+     * @param dni DNI que se comprueba
+     * @return {@code true} si el DNI es válido
+     */
     public static boolean dniValido(String dni) {
         return dni != null && dni.matches("^[0-9]{8}[A-Za-z]$");
     }
 
+    /**
+     * Comprueba que un correo electrónico tenga la forma usuario@dominio y termine en .com o .es.
+     *
+     * @param correo correo que se comprueba
+     * @return {@code true} si el correo es válido
+     */
     public static boolean correoValido(String correo) {
         return correo != null && correo.matches("^.+@.+\\.(com|es)$");
     }
 
+    /**
+     * Comprueba que un teléfono tenga exactamente nueve dígitos.
+     *
+     * @param telefono teléfono que se comprueba
+     * @return {@code true} si el teléfono es válido
+     */
     public static boolean telefonoValido(String telefono) {
         return telefono != null && telefono.matches("^[0-9]{9}$");
     }
 
+    /**
+     * Comprueba que un código postal tenga exactamente cinco dígitos.
+     *
+     * @param cp código postal que se comprueba
+     * @return {@code true} si el código postal es válido
+     */
     public static boolean cpValido(String cp) {
         return cp != null && cp.matches("^[0-9]{5}$");
     }

@@ -38,14 +38,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de trabajadores. Gestiona el listado con búsqueda, el alta (con usuario
+ * y contraseña), la edición y la eliminación de trabajadores.
+ *
+ * @author Iker
+ */
 public class TrabajadorController implements Initializable {
 
     private final TrabajadorDAO trabajadorDAO;
 
+    /**
+     * Crea el controlador con el TrabajadorDAO por defecto.
+     */
     public TrabajadorController() {
         this.trabajadorDAO = new TrabajadorDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param trabajadorDAO DAO que se utilizará para acceder a la base de datos
+     */
     public TrabajadorController(TrabajadorDAO trabajadorDAO) {
         this.trabajadorDAO = trabajadorDAO;
     }
@@ -172,6 +187,13 @@ public class TrabajadorController implements Initializable {
     private final ObservableList<Trabajador> masterData = FXCollections.observableArrayList();
     private Trabajador trabajadorSeleccionado;
 
+    /**
+     * Inicializa la vista de trabajadores: configura la tabla, el buscador y los formularios de alta y
+     * de detalle, y carga los datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         panelFormularioNuevo.setTranslateX(400);
@@ -297,6 +319,10 @@ public class TrabajadorController implements Initializable {
         configurarModoEdicion();
     }
 
+    /**
+     * Carga los trabajadores desde la base de datos en un hilo en segundo plano y actualiza la tabla
+     * al terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         Task<List<Trabajador>> taskObtenerTrabajadores = new Task<List<Trabajador>>() {
             @Override
@@ -331,6 +357,14 @@ public class TrabajadorController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Genera un nombre de usuario con el formato inicial.apellido, sin tildes y en minúsculas. Si ya
+     * existe, añade más letras del nombre y, en último caso, un número.
+     *
+     * @param nombre nombre del trabajador
+     * @param apellidos apellidos del trabajador; solo se usa el primero
+     * @return nombre de usuario que todavía no existe en la base de datos
+     */
     private String generarUsuario(String nombre, String apellidos) {
         String cleanNombre = java.text.Normalizer.normalize(nombre.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
@@ -364,6 +398,10 @@ public class TrabajadorController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, genera el usuario, inserta el
+     * trabajador en la base de datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevoTrabajador() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevoApellidos.getStyleClass().remove("error");
@@ -434,6 +472,12 @@ public class TrabajadorController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos del formulario de alta de trabajador y marca como erróneos los que no son
+     * válidos.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarNuevoTrabajador() {
         String mensaje = null;
         boolean hayError = false;
@@ -527,6 +571,13 @@ public class TrabajadorController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Alterna entre mostrar y ocultar la contraseña y cambia el icono del ojo.
+     *
+     * @param campoOculto campo de contraseña oculta
+     * @param campoVisible campo de texto que muestra la contraseña
+     * @param icono icono del botón de visibilidad
+     */
     private void alternarVisibilidadPassword(PasswordField campoOculto, TextField campoVisible, SVGPath icono) {
         boolean mostrar = !campoVisible.isVisible();
 
@@ -542,6 +593,10 @@ public class TrabajadorController implements Initializable {
         }
     }
 
+    /**
+     * Actualiza los roles que se pueden elegir en el formulario de alta según el cargo seleccionado.
+     * Si solo hay un rol posible, lo selecciona.
+     */
     private void actualizarRolesNuevo() {
         Cargo cargo = cmbNuevoCargo.getSelectionModel().getSelectedItem();
         ObservableList<Rol> roles = FXCollections.observableArrayList();
@@ -568,6 +623,9 @@ public class TrabajadorController implements Initializable {
         }
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevoApellidos.clear();
@@ -586,6 +644,9 @@ public class TrabajadorController implements Initializable {
         cmbNuevoRol.getSelectionModel().clearSelection();
     }
 
+    /**
+     * Elimina de la base de datos el trabajador seleccionado en la tabla y recarga los datos.
+     */
     private void eliminarTrabajadorSeleccionado() {
         if (trabajadorSeleccionado != null) {
             if (trabajadorDAO.eliminarTrabajador(trabajadorSeleccionado.getId())) {
@@ -608,14 +669,24 @@ public class TrabajadorController implements Initializable {
         }
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Configura la selección de la tabla: al elegir un trabajador se muestran sus datos en el panel de
+     * detalle.
+     */
     private void configurarSeleccionDeTabla() {
         tablaTrabajadores.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -685,6 +756,10 @@ public class TrabajadorController implements Initializable {
         });
     }
 
+    /**
+     * Configura los botones del panel de detalle para editar el trabajador seleccionado y guardar o
+     * descartar los cambios.
+     */
     private void configurarModoEdicion() {
         btnEditar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -803,6 +878,11 @@ public class TrabajadorController implements Initializable {
         });
     }
 
+    /**
+     * Comprueba los campos del panel de detalle antes de guardar la edición del trabajador.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarDetalleTrabajador() {
         String mensaje = null;
         boolean hayError = false;
@@ -874,6 +954,12 @@ public class TrabajadorController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSinNulos(String texto) {
         String resultado = "";
         if (texto != null) {
@@ -882,6 +968,9 @@ public class TrabajadorController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         txtDetalleNombre.setEditable(false);
         txtDetalleApellidos.setEditable(false);

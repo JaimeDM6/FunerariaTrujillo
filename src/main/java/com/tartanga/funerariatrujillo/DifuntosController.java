@@ -45,16 +45,32 @@ import java.util.function.Predicate;
 import javafx.application.Platform;
 import javafx.scene.control.Control;
 
+/**
+ * Controlador de la vista de difuntos. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de difuntos, así como la elección del cliente responsable, el féretro, la urna y el
+ * tipo de servicio.
+ *
+ * @author Iker
+ */
 public class DifuntosController implements Initializable {
 
     private static final String NUEVO_CLIENTE = "Nuevo cliente";
 
     private final DifuntoDAO difuntoDAO;
 
+    /**
+     * Crea el controlador con el DifuntoDAO por defecto.
+     */
     public DifuntosController() {
         this.difuntoDAO = new DifuntoDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param difuntoDAO DAO que se utilizará para acceder a la base de datos
+     */
     public DifuntosController(DifuntoDAO difuntoDAO) {
         this.difuntoDAO = difuntoDAO;
     }
@@ -150,10 +166,22 @@ public class DifuntosController implements Initializable {
     private FilteredList<String> clientesFiltrados;
     private MainController mainController;
 
+    /**
+     * Establece el controlador principal, que permite navegar a otras vistas desde este módulo.
+     *
+     * @param mainController controlador principal de la aplicación
+     */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
 
+    /**
+     * Inicializa la vista de difuntos: configura la tabla, el buscador y los formularios de alta y de
+     * detalle, y carga los datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         panelFormularioNuevo.setTranslateX(400);
@@ -261,6 +289,10 @@ public class DifuntosController implements Initializable {
         configurarModoEdicion();
     }
 
+    /**
+     * Rellena las listas de clientes y de materiales de féretro y urna con los datos de la base de
+     * datos, y configura el buscador de clientes del formulario de alta.
+     */
     private void configurarMateriales() {
         cargarClientes(difuntoDAO.obtenerClientes());
         cmbNuevoMaterialFeretro.getItems().setAll(difuntoDAO.obtenerMaterialesFeretros());
@@ -332,6 +364,10 @@ public class DifuntosController implements Initializable {
         });
     }
 
+    /**
+     * Muestra u oculta la lista de sugerencias de clientes según el campo de cliente tenga el foco y
+     * su texto no coincida ya con un cliente existente.
+     */
     private void actualizarListaClientes() {
         boolean mostrar = txtNuevoCliente.isFocused()
                 && !idsClientes.containsKey(txtNuevoCliente.getText().trim());
@@ -339,11 +375,20 @@ public class DifuntosController implements Initializable {
         listaClientes.setManaged(mostrar);
     }
 
+    /**
+     * Oculta la lista de sugerencias de clientes.
+     */
     private void ocultarListaClientes() {
         listaClientes.setVisible(false);
         listaClientes.setManaged(false);
     }
 
+    /**
+     * Carga los clientes disponibles para el formulario de alta, guardando la relación entre el nombre
+     * mostrado y el identificador. Añade al final la opción de crear un cliente nuevo.
+     *
+     * @param clientes clientes con el formato {@code identificador - nombre apellidos}
+     */
     private void cargarClientes(List<String> clientes) {
         idsClientes.clear();
         nombresClientes.clear();
@@ -361,6 +406,12 @@ public class DifuntosController implements Initializable {
         nombresClientes.add(NUEVO_CLIENTE);
     }
 
+    /**
+     * Filtra la lista de sugerencias de clientes por el texto escrito. La opción de crear un cliente
+     * nuevo se muestra siempre.
+     *
+     * @param texto texto escrito en el campo de cliente, que puede ser nulo
+     */
     private void filtrarClientes(String texto) {
         String textoFiltro = "";
         if (texto != null) {
@@ -376,12 +427,20 @@ public class DifuntosController implements Initializable {
         });
     }
 
+    /**
+     * Establece la fecha actual como valor inicial de las fechas de nacimiento y de fallecimiento del
+     * formulario de alta.
+     */
     private void establecerFechasPorDefecto() {
         LocalDate hoy = LocalDate.now();
         dpNuevoNacimiento.setValue(hoy);
         dpNuevoMuerte.setValue(hoy);
     }
 
+    /**
+     * Agrupa los botones de opción de entierro y cremación de los formularios de alta y de detalle y
+     * deja el entierro seleccionado por defecto en el alta.
+     */
     private void configurarGruposDeServicio() {
         ToggleGroup grupoNuevo = new ToggleGroup();
         rbNuevoEntierro.setToggleGroup(grupoNuevo);
@@ -393,6 +452,11 @@ public class DifuntosController implements Initializable {
         rbDetalleCremacion.setToggleGroup(grupoDetalle);
     }
 
+    /**
+     * Actualiza el contador y el texto de la tabla según el resultado de la búsqueda.
+     *
+     * @param textoBusqueda texto escrito en el buscador, que puede ser nulo
+     */
     private void actualizarEstadoBusqueda(String textoBusqueda) {
         if (filteredData.size() > 0) {
             lblEstadoTabla.setText(filteredData.size() + " difuntos");
@@ -409,6 +473,10 @@ public class DifuntosController implements Initializable {
         }
     }
 
+    /**
+     * Carga los difuntos desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         Task<List<Difunto>> taskObtenerDifuntos = new Task<List<Difunto>>() {
             @Override
@@ -443,6 +511,10 @@ public class DifuntosController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta el difunto en la base de
+     * datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevoDifunto() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevoApellidos.getStyleClass().remove("error");
@@ -486,6 +558,12 @@ public class DifuntosController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos del formulario de alta de difunto y marca como erróneos los que no son
+     * válidos.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarNuevoDifunto() {
         String mensaje = null;
         boolean hayError = false;
@@ -529,6 +607,11 @@ public class DifuntosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Crea un difunto con los datos del formulario de alta.
+     *
+     * @return difunto con los datos introducidos, sin identificador
+     */
     private Difunto crearDifuntoDesdeFormularioNuevo() {
         Difunto difunto = new Difunto();
         String cliente = txtNuevoCliente.getText().trim();
@@ -559,10 +642,23 @@ public class DifuntosController implements Initializable {
         return difunto;
     }
 
+    /**
+     * Convierte una fecha local en un {@link java.util.Date} a las 00:00 de la zona horaria del
+     * sistema.
+     *
+     * @param fecha fecha local que se va a convertir
+     * @return fecha equivalente
+     */
     private Date convertirAFecha(LocalDate fecha) {
         return Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
+    /**
+     * Convierte un {@link java.util.Date} en una fecha local para el selector de fechas.
+     *
+     * @param fecha fecha que se va a convertir, que puede ser nula
+     * @return fecha local equivalente, o {@code null} si la fecha era nula
+     */
     private LocalDate convertirAFechaPicker(Date fecha) {
         LocalDate resultado = null;
         if (fecha != null) {
@@ -571,6 +667,12 @@ public class DifuntosController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSinNulos(String texto) {
         String resultado = "";
         if (texto != null) {
@@ -579,6 +681,13 @@ public class DifuntosController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Comprueba que las fechas no sean futuras y que el fallecimiento no sea anterior al nacimiento.
+     *
+     * @param nacimiento fecha de nacimiento
+     * @param muerte fecha de fallecimiento
+     * @return mensaje con el error encontrado, o {@code null} si las fechas son correctas
+     */
     private String validarFechas(LocalDate nacimiento, LocalDate muerte) {
         LocalDate hoy = LocalDate.now();
         String mensaje = null;
@@ -594,6 +703,11 @@ public class DifuntosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Comprueba los campos del panel de detalle antes de guardar la edición del difunto.
+     *
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarDetalleDifunto() {
         String mensaje = null;
         boolean hayError = false;
@@ -630,6 +744,9 @@ public class DifuntosController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevoApellidos.clear();
@@ -643,6 +760,9 @@ public class DifuntosController implements Initializable {
         rbNuevoEntierro.setSelected(true);
     }
 
+    /**
+     * Elimina de la base de datos el difunto seleccionado en la tabla y recarga los datos.
+     */
     private void eliminarDifuntoSeleccionado() {
         if (difuntoSeleccionado != null) {
             if (difuntoDAO.eliminarDifunto(difuntoSeleccionado.getId())) {
@@ -665,14 +785,24 @@ public class DifuntosController implements Initializable {
         }
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Configura la selección de la tabla: al elegir un difunto se muestran sus datos en el panel de
+     * detalle.
+     */
     private void configurarSeleccionDeTabla() {
         tablaDifuntos.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -738,6 +868,10 @@ public class DifuntosController implements Initializable {
         });
     }
 
+    /**
+     * Configura los botones del panel de detalle para editar el difunto seleccionado y guardar o
+     * descartar los cambios.
+     */
     private void configurarModoEdicion() {
         btnEditar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -817,6 +951,12 @@ public class DifuntosController implements Initializable {
         });
     }
 
+    /**
+     * Habilita o deshabilita la edición de los campos del panel de detalle.
+     *
+     * @param editable {@code true} para permitir la edición; {@code false} para dejar los campos en
+     *         solo lectura
+     */
     private void cambiarEstadoCamposEdicion(boolean editable) {
         txtDetalleNombre.setEditable(editable);
         txtDetalleApellidos.setEditable(editable);
@@ -846,6 +986,9 @@ public class DifuntosController implements Initializable {
         }
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         cambiarEstadoCamposEdicion(false);
 

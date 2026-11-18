@@ -13,8 +13,10 @@ import java.util.ResourceBundle;
 import com.tartanga.funerariatrujillo.Security.UserSession;
 
 /**
- * FXML Controller class
+ * Controlador del contenedor principal (layout). Aloja la barra lateral y la zona central donde se
+ * cargan las vistas de cada módulo, y gestiona el cierre de sesión.
  *
+ * @author Aritz
  */
 public class MainController implements Initializable {
 
@@ -26,6 +28,13 @@ public class MainController implements Initializable {
     @FXML
     private SidebarController sidebarController;
 
+    /**
+     * Inicializa el contenedor principal: conecta la barra lateral con este controlador y carga la
+     * vista de clientes.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (sidebarController != null) {
@@ -36,9 +45,10 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Método reutilizable para cambiar el contenido central.
+     * Carga una vista en la zona central. Si la vista es la de difuntos, le facilita este controlador
+     * para que pueda navegar a otras vistas.
      *
-     * @param archivoFxml
+     * @param archivoFxml nombre del archivo FXML de la vista
      */
     public void cargarVista(String archivoFxml) {
         try {
@@ -58,6 +68,9 @@ public class MainController implements Initializable {
         }
     }
 
+    /**
+     * Cierra la sesión del usuario y vuelve a la pantalla de inicio de sesión.
+     */
     public void cerrarSesion() {
         UserSession.logout();
         try {

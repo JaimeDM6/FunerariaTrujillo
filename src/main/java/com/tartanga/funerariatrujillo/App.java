@@ -11,12 +11,22 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 
 /**
- * JavaFX App
+ * Clase principal de la aplicación JavaFX de la Funeraria Trujillo. Crea la ventana, carga la
+ * pantalla de inicio de sesión y permite cambiar la vista raíz de la escena.
+ *
+ * @author Aritz
  */
 public class App extends Application {
 
     private static Scene scene;
 
+    /**
+     * Arranca la aplicación: carga la pantalla de inicio de sesión, establece el título, el icono y
+     * las fuentes, y muestra la ventana.
+     *
+     * @param stage ventana principal proporcionada por JavaFX
+     * @throws IOException si no se puede cargar el archivo FXML o un recurso
+     */
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("login"), 1000, 700);
@@ -30,15 +40,33 @@ public class App extends Application {
         Font.loadFont(getClass().getResourceAsStream("/com/tartanga/funerariatrujillo/fonts/Inter_18pt-Bold.ttf"), 14);
     }
 
+    /**
+     * Cambia el contenido de la escena cargando otro archivo FXML.
+     *
+     * @param fxml nombre del archivo FXML, sin la extensión
+     * @throws IOException si no se puede cargar el archivo FXML
+     */
     static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
+    /**
+     * Carga un archivo FXML y devuelve su vista.
+     *
+     * @param fxml nombre del archivo FXML, sin la extensión
+     * @return raíz de la vista cargada
+     * @throws IOException si no se puede cargar el archivo FXML
+     */
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
+    /**
+     * Método de arranque de la aplicación.
+     *
+     * @param args argumentos de la línea de comandos
+     */
     public static void main(String[] args) {
         launch();
     }

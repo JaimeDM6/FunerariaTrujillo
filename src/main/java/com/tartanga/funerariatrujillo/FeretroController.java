@@ -31,14 +31,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de féretros. Gestiona el listado con búsqueda, el alta, la edición y la
+ * eliminación de féretros.
+ *
+ * @author Aritz
+ */
 public class FeretroController implements Initializable {
 
     private final FeretroDAO feretroDAO;
 
+    /**
+     * Crea el controlador con el FeretroDAO por defecto.
+     */
     public FeretroController() {
         this.feretroDAO = new FeretroDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param feretroDAO DAO que se utilizará para acceder a la base de datos
+     */
     public FeretroController(FeretroDAO feretroDAO) {
         this.feretroDAO = feretroDAO;
     }
@@ -106,6 +121,13 @@ public class FeretroController implements Initializable {
     private final ObservableList<Feretro> masterData = FXCollections.observableArrayList();
     private Feretro feretroSeleccionado;
 
+    /**
+     * Inicializa la vista de los féretros: configura los botones, la tabla y el buscador, y carga los
+     * datos de la base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         ocultarFormularioNuevo();
@@ -121,6 +143,10 @@ public class FeretroController implements Initializable {
         cargarDatos();
     }
 
+    /**
+     * Asigna las acciones de los botones de la vista: abrir y cerrar el formulario de alta, guardar,
+     * editar, eliminar y volver al listado.
+     */
     private void configurarBotones() {
         btnNuevoFeretro.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -183,6 +209,9 @@ public class FeretroController implements Initializable {
         });
     }
 
+    /**
+     * Configura las columnas de la tabla, su origen de datos y la selección de filas.
+     */
     private void configurarTabla() {
         colID.setCellValueFactory(new PropertyValueFactory<Feretro, String>("id"));
         Utils.columnID(colID);
@@ -198,6 +227,10 @@ public class FeretroController implements Initializable {
         colPrecio.setReorderable(false);
     }
 
+    /**
+     * Configura el buscador para filtrar la tabla mientras se escribe y actualiza el contador de
+     * resultados.
+     */
     private void configurarBusqueda() {
         FilteredList<Feretro> filtradas = new FilteredList<>(masterData, new Predicate<Feretro>() {
             @Override
@@ -229,6 +262,12 @@ public class FeretroController implements Initializable {
         tablaFeretros.setItems(ordenadas);
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSinNulos(String texto) {
         String resultado = "";
         if (texto != null) {
@@ -237,6 +276,10 @@ public class FeretroController implements Initializable {
         return resultado;
     }
 
+    /**
+     * Carga los féretros desde la base de datos en un hilo en segundo plano y actualiza la tabla al
+     * terminar. Si la carga falla, avisa al usuario del error de conexión.
+     */
     private void cargarDatos() {
         lblEstadoTabla.setText("Cargando féretros...");
         vistaTabla.setDisable(true);
@@ -273,6 +316,10 @@ public class FeretroController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Valida el formulario de alta y, si los datos son correctos, inserta el féretro en la base de
+     * datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarNuevoFeretro() {
         txtNuevasMedidas.getStyleClass().remove("error");
         txtNuevoMaterial.getStyleClass().remove("error");
@@ -303,6 +350,10 @@ public class FeretroController implements Initializable {
         }
     }
 
+    /**
+     * Valida los datos del panel de detalle y, si son correctos, actualiza el féretro en la base de
+     * datos y recarga la tabla. Si no lo son, muestra un aviso con el motivo.
+     */
     private void guardarEdicion() {
         txtDetalleMedidas.getStyleClass().remove("error");
         txtDetalleMaterial.getStyleClass().remove("error");
@@ -339,6 +390,9 @@ public class FeretroController implements Initializable {
         }
     }
 
+    /**
+     * Elimina de la base de datos el féretro seleccionado en la tabla y recarga los datos.
+     */
     private void eliminarFeretroSeleccionado() {
         if (feretroSeleccionado != null) {
             String id = feretroSeleccionado.getId();
@@ -357,6 +411,15 @@ public class FeretroController implements Initializable {
         }
     }
 
+    /**
+     * Comprueba los campos de un formulario de féretro y marca como erróneos los que no son válidos.
+     *
+     * @param txtMedidas campo de las medidas
+     * @param txtMaterial campo del material
+     * @param txtPeso campo del peso
+     * @param txtPrecio campo del precio
+     * @return mensaje con el primer error encontrado, o {@code null} si todos los datos son válidos
+     */
     private String validarDatos(TextField txtMedidas, TextField txtMaterial, TextField txtPeso, TextField txtPrecio) {
         String mensaje = null;
         boolean hayError = false;
@@ -405,10 +468,23 @@ public class FeretroController implements Initializable {
         return mensaje;
     }
 
+    /**
+     * Convierte un texto en un número, admitiendo la coma como separador decimal.
+     *
+     * @param texto texto con el número
+     * @return valor numérico
+     * @throws NumberFormatException si el texto no es un número
+     */
     private double convertirNumero(String texto) {
         return Double.parseDouble(texto.trim().replace(",", "."));
     }
 
+    /**
+     * Muestra el detalle del féretro indicado: lo guarda como féretro seleccionado, rellena los
+     * campos, cambia del listado al panel de detalle y deja los campos en solo lectura.
+     *
+     * @param feretro féretro cuyos datos se van a mostrar
+     */
     private void mostrarDetalles(Feretro feretro) {
         feretroSeleccionado = feretro;
 
@@ -427,6 +503,9 @@ public class FeretroController implements Initializable {
         bloquearCamposEdicion();
     }
 
+    /**
+     * Vuelve del panel de detalle al listado, bloquea los campos y descarta la selección.
+     */
     private void volverAListado() {
         vistaDetalles.setVisible(false);
         vistaDetalles.setManaged(false);
@@ -437,10 +516,19 @@ public class FeretroController implements Initializable {
         feretroSeleccionado = null;
     }
 
+    /**
+     * Deja los campos del panel de detalle en modo solo lectura.
+     */
     private void bloquearCamposEdicion() {
         configurarCamposEdicion(false);
     }
 
+    /**
+     * Habilita o deshabilita la edición de los campos del panel de detalle.
+     *
+     * @param editable {@code true} para permitir la edición; {@code false} para dejar los campos en
+     *         solo lectura
+     */
     private void configurarCamposEdicion(boolean editable) {
         txtDetalleMedidas.setEditable(editable);
         txtDetalleMaterial.setEditable(editable);
@@ -467,14 +555,23 @@ public class FeretroController implements Initializable {
         btnGuardarEdicion.setManaged(editable);
     }
 
+    /**
+     * Abre el panel lateral del formulario de alta.
+     */
     private void openForm() {
         Utils.openForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Cierra el panel lateral del formulario de alta.
+     */
     private void closeForm() {
         Utils.closeForm(panelFormularioNuevo, spacerLateral);
     }
 
+    /**
+     * Oculta el panel lateral del formulario de alta sin modificar sus campos.
+     */
     private void ocultarFormularioNuevo() {
         panelFormularioNuevo.setTranslateX(400);
         panelFormularioNuevo.setVisible(false);
@@ -482,6 +579,9 @@ public class FeretroController implements Initializable {
         spacerLateral.setMinWidth(0);
     }
 
+    /**
+     * Vacía los campos del formulario de alta.
+     */
     private void limpiarFormularioNuevo() {
         txtNuevasMedidas.clear();
         txtNuevoMaterial.clear();
@@ -489,6 +589,12 @@ public class FeretroController implements Initializable {
         txtNuevoPrecio.clear();
     }
 
+    /**
+     * Busca la posición de un elemento en la lista de datos a partir de su identificador.
+     *
+     * @param id identificador que se busca
+     * @return posición del elemento en la lista, o -1 si no se encuentra
+     */
     private int buscarPosicionPorId(String id) {
         int posicion = -1;
         int i = 0;
@@ -503,10 +609,20 @@ public class FeretroController implements Initializable {
         return posicion;
     }
 
+    /**
+     * Actualiza el contador de resultados y el texto de la tabla según los elementos visibles.
+     */
     private void actualizarEstadoTabla() {
         lblEstadoTabla.setText(tablaFeretros.getItems().size() + " féretros");
     }
 
+    /**
+     * Muestra una ventana de aviso y espera a que el usuario la cierre.
+     *
+     * @param tipo tipo de aviso
+     * @param titulo título de la ventana
+     * @param mensaje mensaje que se muestra
+     */
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);

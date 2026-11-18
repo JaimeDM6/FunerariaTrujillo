@@ -13,10 +13,21 @@ import com.tartanga.funerariatrujillo.Objects.Trabajador.Cargo;
 import com.tartanga.funerariatrujillo.Objects.Trabajador.Rol;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ * Acceso a datos de la colección {@code trabajador} de MongoDB. Incluye la comprobación de
+ * usuarios y la autenticación con contraseñas cifradas con BCrypt.
+ *
+ * @author Iker
+ */
 public class TrabajadorDAO {
 
     private static final String COLLECTION_NAME = "trabajador";
 
+    /**
+     * Obtiene todos los trabajadores de la base de datos.
+     *
+     * @return lista de trabajadores; vacía si se produce un error
+     */
     public List<Trabajador> obtenerTrabajadores() {
         List<Trabajador> trabajadores = new ArrayList<>();
 
@@ -97,6 +108,12 @@ public class TrabajadorDAO {
         return trabajadores;
     }
 
+    /**
+     * Actualiza los datos de un trabajador.
+     *
+     * @param t trabajador con los datos nuevos; su identificador indica el documento que se modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarTrabajador(Trabajador t) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("trabajador");
@@ -122,6 +139,12 @@ public class TrabajadorDAO {
         }
     }
 
+    /**
+     * Inserta un nuevo trabajador.
+     *
+     * @param t trabajador que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarTrabajador(Trabajador t) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection(COLLECTION_NAME);
@@ -156,6 +179,12 @@ public class TrabajadorDAO {
         }
     }
 
+    /**
+     * Elimina un trabajador.
+     *
+     * @param id identificador del trabajador
+     * @return {@code true} si se eliminó correctamente
+     */
     public boolean eliminarTrabajador(String id) {
         try {
             Document filtro = new Document("_id", new org.bson.types.ObjectId(id));
@@ -167,6 +196,12 @@ public class TrabajadorDAO {
         }
     }
 
+    /**
+     * Comprueba si ya existe un trabajador con un nombre de usuario.
+     *
+     * @param usuario nombre de usuario que se comprueba
+     * @return {@code true} si el usuario existe o si no se pudo comprobar
+     */
     public boolean existeUsuario(String usuario) {
         try {
             Document doc = MongoConfig.getCollection(COLLECTION_NAME)
@@ -179,6 +214,15 @@ public class TrabajadorDAO {
         }
     }
 
+    /**
+     * Comprueba las credenciales de un trabajador comparando la contraseña con el hash BCrypt
+     * guardado.
+     *
+     * @param usuario nombre de usuario
+     * @param password contraseña en texto
+     * @return trabajador autenticado, o vacío si las credenciales no son correctas o se produce un
+     *         error
+     */
     public Optional<Trabajador> autenticar(String usuario, char[] password) {
         if (usuario == null || usuario.isBlank() || password == null || password.length == 0) {
             return Optional.empty();

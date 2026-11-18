@@ -7,8 +7,18 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Acceso a datos de la colección {@code urna} de MongoDB.
+ *
+ * @author Jaime
+ */
 public class UrnaDAO {
 
+    /**
+     * Obtiene todas las urnas de la base de datos.
+     *
+     * @return lista de urnas; vacía si se produce un error
+     */
     public List<Urna> obtenerUrnas() {
         List<Urna> urnas = new ArrayList<>();
 
@@ -52,6 +62,12 @@ public class UrnaDAO {
         return urnas;
     }
 
+    /**
+     * Actualiza los datos de una urna.
+     *
+     * @param u urna con los datos nuevos; su identificador indica el documento que se modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarUrna(Urna u) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("urna");
@@ -72,6 +88,12 @@ public class UrnaDAO {
         }
     }
 
+    /**
+     * Inserta una nueva urna.
+     *
+     * @param u urna que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarUrna(Urna u) {
         try {
             MongoCollection<Document> collection = MongoConfig.getCollection("urna");
@@ -91,6 +113,12 @@ public class UrnaDAO {
         }
     }
 
+    /**
+     * Elimina una urna.
+     *
+     * @param id identificador de la urna
+     * @return {@code true} si se eliminó correctamente
+     */
     public boolean eliminarUrna(String id) {
         try {
             Document filtro = new Document("_id", new org.bson.types.ObjectId(id));

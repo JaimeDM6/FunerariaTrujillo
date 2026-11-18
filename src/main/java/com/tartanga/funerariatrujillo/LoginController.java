@@ -21,6 +21,12 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.Initializable;
 
+/**
+ * Controlador de la pantalla de inicio de sesión. Valida las credenciales contra la base de datos
+ * en un hilo en segundo plano, recuerda el usuario si se solicita y abre la aplicación principal.
+ *
+ * @author Aritz
+ */
 public class LoginController implements Initializable {
 
     @FXML
@@ -54,18 +60,39 @@ public class LoginController implements Initializable {
         }
     };
 
+    /**
+     * Crea el controlador con el acceso a datos de trabajadores por defecto.
+     */
     public LoginController() {
         this(new TrabajadorDAO());
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param trabajadorDAO DAO que se utilizará para autenticar a los trabajadores
+     */
     LoginController(TrabajadorDAO trabajadorDAO) {
         this.trabajadorDAO = trabajadorDAO;
     }
 
+    /**
+     * Establece la acción que se ejecuta cuando el inicio de sesión es correcto.
+     *
+     * @param onLoginSuccess acción que se ejecuta tras autenticar al usuario
+     */
     void setOnLoginSuccess(Runnable onLoginSuccess) {
         this.onLoginSuccess = onLoginSuccess;
     }
 
+    /**
+     * Inicializa la pantalla de inicio de sesión: recupera el usuario recordado, enlaza los campos de
+     * contraseña y asigna las acciones de los botones.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         txtUser.setText(preferences.get("usuario", ""));
@@ -114,6 +141,10 @@ public class LoginController implements Initializable {
         txtUser.requestFocus();
     }
 
+    /**
+     * Comprueba las credenciales introducidas en un hilo en segundo plano para no bloquear la interfaz
+     * y muestra el resultado.
+     */
     private void iniciarSesion() {
         try {
             lblError.setText("");
@@ -162,6 +193,12 @@ public class LoginController implements Initializable {
         }
     }
 
+    /**
+     * Procesa el resultado de la autenticación: si es correcto recuerda el usuario si se ha pedido,
+     * guarda la sesión y abre la aplicación; si no, muestra un mensaje de error.
+     *
+     * @param resultado trabajador autenticado, o vacío si las credenciales no son correctas
+     */
     private void finalizarAutenticacion(Optional<Trabajador> resultado) {
         btnLogin.setDisable(false);
         if (resultado.isEmpty()) {
@@ -180,6 +217,9 @@ public class LoginController implements Initializable {
         onLoginSuccess.run();
     }
 
+    /**
+     * Abre la pantalla principal de la aplicación.
+     */
     private void abrirAplicacion() {
         try {
             App.setRoot("layout");

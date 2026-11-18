@@ -8,8 +8,18 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Acceso a datos de la colección {@code servicios} de MongoDB.
+ *
+ * @author Iker
+ */
 public class ServiciosDAO {
 
+    /**
+     * Obtiene todos los servicios de la base de datos.
+     *
+     * @return lista de servicios; vacía si se produce un error
+     */
     public List<Servicios> obtenerServicios() {
         List<Servicios> servicios = new ArrayList<>();
 
@@ -37,6 +47,12 @@ public class ServiciosDAO {
         return servicios;
     }
 
+    /**
+     * Lee el precio de un servicio de su documento.
+     *
+     * @param doc documento del servicio
+     * @return precio del servicio
+     */
     private Double obtenerPrecio(Document doc) {
         Object precioObject = doc.get("precio");
 
@@ -53,6 +69,13 @@ public class ServiciosDAO {
         return 0.0;
     }
 
+    /**
+     * Actualiza los datos de un servicio.
+     *
+     * @param servicio servicio con los datos nuevos; su identificador indica el documento que se
+     *         modifica
+     * @return {@code true} si se actualizó correctamente
+     */
     public boolean actualizarServicio(Servicios servicio) {
         try {
             if (!ObjectId.isValid(servicio.getId())) {
@@ -75,6 +98,12 @@ public class ServiciosDAO {
         }
     }
 
+    /**
+     * Inserta un nuevo servicio.
+     *
+     * @param servicio servicio que se inserta
+     * @return {@code true} si se insertó correctamente
+     */
     public boolean insertarServicio(Servicios servicio) {
         try {
             Document documento = new Document()
@@ -98,6 +127,12 @@ public class ServiciosDAO {
         }
     }
 
+    /**
+     * Elimina un servicio.
+     *
+     * @param id identificador del servicio
+     * @return {@code true} si se eliminó correctamente
+     */
     public boolean eliminarServicio(String id) {
         try {
             if (!ObjectId.isValid(id)) {
