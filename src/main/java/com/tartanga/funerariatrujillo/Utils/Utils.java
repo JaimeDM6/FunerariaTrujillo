@@ -24,14 +24,11 @@ public class Utils {
                     new KeyFrame(Duration.ZERO,
                             new KeyValue(panelFormulario.translateXProperty(), 400),
                             new KeyValue(spacerLateral.prefWidthProperty(), 0),
-                            new KeyValue(spacerLateral.minWidthProperty(), 0)
-                    ),
+                            new KeyValue(spacerLateral.minWidthProperty(), 0)),
                     new KeyFrame(Duration.millis(350),
                             new KeyValue(panelFormulario.translateXProperty(), 0),
                             new KeyValue(spacerLateral.prefWidthProperty(), 370),
-                            new KeyValue(spacerLateral.minWidthProperty(), 370)
-                    )
-            );
+                            new KeyValue(spacerLateral.minWidthProperty(), 370)));
             slide.play();
         }
     }
@@ -41,14 +38,11 @@ public class Utils {
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(panelFormulario.translateXProperty(), 0),
                         new KeyValue(spacerLateral.prefWidthProperty(), 370),
-                        new KeyValue(spacerLateral.minWidthProperty(), 370)
-                ),
+                        new KeyValue(spacerLateral.minWidthProperty(), 370)),
                 new KeyFrame(Duration.millis(350),
                         new KeyValue(panelFormulario.translateXProperty(), 400),
                         new KeyValue(spacerLateral.prefWidthProperty(), 0),
-                        new KeyValue(spacerLateral.minWidthProperty(), 0)
-                )
-        );
+                        new KeyValue(spacerLateral.minWidthProperty(), 0)));
 
         slide.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
@@ -94,5 +88,21 @@ public class Utils {
                 };
             }
         });
+    }
+
+    public static boolean dniValido(String dni) {
+        return dni != null && dni.matches("^[0-9]{8}[A-Za-z]$");
+    }
+
+    public static boolean correoValido(String correo) {
+        return correo != null && correo.matches("^.+@.+\\.(com|es)$");
+    }
+
+    public static boolean telefonoValido(String telefono) {
+        return telefono != null && telefono.matches("^[0-9]{9}$");
+    }
+
+    public static boolean cpValido(String cp) {
+        return cp != null && cp.matches("^[0-9]{5}$");
     }
 }

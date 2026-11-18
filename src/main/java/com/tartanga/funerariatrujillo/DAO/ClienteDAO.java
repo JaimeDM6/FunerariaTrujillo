@@ -64,8 +64,7 @@ public class ClienteDAO {
                     .append("apellidos", c.getApellidos())
                     .append("dni", c.getDni())
                     .append("telefono", c.getTelefono())
-                    .append("correo_electronico", c.getCorreo_electronico())
-            );
+                    .append("correo_electronico", c.getCorreo_electronico()));
 
             collection.updateOne(filtro, updateDocs);
             return true;
@@ -82,12 +81,12 @@ public class ClienteDAO {
             Document dirDoc = new Document()
                     .append("calle", c.getDireccion().getCalle())
                     .append("ciudad", c.getDireccion().getCiudad())
-                    .append("codigo_postal", String.valueOf(c.getDireccion().getCodigoPostal()));
+                    .append("codigo_postal", String.format("%05d", c.getDireccion().getCodigoPostal()));
 
             Document doc = new Document()
                     .append("nombre", c.getNombre())
                     .append("apellidos", c.getApellidos())
-                    .append("dni", c.getDni())
+                    .append("dni", c.getDni().toUpperCase())
                     .append("telefono", c.getTelefono())
                     .append("correo_electronico", c.getCorreo_electronico())
                     .append("fecha_registro", c.getFecha_registro())

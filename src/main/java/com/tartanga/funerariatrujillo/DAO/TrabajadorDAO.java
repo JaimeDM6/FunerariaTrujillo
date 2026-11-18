@@ -112,8 +112,7 @@ public class TrabajadorDAO {
                     .append("iban", t.getIban())
                     .append("salario", t.getSalario())
                     .append("cargo", t.getCargo())
-                    .append("tipo_jornada", t.getTipo_jornada())
-            );
+                    .append("tipo_jornada", t.getTipo_jornada()));
 
             collection.updateOne(filtro, updateDocs);
             return true;
@@ -125,23 +124,26 @@ public class TrabajadorDAO {
 
     public boolean insertarTrabajador(Trabajador t) {
         try {
-            MongoCollection<Document> collection = MongoConfig.getCollection("trabajador");
+            MongoCollection<Document> collection = MongoConfig.getCollection(COLLECTION_NAME);
 
             Document dirDoc = new Document()
                     .append("calle", t.getDireccion().getCalle())
                     .append("ciudad", t.getDireccion().getCiudad())
-                    .append("codigo_postal", String.valueOf(t.getDireccion().getCodigoPostal()));
+                    .append("codigo_postal", String.format("%05d", t.getDireccion().getCodigoPostal()));
 
             Document doc = new Document()
                     .append("nombre", t.getNombre())
                     .append("apellidos", t.getApellidos())
-                    .append("dni", t.getDni())
+                    .append("dni", t.getDni().toUpperCase())
                     .append("correo_electronico", t.getCorreo_electronico())
+                    .append("usuario", t.getUsuario())
+                    .append("password", t.getPassword())
                     .append("direccion", dirDoc)
                     .append("numero_ss", t.getNumero_ss())
                     .append("iban", t.getIban())
                     .append("salario", t.getSalario())
-                    .append("cargo", t.getCargo())
+                    .append("cargo", t.getCargo().name())
+                    .append("rol", t.getRol().name())
                     .append("tipo_jornada", t.getTipo_jornada());
 
             collection.insertOne(doc);
@@ -149,7 +151,7 @@ public class TrabajadorDAO {
             t.setId(doc.getObjectId("_id").toString());
             return true;
         } catch (Exception e) {
-            System.err.println("Error al insertar el trabajador: " + e.getMessage());
+            System.err.println("Error al insertar el trabajador: " + e);
             return false;
         }
     }

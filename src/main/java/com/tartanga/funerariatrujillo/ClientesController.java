@@ -320,10 +320,33 @@ public class ClientesController implements Initializable {
             return;
         }
 
+        String msg = null;
+        if (!com.tartanga.funerariatrujillo.Utils.Utils.dniValido(txtNuevoDni.getText().trim())) {
+            txtNuevoDni.getStyleClass().add("error");
+            msg = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
+        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.telefonoValido(txtNuevoTelefono.getText().trim())) {
+            txtNuevoTelefono.getStyleClass().add("error");
+            msg = "El teléfono debe tener 9 números.";
+        }else if (!com.tartanga.funerariatrujillo.Utils.Utils.correoValido(txtNuevoCorreo.getText().trim())) {
+            txtNuevoCorreo.getStyleClass().add("error");
+            msg = "El correo electrónico no tiene un formato válido.";  
+        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.cpValido(txtNuevoCP.getText().trim())) {
+            txtNuevoCP.getStyleClass().add("error");
+            msg = "El código postal debe tener 5 números.";
+        }
+        if (msg != null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return;
+        }
+
         Cliente nuevoCliente = new Cliente();
         nuevoCliente.setNombre(txtNuevoNombre.getText().trim());
         nuevoCliente.setApellidos(txtNuevoApellidos.getText().trim());
-        nuevoCliente.setDni(txtNuevoDni.getText().trim());
+        nuevoCliente.setDni(txtNuevoDni.getText().trim().toUpperCase());
         nuevoCliente.setTelefono(txtNuevoTelefono.getText().trim());
         nuevoCliente.setCorreo_electronico(txtNuevoCorreo.getText().trim());
         nuevoCliente.setFecha_registro(new Date());
@@ -333,7 +356,8 @@ public class ClientesController implements Initializable {
         dir.setCiudad(txtNuevoCiudad.getText().trim());
 
         try {
-            dir.setCodigoPostal(txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
+            dir.setCodigoPostal(
+                    txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
         } catch (NumberFormatException ex) {
             dir.setCodigoPostal(0);
         }
@@ -413,9 +437,14 @@ public class ClientesController implements Initializable {
                         txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
                         if (newSelection.getDireccion() != null) {
-                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null ? newSelection.getDireccion().getCalle() : "");
-                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null ? newSelection.getDireccion().getCiudad() : "");
-                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? "" : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
+                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null
+                                    ? newSelection.getDireccion().getCalle()
+                                    : "");
+                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null
+                                    ? newSelection.getDireccion().getCiudad()
+                                    : "");
+                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? ""
+                                    : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
                         } else {
                             txtDetalleCalle.setText("");
                             txtDetalleCiudad.setText("");
@@ -560,7 +589,8 @@ public class ClientesController implements Initializable {
                     dir.setCalle(txtDetalleCalle.getText().trim());
                     dir.setCiudad(txtDetalleCiudad.getText().trim());
                     try {
-                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtDetalleCP.getText().trim()));
+                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0
+                                : Integer.parseInt(txtDetalleCP.getText().trim()));
                     } catch (NumberFormatException ex) {
                         dir.setCodigoPostal(0);
                     }

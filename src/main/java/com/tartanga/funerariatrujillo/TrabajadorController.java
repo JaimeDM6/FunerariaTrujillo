@@ -220,7 +220,8 @@ public class TrabajadorController implements Initializable {
                         String lowerCaseFilter = newValue.toLowerCase();
                         if (trabajador.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)) {
                             return true;
-                        } else if (trabajador.getCargo() != null && trabajador.getCargo().toString().toLowerCase().contains(lowerCaseFilter)) {
+                        } else if (trabajador.getCargo() != null
+                                && trabajador.getCargo().toString().toLowerCase().contains(lowerCaseFilter)) {
                             return true;
                         }
                         return false;
@@ -296,7 +297,8 @@ public class TrabajadorController implements Initializable {
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .replaceAll("\\s+", "");
 
-        String cleanApellido = java.text.Normalizer.normalize(apellidos.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
+        String cleanApellido = java.text.Normalizer
+                .normalize(apellidos.trim().toLowerCase(), java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                 .split("\\s+")[0];
 
@@ -419,10 +421,30 @@ public class TrabajadorController implements Initializable {
             return;
         }
 
+        String msg = null;
+        if (!com.tartanga.funerariatrujillo.Utils.Utils.dniValido(txtNuevoDni.getText().trim())) {
+            txtNuevoDni.getStyleClass().add("error");
+            msg = "El DNI debe tener 8 números y una letra (ej. 12345678A).";
+        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.correoValido(txtNuevoCorreo.getText().trim())) {
+            txtNuevoCorreo.getStyleClass().add("error");
+            msg = "El correo electrónico no tiene un formato válido.";
+        } else if (!com.tartanga.funerariatrujillo.Utils.Utils.cpValido(txtNuevoCP.getText().trim())) {
+            txtNuevoCP.getStyleClass().add("error");
+            msg = "El código postal debe tener 5 números.";
+        }
+        if (msg != null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(msg);
+            alert.showAndWait();
+            return;
+        }
+
         Trabajador nuevoTrabajador = new Trabajador();
         nuevoTrabajador.setNombre(txtNuevoNombre.getText().trim());
         nuevoTrabajador.setApellidos(txtNuevoApellidos.getText().trim());
-        nuevoTrabajador.setDni(txtNuevoDni.getText().trim());
+        nuevoTrabajador.setDni(txtNuevoDni.getText().trim().toUpperCase());
         nuevoTrabajador.setCorreo_electronico(txtNuevoCorreo.getText().trim());
         nuevoTrabajador.setNumero_ss(txtNuevoSS.getText().trim());
         nuevoTrabajador.setIban(txtNuevoIban.getText().trim());
@@ -452,7 +474,8 @@ public class TrabajadorController implements Initializable {
         dir.setCalle(txtNuevoCalle.getText().trim());
         dir.setCiudad(txtNuevaCiudad.getText().trim());
         try {
-            dir.setCodigoPostal(txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
+            dir.setCodigoPostal(
+                    txtNuevoCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtNuevoCP.getText().trim()));
         } catch (NumberFormatException ex) {
             dir.setCodigoPostal(0);
         }
@@ -538,9 +561,14 @@ public class TrabajadorController implements Initializable {
                         txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
                         if (newSelection.getDireccion() != null) {
-                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null ? newSelection.getDireccion().getCalle() : "");
-                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null ? newSelection.getDireccion().getCiudad() : "");
-                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? "" : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
+                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null
+                                    ? newSelection.getDireccion().getCalle()
+                                    : "");
+                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null
+                                    ? newSelection.getDireccion().getCiudad()
+                                    : "");
+                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? ""
+                                    : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
                         } else {
                             txtDetalleCalle.setText("");
                             txtDetalleCiudad.setText("");
@@ -720,7 +748,8 @@ public class TrabajadorController implements Initializable {
                     dir.setCalle(txtDetalleCalle.getText().trim());
                     dir.setCiudad(txtDetalleCiudad.getText().trim());
                     try {
-                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0 : Integer.parseInt(txtDetalleCP.getText().trim()));
+                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0
+                                : Integer.parseInt(txtDetalleCP.getText().trim()));
                     } catch (NumberFormatException ex) {
                         dir.setCodigoPostal(0);
                     }
