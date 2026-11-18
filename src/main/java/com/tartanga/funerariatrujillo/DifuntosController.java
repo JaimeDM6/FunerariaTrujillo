@@ -22,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -35,7 +36,6 @@ import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +90,9 @@ public class DifuntosController implements Initializable {
     @FXML
     private TextField txtNuevoApellidos;
     @FXML
-    private ComboBox<String> cmbNuevoCliente;
+    private TextField txtNuevoCliente;
+    @FXML
+    private ListView<String> listaClientes;
     @FXML
     private DatePicker dpNuevoNacimiento;
     @FXML
@@ -142,7 +144,8 @@ public class DifuntosController implements Initializable {
     private Difunto difuntoSeleccionado;
     private FilteredList<Difunto> filteredData;
     private final Map<String, String> idsClientes = new HashMap<String, String>();
-    private final List<String> nombresClientes = new ArrayList<String>();
+    private final ObservableList<String> nombresClientes = FXCollections.observableArrayList();
+    private FilteredList<String> clientesFiltrados;
     private MainController mainController;
 
     public void setMainController(MainController mainController) {
@@ -158,6 +161,7 @@ public class DifuntosController implements Initializable {
 
         configurarGruposDeServicio();
         configurarMateriales();
+        establecerFechasPorDefecto();
 
         btnNuevoDifunto.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -200,17 +204,23 @@ public class DifuntosController implements Initializable {
                 filteredData.setPredicate(new Predicate<Difunto>() {
                     @Override
                     public boolean test(Difunto difunto) {
-                        if (newValue == null || newValue.isEmpty()) {
-                            return true;
-                        }
-                        String lowerCaseFilter = newValue.toLowerCase();
-                        String nombre = difunto.getNombreCompleto() != null ? difunto.getNombreCompleto() : "";
-                        String causa = difunto.getCausa_muerte() != null ? difunto.getCausa_muerte() : "";
-                        String servicio = difunto.getServicio() != null ? difunto.getServicio().name() : "";
+                        boolean coincide = true;
 
-                        return nombre.toLowerCase().contains(lowerCaseFilter)
-                                || causa.toLowerCase().contains(lowerCaseFilter)
-                                || servicio.toLowerCase().contains(lowerCaseFilter);
+                        if (newValue != null && !newValue.isEmpty()) {
+                            String lowerCaseFilter = newValue.toLowerCase();
+                            String nombre = textoSinNulos(difunto.getNombreCompleto());
+                            String causa = textoSinNulos(difunto.getCausa_muerte());
+                            String servicio = "";
+                            if (difunto.getServicio() != null) {
+                                servicio = difunto.getServicio().name();
+                            }
+
+                            coincide = nombre.toLowerCase().contains(lowerCaseFilter)
+                                    || causa.toLowerCase().contains(lowerCaseFilter)
+                                    || servicio.toLowerCase().contains(lowerCaseFilter);
+                        }
+
+                        return coincide;
                     }
                 });
                 actualizarEstadoBusqueda(newValue);
@@ -255,28 +265,54 @@ public class DifuntosController implements Initializable {
         cmbNuevoMaterialUrna.getItems().setAll(difuntoDAO.obtenerMaterialesUrnas());
         cmbDetalleMaterialFeretro.getItems().setAll(cmbNuevoMaterialFeretro.getItems());
         cmbDetalleMaterialUrna.getItems().setAll(cmbNuevoMaterialUrna.getItems());
-        cmbNuevoCliente.setEditable(true);
-        cmbNuevoCliente.setPromptText("Escribe para buscar un cliente");
-        cmbNuevoCliente.getEditor().textProperty().addListener(new ChangeListener<String>() {
+        clientesFiltrados = new FilteredList<>(nombresClientes, new Predicate<String>() {
+            @Override
+            public boolean test(String nombre) {
+                return true;
+            }
+        });
+        listaClientes.setItems(clientesFiltrados);
+        txtNuevoCliente.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 filtrarClientes(newValue);
+                actualizarListaClientes();
             }
         });
-        cmbNuevoCliente.setOnAction(new EventHandler<ActionEvent>() {
+        txtNuevoCliente.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
-            public void handle(ActionEvent event) {
-                if (NUEVO_CLIENTE.equals(cmbNuevoCliente.getValue()) && mainController != null) {
-                    mainController.cargarVista("clientes.fxml");
+            public void handle(MouseEvent event) {
+                actualizarListaClientes();
+            }
+        });
+        listaClientes.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                String elegido = listaClientes.getSelectionModel().getSelectedItem();
+
+                if (elegido != null) {
+                    if (NUEVO_CLIENTE.equals(elegido)) {
+                        if (mainController != null) {
+                            mainController.cargarVista("clientes.fxml");
+                        }
+                    } else {
+                        txtNuevoCliente.setText(elegido);
+                    }
+                    listaClientes.getSelectionModel().clearSelection();
                 }
             }
         });
     }
 
+    private void actualizarListaClientes() {
+        boolean mostrar = !idsClientes.containsKey(txtNuevoCliente.getText().trim());
+        listaClientes.setVisible(mostrar);
+        listaClientes.setManaged(mostrar);
+    }
+
     private void cargarClientes(List<String> clientes) {
         idsClientes.clear();
         nombresClientes.clear();
-        cmbNuevoCliente.getItems().clear();
 
         for (String cliente : clientes) {
             int separador = cliente.indexOf(" - ");
@@ -285,26 +321,31 @@ public class DifuntosController implements Initializable {
                 String nombre = cliente.substring(separador + 3);
                 idsClientes.put(nombre, id);
                 nombresClientes.add(nombre);
-                cmbNuevoCliente.getItems().add(nombre);
             }
         }
 
-        cmbNuevoCliente.getItems().add(NUEVO_CLIENTE);
+        nombresClientes.add(NUEVO_CLIENTE);
     }
 
     private void filtrarClientes(String texto) {
-        if (texto != null && !texto.equals(NUEVO_CLIENTE)) {
-            String filtro = texto.toLowerCase().trim();
-            cmbNuevoCliente.getItems().clear();
-
-            for (String nombre : nombresClientes) {
-                if (filtro.isEmpty() || nombre.toLowerCase().contains(filtro)) {
-                    cmbNuevoCliente.getItems().add(nombre);
-                }
-            }
-
-            cmbNuevoCliente.getItems().add(NUEVO_CLIENTE);
+        String textoFiltro = "";
+        if (texto != null) {
+            textoFiltro = texto.toLowerCase().trim();
         }
+        String filtro = textoFiltro;
+
+        clientesFiltrados.setPredicate(new Predicate<String>() {
+            @Override
+            public boolean test(String nombre) {
+                return nombre.equals(NUEVO_CLIENTE) || nombre.toLowerCase().contains(filtro);
+            }
+        });
+    }
+
+    private void establecerFechasPorDefecto() {
+        LocalDate hoy = LocalDate.now();
+        dpNuevoNacimiento.setValue(hoy);
+        dpNuevoMuerte.setValue(hoy);
     }
 
     private void configurarGruposDeServicio() {
@@ -371,11 +412,48 @@ public class DifuntosController implements Initializable {
     private void guardarNuevoDifunto() {
         txtNuevoNombre.getStyleClass().remove("error");
         txtNuevoApellidos.getStyleClass().remove("error");
-        cmbNuevoCliente.getStyleClass().remove("error");
+        txtNuevoCliente.getStyleClass().remove("error");
         cmbNuevoMaterialFeretro.getStyleClass().remove("error");
         dpNuevoNacimiento.getStyleClass().remove("error");
         dpNuevoMuerte.getStyleClass().remove("error");
 
+        String mensaje = validarNuevoDifunto();
+
+        if (mensaje == null) {
+            Difunto nuevoDifunto = crearDifuntoDesdeFormularioNuevo();
+
+            if (nuevoDifunto.getId_cliente() == null || nuevoDifunto.getId_cliente().isEmpty()
+                    || nuevoDifunto.getId_feretro() == null || nuevoDifunto.getId_feretro().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Referencias obligatorias");
+                alert.setHeaderText(null);
+                alert.setContentText("Debes seleccionar un cliente y un material de féretro válido.");
+                alert.showAndWait();
+            } else if (difuntoDAO.insertarDifunto(nuevoDifunto)) {
+                masterData.add(nuevoDifunto);
+                tablaDifuntos.sort();
+                actualizarEstadoBusqueda(txtBuscar.getText());
+
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al guardar el difunto en la base de datos.");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
+        }
+    }
+
+    private String validarNuevoDifunto() {
+        String mensaje = null;
         boolean hayError = false;
 
         if (txtNuevoNombre.getText().isBlank()) {
@@ -388,8 +466,8 @@ public class DifuntosController implements Initializable {
             hayError = true;
         }
 
-        if (cmbNuevoCliente.getValue() == null || cmbNuevoCliente.getValue().isBlank()) {
-            cmbNuevoCliente.getStyleClass().add("error");
+        if (txtNuevoCliente.getText().isBlank()) {
+            txtNuevoCliente.getStyleClass().add("error");
             hayError = true;
         }
 
@@ -409,49 +487,18 @@ public class DifuntosController implements Initializable {
         }
 
         if (hayError) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Faltan datos");
-            alert.setHeaderText(null);
-            alert.setContentText("Los campos obligatorios no pueden estar vacíos.");
-            alert.showAndWait();
-            return;
-        }
-
-        if (!validarFechas(dpNuevoNacimiento.getValue(), dpNuevoMuerte.getValue())) {
-            return;
-        }
-
-        Difunto nuevoDifunto = crearDifuntoDesdeFormularioNuevo();
-        if (nuevoDifunto.getId_cliente() == null || nuevoDifunto.getId_cliente().isEmpty()
-                || nuevoDifunto.getId_feretro() == null || nuevoDifunto.getId_feretro().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Referencias obligatorias");
-            alert.setHeaderText(null);
-            alert.setContentText("Debes seleccionar un cliente y un material de féretro válido.");
-            alert.showAndWait();
-            return;
-        }
-
-        if (difuntoDAO.insertarDifunto(nuevoDifunto)) {
-            masterData.add(nuevoDifunto);
-            tablaDifuntos.sort();
-            actualizarEstadoBusqueda(txtBuscar.getText());
-
-            limpiarFormularioNuevo();
-            closeForm();
+            mensaje = "Los campos obligatorios no pueden estar vacíos.";
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Hubo un problema al guardar el difunto en la base de datos.");
-            alert.showAndWait();
+            mensaje = validarFechas(dpNuevoNacimiento.getValue(), dpNuevoMuerte.getValue());
         }
+
+        return mensaje;
     }
 
     private Difunto crearDifuntoDesdeFormularioNuevo() {
         Difunto difunto = new Difunto();
-        String cliente = cmbNuevoCliente.getValue();
-        if (cliente != null && idsClientes.containsKey(cliente)) {
+        String cliente = txtNuevoCliente.getText().trim();
+        if (idsClientes.containsKey(cliente)) {
             difunto.setId_cliente(idsClientes.get(cliente));
         }
         difunto.setId_feretro(difuntoDAO.obtenerIdPorMaterial("feretro", cmbNuevoMaterialFeretro.getValue()));
@@ -483,51 +530,79 @@ public class DifuntosController implements Initializable {
     }
 
     private LocalDate convertirAFechaPicker(Date fecha) {
-        if (fecha == null) {
-            return null;
+        LocalDate resultado = null;
+        if (fecha != null) {
+            resultado = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         }
-        return fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return resultado;
     }
 
-    private boolean validarFechas(LocalDate nacimiento, LocalDate muerte) {
+    private String textoSinNulos(String texto) {
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
+    }
+
+    private String validarFechas(LocalDate nacimiento, LocalDate muerte) {
         LocalDate hoy = LocalDate.now();
+        String mensaje = null;
 
         if (nacimiento.isAfter(hoy)) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Fecha incorrecta");
-            alert.setHeaderText(null);
-            alert.setContentText("La fecha de nacimiento no puede ser futura.");
-            alert.showAndWait();
-            return false;
+            mensaje = "La fecha de nacimiento no puede ser futura.";
+        } else if (muerte.isAfter(hoy)) {
+            mensaje = "La fecha de fallecimiento no puede ser futura.";
+        } else if (muerte.isBefore(nacimiento)) {
+            mensaje = "La fecha de fallecimiento debe ser posterior a la fecha de nacimiento.";
         }
 
-        if (muerte.isAfter(hoy)) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Fecha incorrecta");
-            alert.setHeaderText(null);
-            alert.setContentText("La fecha de fallecimiento no puede ser futura.");
-            alert.showAndWait();
-            return false;
+        return mensaje;
+    }
+
+    private String validarDetalleDifunto() {
+        String mensaje = null;
+        boolean hayError = false;
+
+        if (txtDetalleNombre.getText().isBlank()) {
+            txtDetalleNombre.getStyleClass().add("error");
+            hayError = true;
         }
 
-        if (muerte.isBefore(nacimiento)) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Fechas incorrectas");
-            alert.setHeaderText(null);
-            alert.setContentText("La fecha de fallecimiento debe ser posterior a la fecha de nacimiento.");
-            alert.showAndWait();
-            return false;
+        if (txtDetalleApellidos.getText().isBlank()) {
+            txtDetalleApellidos.getStyleClass().add("error");
+            hayError = true;
         }
 
-        return true;
+        if (dpDetalleNacimiento.getValue() == null) {
+            hayError = true;
+        }
+
+        if (dpDetalleMuerte.getValue() == null) {
+            hayError = true;
+        }
+
+        if (cmbDetalleMaterialFeretro.getValue() == null || cmbDetalleMaterialFeretro.getValue().isBlank()) {
+            cmbDetalleMaterialFeretro.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            mensaje = "No puedes dejar en blanco los campos obligatorios.";
+        } else {
+            mensaje = validarFechas(dpDetalleNacimiento.getValue(), dpDetalleMuerte.getValue());
+        }
+
+        return mensaje;
     }
 
     private void limpiarFormularioNuevo() {
         txtNuevoNombre.clear();
         txtNuevoApellidos.clear();
-        cmbNuevoCliente.setValue(null);
-        dpNuevoNacimiento.setValue(null);
-        dpNuevoMuerte.setValue(null);
+        txtNuevoCliente.clear();
+        listaClientes.setVisible(false);
+        listaClientes.setManaged(false);
+        establecerFechasPorDefecto();
         txtNuevaCausa.clear();
         cmbNuevoMaterialFeretro.setValue(null);
         cmbNuevoMaterialUrna.setValue(null);
@@ -574,13 +649,11 @@ public class DifuntosController implements Initializable {
                     difuntoSeleccionado = newSelection;
 
                     try {
-                        txtDetalleNombre.setText(newSelection.getNombre() != null ? newSelection.getNombre() : "");
-                        txtDetalleApellidos
-                                .setText(newSelection.getApellidos() != null ? newSelection.getApellidos() : "");
+                        txtDetalleNombre.setText(textoSinNulos(newSelection.getNombre()));
+                        txtDetalleApellidos.setText(textoSinNulos(newSelection.getApellidos()));
                         dpDetalleNacimiento.setValue(convertirAFechaPicker(newSelection.getFecha_nacimiento()));
                         dpDetalleMuerte.setValue(convertirAFechaPicker(newSelection.getFecha_muerte()));
-                        txtDetalleCausa
-                                .setText(newSelection.getCausa_muerte() != null ? newSelection.getCausa_muerte() : "");
+                        txtDetalleCausa.setText(textoSinNulos(newSelection.getCausa_muerte()));
 
                         if (newSelection.getFeretro() != null) {
                             cmbDetalleMaterialFeretro.setValue(newSelection.getFeretro().getMaterial());
@@ -659,79 +732,51 @@ public class DifuntosController implements Initializable {
                 txtDetalleCausa.getStyleClass().remove("error");
                 cmbDetalleMaterialFeretro.getStyleClass().remove("error");
 
-                boolean hayError = false;
+                String mensaje = validarDetalleDifunto();
 
-                if (txtDetalleNombre.getText().isBlank()) {
-                    txtDetalleNombre.getStyleClass().add("error");
-                    hayError = true;
-                }
+                if (mensaje == null) {
+                    if (difuntoSeleccionado != null) {
+                        difuntoSeleccionado.setNombre(txtDetalleNombre.getText().trim());
+                        difuntoSeleccionado.setApellidos(txtDetalleApellidos.getText().trim());
+                        difuntoSeleccionado.setFecha_nacimiento(convertirAFecha(dpDetalleNacimiento.getValue()));
+                        difuntoSeleccionado.setFecha_muerte(convertirAFecha(dpDetalleMuerte.getValue()));
+                        difuntoSeleccionado.setCausa_muerte(txtDetalleCausa.getText().trim());
 
-                if (txtDetalleApellidos.getText().isBlank()) {
-                    txtDetalleApellidos.getStyleClass().add("error");
-                    hayError = true;
-                }
+                        if (rbDetalleCremacion.isSelected()) {
+                            difuntoSeleccionado.setServicio(Difunto.Servicio.CREMACIÓN);
+                        } else {
+                            difuntoSeleccionado.setServicio(Difunto.Servicio.ENTIERRO);
+                        }
 
-                if (dpDetalleNacimiento.getValue() == null) {
-                    hayError = true;
-                }
+                        if (difuntoSeleccionado.getFeretro() == null) {
+                            difuntoSeleccionado.setFeretro(new Feretro());
+                        }
+                        difuntoSeleccionado.getFeretro().setMaterial(cmbDetalleMaterialFeretro.getValue());
 
-                if (dpDetalleMuerte.getValue() == null) {
-                    hayError = true;
-                }
+                        if (difuntoSeleccionado.getUrna() == null) {
+                            difuntoSeleccionado.setUrna(new Urna());
+                        }
+                        difuntoSeleccionado.getUrna().setMaterial(cmbDetalleMaterialUrna.getValue());
 
-                if (cmbDetalleMaterialFeretro.getValue() == null || cmbDetalleMaterialFeretro.getValue().isBlank()) {
-                    cmbDetalleMaterialFeretro.getStyleClass().add("error");
-                    hayError = true;
-                }
+                        if (difuntoDAO.actualizarDifunto(difuntoSeleccionado)) {
+                            tablaDifuntos.refresh();
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                            alert.showAndWait();
+                        }
+                    }
 
-                if (hayError) {
+                    bloquearCamposEdicion();
+                } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Datos incompletos");
+                    alert.setTitle("Datos no válidos");
                     alert.setHeaderText(null);
-                    alert.setContentText("No puedes dejar en blanco los campos obligatorios.");
+                    alert.setContentText(mensaje);
                     alert.showAndWait();
-                    return;
                 }
-
-                if (!validarFechas(dpDetalleNacimiento.getValue(), dpDetalleMuerte.getValue())) {
-                    return;
-                }
-
-                if (difuntoSeleccionado != null) {
-                    difuntoSeleccionado.setNombre(txtDetalleNombre.getText().trim());
-                    difuntoSeleccionado.setApellidos(txtDetalleApellidos.getText().trim());
-                    difuntoSeleccionado.setFecha_nacimiento(convertirAFecha(dpDetalleNacimiento.getValue()));
-                    difuntoSeleccionado.setFecha_muerte(convertirAFecha(dpDetalleMuerte.getValue()));
-                    difuntoSeleccionado.setCausa_muerte(txtDetalleCausa.getText().trim());
-
-                    if (rbDetalleCremacion.isSelected()) {
-                        difuntoSeleccionado.setServicio(Difunto.Servicio.CREMACIÓN);
-                    } else {
-                        difuntoSeleccionado.setServicio(Difunto.Servicio.ENTIERRO);
-                    }
-
-                    if (difuntoSeleccionado.getFeretro() == null) {
-                        difuntoSeleccionado.setFeretro(new Feretro());
-                    }
-                    difuntoSeleccionado.getFeretro().setMaterial(cmbDetalleMaterialFeretro.getValue());
-
-                    if (difuntoSeleccionado.getUrna() == null) {
-                        difuntoSeleccionado.setUrna(new Urna());
-                    }
-                    difuntoSeleccionado.getUrna().setMaterial(cmbDetalleMaterialUrna.getValue());
-
-                    if (difuntoDAO.actualizarDifunto(difuntoSeleccionado)) {
-                        tablaDifuntos.refresh();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
-                        alert.showAndWait();
-                    }
-                }
-
-                bloquearCamposEdicion();
             }
         });
     }
