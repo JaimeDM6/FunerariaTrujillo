@@ -3,11 +3,16 @@ package com.tartanga.funerariatrujillo;
 import com.tartanga.funerariatrujillo.DAO.FeretroDAO;
 import com.tartanga.funerariatrujillo.Objects.Feretro;
 import com.tartanga.funerariatrujillo.Utils.Utils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -17,52 +22,88 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 public class FeretroController implements Initializable {
 
-    @FXML private VBox vistaTabla;
-    @FXML private VBox vistaDetalles;
-    @FXML private VBox panelFormularioNuevo;
-    @FXML private Region spacerLateral;
+    private final FeretroDAO feretroDAO;
 
-    @FXML private TableView<Feretro> tablaFeretros;
-    @FXML private TextField txtBuscar;
-    @FXML private Label lblEstadoTabla;
+    public FeretroController() {
+        this.feretroDAO = new FeretroDAO();
+    }
 
-    @FXML private TableColumn<Feretro, String> colID;
-    @FXML private TableColumn<Feretro, String> colMedidas;
-    @FXML private TableColumn<Feretro, String> colMaterial;
-    @FXML private TableColumn<Feretro, Double> colPeso;
-    @FXML private TableColumn<Feretro, Double> colPrecio;
+    public FeretroController(FeretroDAO feretroDAO) {
+        this.feretroDAO = feretroDAO;
+    }
 
-    @FXML private Button btnNuevoFeretro;
-    @FXML private Button btnCerrarFormulario;
-    @FXML private Button btnVolver;
-    @FXML private Button btnEditar;
-    @FXML private Button btnGuardarEdicion;
-    @FXML private Button btnEliminar;
-    @FXML private Button btnGuardarNuevo;
+    @FXML
+    private VBox vistaTabla;
+    @FXML
+    private VBox vistaDetalles;
+    @FXML
+    private VBox panelFormularioNuevo;
+    @FXML
+    private Region spacerLateral;
 
-    @FXML private TextField txtNuevasMedidas;
-    @FXML private TextField txtNuevoMaterial;
-    @FXML private TextField txtNuevoPeso;
-    @FXML private TextField txtNuevoPrecio;
+    @FXML
+    private TableView<Feretro> tablaFeretros;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private Label lblEstadoTabla;
 
-    @FXML private TextField txtDetalleMedidas;
-    @FXML private TextField txtDetalleMaterial;
-    @FXML private TextField txtDetallePeso;
-    @FXML private TextField txtDetallePrecio;
+    @FXML
+    private TableColumn<Feretro, String> colID;
+    @FXML
+    private TableColumn<Feretro, String> colMedidas;
+    @FXML
+    private TableColumn<Feretro, String> colMaterial;
+    @FXML
+    private TableColumn<Feretro, Double> colPeso;
+    @FXML
+    private TableColumn<Feretro, Double> colPrecio;
 
-    private final ObservableList<Feretro> masterData =
-            FXCollections.observableArrayList();
+    @FXML
+    private Button btnNuevoFeretro;
+    @FXML
+    private Button btnCerrarFormulario;
+    @FXML
+    private Button btnVolver;
+    @FXML
+    private Button btnEditar;
+    @FXML
+    private Button btnGuardarEdicion;
+    @FXML
+    private Button btnEliminar;
+    @FXML
+    private Button btnGuardarNuevo;
 
+    @FXML
+    private TextField txtNuevasMedidas;
+    @FXML
+    private TextField txtNuevoMaterial;
+    @FXML
+    private TextField txtNuevoPeso;
+    @FXML
+    private TextField txtNuevoPrecio;
+
+    @FXML
+    private TextField txtDetalleMedidas;
+    @FXML
+    private TextField txtDetalleMaterial;
+    @FXML
+    private TextField txtDetallePeso;
+    @FXML
+    private TextField txtDetallePrecio;
+
+    private final ObservableList<Feretro> masterData = FXCollections.observableArrayList();
     private Feretro feretroSeleccionado;
 
     @Override
@@ -81,55 +122,105 @@ public class FeretroController implements Initializable {
     }
 
     private void configurarBotones() {
-        // Cada acción llama al método correspondiente.
-        btnNuevoFeretro.setOnAction(event -> openForm());
-        btnCerrarFormulario.setOnAction(event -> closeForm());
-        btnGuardarNuevo.setOnAction(event -> guardarNuevoFeretro());
-        btnVolver.setOnAction(event -> volverAListado());
-        btnEditar.setOnAction(event -> activarEdicion());
-        btnGuardarEdicion.setOnAction(event -> guardarEdicion());
-        btnEliminar.setOnAction(event -> eliminarFeretroSeleccionado());
+        btnNuevoFeretro.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                openForm();
+            }
+        });
 
-        tablaFeretros.setOnMouseClicked(event -> {
-            Feretro seleccion = tablaFeretros.getSelectionModel().getSelectedItem();
+        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                closeForm();
+            }
+        });
 
-            if (seleccion != null) {
-                mostrarDetalles(seleccion);
+        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarNuevoFeretro();
+            }
+        });
+
+        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                volverAListado();
+            }
+        });
+
+        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                configurarCamposEdicion(true);
+            }
+        });
+
+        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarEdicion();
+            }
+        });
+
+        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                eliminarFeretroSeleccionado();
+            }
+        });
+
+        tablaFeretros.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Feretro seleccion = tablaFeretros.getSelectionModel().getSelectedItem();
+
+                if (seleccion != null) {
+                    mostrarDetalles(seleccion);
+                }
             }
         });
     }
 
     private void configurarTabla() {
-        colID.setCellValueFactory(
-                new PropertyValueFactory<Feretro, String>("id"));
-        colMedidas.setCellValueFactory(
-                new PropertyValueFactory<Feretro, String>("medidas"));
-        colMaterial.setCellValueFactory(
-                new PropertyValueFactory<Feretro, String>("material"));
-        colPeso.setCellValueFactory(
-                new PropertyValueFactory<Feretro, Double>("peso"));
-
+        Utils.columnID(colID);
+        colMedidas.setCellValueFactory(new PropertyValueFactory<Feretro, String>("medidas"));
+        colMaterial.setCellValueFactory(new PropertyValueFactory<Feretro, String>("material"));
+        colPeso.setCellValueFactory(new PropertyValueFactory<Feretro, Double>("peso"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<Feretro, Double>("precio"));
-        colPrecio.setReorderable(false);
+
         colID.setReorderable(false);
         colMedidas.setReorderable(false);
         colMaterial.setReorderable(false);
         colPeso.setReorderable(false);
+        colPrecio.setReorderable(false);
     }
 
     private void configurarBusqueda() {
-        FilteredList<Feretro> filtradas = new FilteredList<>(masterData);
+        FilteredList<Feretro> filtradas = new FilteredList<>(masterData, new Predicate<Feretro>() {
+            @Override
+            public boolean test(Feretro feretro) {
+                return true;
+            }
+        });
 
-        txtBuscar.textProperty().addListener((observable, anterior, nuevo) -> {
-            String filtro = textoSeguro(nuevo).trim().toLowerCase(Locale.ROOT);
+        txtBuscar.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String anterior, String nuevo) {
+                String filtro = textoSinNulos(nuevo).trim().toLowerCase();
 
-            filtradas.setPredicate(feretro ->
-                    textoSeguro(feretro.getId()).toLowerCase(Locale.ROOT).contains(filtro)
-                    || textoSeguro(feretro.getMedidas()).toLowerCase(Locale.ROOT).contains(filtro)
-                    || textoSeguro(feretro.getMaterial()).toLowerCase(Locale.ROOT).contains(filtro)
-            );
+                filtradas.setPredicate(new Predicate<Feretro>() {
+                    @Override
+                    public boolean test(Feretro feretro) {
+                        return textoSinNulos(feretro.getId()).toLowerCase().contains(filtro)
+                                || textoSinNulos(feretro.getMedidas()).toLowerCase().contains(filtro)
+                                || textoSinNulos(feretro.getMaterial()).toLowerCase().contains(filtro);
+                    }
+                });
 
-            actualizarEstadoTabla();
+                actualizarEstadoTabla();
+            }
         });
 
         SortedList<Feretro> ordenadas = new SortedList<>(filtradas);
@@ -137,8 +228,12 @@ public class FeretroController implements Initializable {
         tablaFeretros.setItems(ordenadas);
     }
 
-    private String textoSeguro(String texto) {
-        return texto == null ? "" : texto;
+    private String textoSinNulos(String texto) {
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
     }
 
     private void cargarDatos() {
@@ -147,184 +242,177 @@ public class FeretroController implements Initializable {
 
         Task<List<Feretro>> tarea = new Task<List<Feretro>>() {
             @Override
-            protected List<Feretro> call() {
-                return new FeretroDAO().obtenerFeretros();
+            protected List<Feretro> call() throws Exception {
+                return feretroDAO.obtenerFeretros();
             }
         };
 
-        tarea.setOnSucceeded(event -> {
-            vistaTabla.setDisable(false);
-            masterData.setAll(tarea.getValue());
-            tablaFeretros.sort();
-            actualizarEstadoTabla();
-        });
-
-        tarea.setOnFailed(event -> {
-            vistaTabla.setDisable(false);
-            lblEstadoTabla.setText("Error de conexión");
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión",
-                    "No se han podido cargar los féretros desde MongoDB.");
-        });
-
-        iniciarTarea(tarea);
-    }
-
-    private void guardarNuevoFeretro() {
-        Feretro nueva = leerFormulario(
-                txtNuevasMedidas.getText(),
-                txtNuevoMaterial.getText(),
-                txtNuevoPeso.getText(),
-                txtNuevoPrecio.getText()
-        );
-
-        if (nueva == null) {
-            return;
-        }
-
-        Task<Boolean> tarea = new Task<Boolean>() {
+        tarea.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
-            protected Boolean call() {
-                return new FeretroDAO().insertarFeretro(nueva);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            masterData.add(nueva);
-            tablaFeretros.sort();
-            actualizarEstadoTabla();
-            limpiarFormularioNuevo();
-            closeForm();
-        }, "No se ha podido guardar el féretro.");
-    }
-
-    private void guardarEdicion() {
-        if (feretroSeleccionado == null) {
-            return;
-        }
-
-        // El objeto original solo se sustituye si MongoDB guarda los cambios.
-        Feretro modificada = leerFormulario(
-                txtDetalleMedidas.getText(),
-                txtDetalleMaterial.getText(),
-                txtDetallePeso.getText(),
-                txtDetallePrecio.getText()
-        );
-
-        if (modificada == null) {
-            return;
-        }
-
-        modificada.setId(feretroSeleccionado.getId());
-
-        Task<Boolean> tarea = new Task<Boolean>() {
-            @Override
-            protected Boolean call() {
-                return new FeretroDAO().actualizarFeretro(modificada);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            int posicion = buscarPosicionPorId(modificada.getId());
-            if (posicion >= 0) {
-                masterData.set(posicion, modificada);
-            }
-            feretroSeleccionado = modificada;
-            tablaFeretros.sort();
-            actualizarEstadoTabla();
-            mostrarDetalles(modificada);
-        }, "No se ha podido actualizar el féretro.");
-    }
-
-    private void eliminarFeretroSeleccionado() {
-        if (feretroSeleccionado == null) {
-            return;
-        }
-
-        String id = feretroSeleccionado.getId();
-
-        Task<Boolean> tarea = new Task<Boolean>() {
-            @Override
-            protected Boolean call() {
-                return new FeretroDAO().eliminarFeretro(id);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            int posicion = buscarPosicionPorId(id);
-            if (posicion >= 0) {
-                masterData.remove(posicion);
-            }
-            actualizarEstadoTabla();
-            volverAListado();
-        }, "No se ha podido eliminar el féretro.");
-    }
-
-    // Ejecuta las operaciones de MongoDB sin bloquear el hilo de JavaFX.
-    private void ejecutarOperacion(Task<Boolean> tarea,
-                                   Runnable alGuardar, String mensajeError) {
-        bloquearInterfaz(true);
-
-        tarea.setOnSucceeded(event -> {
-            bloquearInterfaz(false);
-
-            if (Boolean.TRUE.equals(tarea.getValue())) {
-                alGuardar.run();
-            } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error", mensajeError);
+            public void handle(WorkerStateEvent event) {
+                vistaTabla.setDisable(false);
+                masterData.setAll(tarea.getValue());
+                tablaFeretros.sort();
+                actualizarEstadoTabla();
             }
         });
 
-        tarea.setOnFailed(event -> {
-            bloquearInterfaz(false);
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", mensajeError);
+        tarea.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                vistaTabla.setDisable(false);
+                lblEstadoTabla.setText("Error de conexión");
+                mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión",
+                        "No se han podido cargar los féretros desde la base de datos.");
+            }
         });
 
-        iniciarTarea(tarea);
-    }
-
-    private void iniciarTarea(Task<?> tarea) {
         Thread hilo = new Thread(tarea);
         hilo.setDaemon(true);
         hilo.start();
     }
 
-    private void bloquearInterfaz(boolean bloquear) {
-        vistaTabla.setDisable(bloquear);
-        vistaDetalles.setDisable(bloquear);
-        panelFormularioNuevo.setDisable(bloquear);
+    private void guardarNuevoFeretro() {
+        txtNuevasMedidas.getStyleClass().remove("error");
+        txtNuevoMaterial.getStyleClass().remove("error");
+        txtNuevoPeso.getStyleClass().remove("error");
+        txtNuevoPrecio.getStyleClass().remove("error");
+
+        String mensaje = validarDatos(txtNuevasMedidas, txtNuevoMaterial, txtNuevoPeso, txtNuevoPrecio);
+
+        if (mensaje == null) {
+            Feretro nuevo = new Feretro(
+                    txtNuevasMedidas.getText().trim(),
+                    txtNuevoMaterial.getText().trim(),
+                    convertirNumero(txtNuevoPeso.getText()),
+                    convertirNumero(txtNuevoPrecio.getText()));
+
+            if (feretroDAO.insertarFeretro(nuevo)) {
+                masterData.add(nuevo);
+                tablaFeretros.sort();
+                actualizarEstadoTabla();
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                        "Hubo un problema al guardar el féretro en la base de datos.");
+            }
+        } else {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
+        }
     }
 
-    // Se usa tanto al crear un féretro como al editarlo.
-    private Feretro leerFormulario(String medidas, String material,
-                                   String textoPeso, String textoPrecio) {
-        if (medidas.trim().isEmpty() || material.trim().isEmpty()
-                || textoPeso.trim().isEmpty() || textoPrecio.trim().isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos",
-                    "Completa las medidas, el material, el peso y el precio.");
-            return null;
-        }
-        try {
-            double peso = Double.parseDouble(textoPeso.trim().replace(",", "."));
-            double precio = Double.parseDouble(textoPrecio.trim().replace(",", "."));
-            if (!Double.isFinite(peso) || !Double.isFinite(precio)
-                    || peso <= 0 || precio < 0) {
-                mostrarAlerta(Alert.AlertType.WARNING, "Datos incorrectos",
-                        "El peso debe ser mayor que cero y el precio no negativo.");
-                return null;
+    private void guardarEdicion() {
+        txtDetalleMedidas.getStyleClass().remove("error");
+        txtDetalleMaterial.getStyleClass().remove("error");
+        txtDetallePeso.getStyleClass().remove("error");
+        txtDetallePrecio.getStyleClass().remove("error");
+
+        String mensaje = validarDatos(txtDetalleMedidas, txtDetalleMaterial, txtDetallePeso, txtDetallePrecio);
+
+        if (mensaje == null) {
+            if (feretroSeleccionado != null) {
+                Feretro modificado = new Feretro(
+                        txtDetalleMedidas.getText().trim(),
+                        txtDetalleMaterial.getText().trim(),
+                        convertirNumero(txtDetallePeso.getText()),
+                        convertirNumero(txtDetallePrecio.getText()));
+                modificado.setId(feretroSeleccionado.getId());
+
+                if (feretroDAO.actualizarFeretro(modificado)) {
+                    int posicion = buscarPosicionPorId(modificado.getId());
+                    if (posicion >= 0) {
+                        masterData.set(posicion, modificado);
+                    }
+                    feretroSeleccionado = modificado;
+                    tablaFeretros.sort();
+                    actualizarEstadoTabla();
+                    mostrarDetalles(modificado);
+                } else {
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                            "Hubo un error al actualizar los datos en la base de datos.");
+                }
             }
-            return new Feretro(medidas.trim(), material.trim(), peso, precio);
-        } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incorrectos",
-                    "El peso y el precio deben ser números, por ejemplo: 80,50.");
-            return null;
+        } else {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
         }
+    }
+
+    private void eliminarFeretroSeleccionado() {
+        if (feretroSeleccionado != null) {
+            String id = feretroSeleccionado.getId();
+
+            if (feretroDAO.eliminarFeretro(id)) {
+                int posicion = buscarPosicionPorId(id);
+                if (posicion >= 0) {
+                    masterData.remove(posicion);
+                }
+                actualizarEstadoTabla();
+                volverAListado();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                        "Hubo un problema al eliminar el féretro de la base de datos.");
+            }
+        }
+    }
+
+    private String validarDatos(TextField txtMedidas, TextField txtMaterial, TextField txtPeso, TextField txtPrecio) {
+        String mensaje = null;
+        boolean hayError = false;
+
+        if (txtMedidas.getText().isBlank()) {
+            txtMedidas.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtMaterial.getText().isBlank()) {
+            txtMaterial.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtPeso.getText().isBlank()) {
+            txtPeso.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtPrecio.getText().isBlank()) {
+            txtPrecio.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            mensaje = "Completa las medidas, el material, el peso y el precio.";
+        } else {
+            try {
+                double peso = convertirNumero(txtPeso.getText());
+                double precio = convertirNumero(txtPrecio.getText());
+
+                if (!Double.isFinite(peso) || peso <= 0) {
+                    txtPeso.getStyleClass().add("error");
+                    mensaje = "El peso debe ser mayor que cero.";
+                } else if (!Double.isFinite(precio) || precio < 0) {
+                    txtPrecio.getStyleClass().add("error");
+                    mensaje = "El precio no puede ser negativo.";
+                }
+            } catch (NumberFormatException ex) {
+                txtPeso.getStyleClass().add("error");
+                txtPrecio.getStyleClass().add("error");
+                mensaje = "El peso y el precio deben ser números, por ejemplo: 80,50.";
+            }
+        }
+
+        return mensaje;
+    }
+
+    private double convertirNumero(String texto) {
+        return Double.parseDouble(texto.trim().replace(",", "."));
     }
 
     private void mostrarDetalles(Feretro feretro) {
         feretroSeleccionado = feretro;
 
-        txtDetalleMedidas.setText(textoSeguro(feretro.getMedidas()));
-        txtDetalleMaterial.setText(textoSeguro(feretro.getMaterial()));
+        txtDetalleMedidas.setText(textoSinNulos(feretro.getMedidas()));
+        txtDetalleMaterial.setText(textoSinNulos(feretro.getMaterial()));
         txtDetallePeso.setText(String.valueOf(feretro.getPeso()));
         txtDetallePrecio.setText(String.valueOf(feretro.getPrecio()));
 
@@ -348,10 +436,6 @@ public class FeretroController implements Initializable {
         feretroSeleccionado = null;
     }
 
-    private void activarEdicion() {
-        configurarCamposEdicion(true);
-    }
-
     private void bloquearCamposEdicion() {
         configurarCamposEdicion(false);
     }
@@ -364,11 +448,9 @@ public class FeretroController implements Initializable {
 
         String estilo;
         if (editable) {
-            estilo = "-fx-background-color: #FFFFFF; "
-                    + "-fx-border-color: #C68E17; -fx-border-radius: 4;";
+            estilo = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
         } else {
-            estilo = "-fx-background-color: #EDE7D9; "
-                    + "-fx-border-color: #7A5230; -fx-border-radius: 4;";
+            estilo = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
         }
 
         txtDetalleMedidas.setStyle(estilo);
@@ -406,22 +488,25 @@ public class FeretroController implements Initializable {
         txtNuevoPrecio.clear();
     }
 
-    // No usamos indexOf() porque Feretro.equals() compara por medidas, no por ID.
     private int buscarPosicionPorId(String id) {
-        for (int i = 0; i < masterData.size(); i++) {
+        int posicion = -1;
+        int i = 0;
+
+        while (posicion == -1 && i < masterData.size()) {
             if (id != null && id.equals(masterData.get(i).getId())) {
-                return i;
+                posicion = i;
             }
+            i++;
         }
-        return -1;
+
+        return posicion;
     }
 
     private void actualizarEstadoTabla() {
         lblEstadoTabla.setText(tablaFeretros.getItems().size() + " féretros");
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo,
-                               String titulo, String mensaje) {
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
