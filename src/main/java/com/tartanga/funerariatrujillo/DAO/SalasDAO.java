@@ -5,14 +5,18 @@ import com.mongodb.client.MongoCursor;
 import com.tartanga.funerariatrujillo.Objects.Sala;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class SalasDAO {
 
+    private static final String COLLECTION_NAME = "sala";
+
     public List<Sala> obtenerSalas() {
         List<Sala> resultado = new ArrayList<>();
-        MongoCollection<Document> collection = MongoConfig.getCollection("salas");
+        MongoCollection<Document> collection = MongoConfig.getCollection(COLLECTION_NAME);
+
         try (MongoCursor<Document> cursor = collection.find().iterator()) {
             while (cursor.hasNext()) {
                 Document doc = cursor.next();
@@ -20,13 +24,24 @@ public class SalasDAO {
                 objeto.setId(doc.getObjectId("_id").toHexString());
                 objeto.setNombre(doc.getString("nombre"));
                 objeto.setDescripcion(doc.getString("descripcion"));
-                objeto.setCapacidad(doc.getInteger("capacidad", 0));
+                objeto.setCapacidad(obtenerCapacidad(doc));
                 resultado.add(objeto);
             }
         } catch (Exception e) {
-            // El controlador mostrará el error en lugar de una tabla vacía.
             throw new RuntimeException("No se pudieron cargar los datos de salas", e);
         }
+
+        return resultado;
+    }
+
+    private int obtenerCapacidad(Document doc) {
+        Object valor = doc.get("capacidad");
+        int resultado = 0;
+
+        if (valor instanceof Number) {
+            resultado = ((Number) valor).intValue();
+        }
+
         return resultado;
     }
 
@@ -38,41 +53,54 @@ public class SalasDAO {
     }
 
     public boolean insertarSala(Sala objeto) {
+        boolean insertado = false;
+
         try {
             Document doc = crearDocumento(objeto);
-            MongoConfig.getCollection("salas").insertOne(doc);
+            MongoConfig.getCollection(COLLECTION_NAME).insertOne(doc);
             ObjectId id = doc.getObjectId("_id");
-            if (id == null) return false;
-            objeto.setId(id.toHexString());
-            return true;
+
+            if (id != null) {
+                objeto.setId(id.toHexString());
+                insertado = true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return insertado;
     }
 
     public boolean actualizarSala(Sala objeto) {
+        boolean actualizado = false;
+
         try {
-            if (objeto.getId() == null || !ObjectId.isValid(objeto.getId())) return false;
-            Document filtro = new Document("_id", new ObjectId(objeto.getId()));
-            Document cambios = new Document("$set", crearDocumento(objeto));
-            return MongoConfig.getCollection("salas")
-                    .updateOne(filtro, cambios).getMatchedCount() > 0;
+            if (objeto.getId() != null && ObjectId.isValid(objeto.getId())) {
+                Document filtro = new Document("_id", new ObjectId(objeto.getId()));
+                Document cambios = new Document("$set", crearDocumento(objeto));
+                actualizado = MongoConfig.getCollection(COLLECTION_NAME)
+                        .updateOne(filtro, cambios).getMatchedCount() > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return actualizado;
     }
 
     public boolean eliminarSala(String id) {
+        boolean eliminado = false;
+
         try {
-            if (id == null || !ObjectId.isValid(id)) return false;
-            return MongoConfig.getCollection("salas")
-                    .deleteOne(new Document("_id", new ObjectId(id)))
-                    .getDeletedCount() > 0;
+            if (id != null && ObjectId.isValid(id)) {
+                eliminado = MongoConfig.getCollection(COLLECTION_NAME)
+                        .deleteOne(new Document("_id", new ObjectId(id)))
+                        .getDeletedCount() > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return eliminado;
     }
 }

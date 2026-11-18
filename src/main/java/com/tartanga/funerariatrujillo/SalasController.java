@@ -3,11 +3,16 @@ package com.tartanga.funerariatrujillo;
 import com.tartanga.funerariatrujillo.DAO.SalasDAO;
 import com.tartanga.funerariatrujillo.Objects.Sala;
 import com.tartanga.funerariatrujillo.Utils.Utils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -18,49 +23,82 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 public class SalasController implements Initializable {
 
-    @FXML private VBox vistaTabla;
-    @FXML private VBox vistaDetalles;
-    @FXML private VBox panelFormularioNuevo;
-    @FXML private Region spacerLateral;
+    private final SalasDAO salasDAO;
 
-    @FXML private TableView<Sala> tablaSalas;
-    @FXML private TextField txtBuscar;
-    @FXML private Label lblEstadoTabla;
+    public SalasController() {
+        this.salasDAO = new SalasDAO();
+    }
 
-    @FXML private TableColumn<Sala, String> colID;
-    @FXML private TableColumn<Sala, String> colNombre;
-    @FXML private TableColumn<Sala, String> colDescripcion;
-    @FXML private TableColumn<Sala, Integer> colCapacidad;
+    public SalasController(SalasDAO salasDAO) {
+        this.salasDAO = salasDAO;
+    }
 
-    @FXML private Button btnNuevaSala;
-    @FXML private Button btnCerrarFormulario;
-    @FXML private Button btnVolver;
-    @FXML private Button btnEditar;
-    @FXML private Button btnGuardarEdicion;
-    @FXML private Button btnEliminar;
-    @FXML private Button btnGuardarNuevo;
+    @FXML
+    private VBox vistaTabla;
+    @FXML
+    private VBox vistaDetalles;
+    @FXML
+    private VBox panelFormularioNuevo;
+    @FXML
+    private Region spacerLateral;
 
-    @FXML private TextField txtNuevoNombre;
-    @FXML private TextArea txtNuevaDescripcion;
-    @FXML private TextField txtNuevaCapacidad;
+    @FXML
+    private TableView<Sala> tablaSalas;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private Label lblEstadoTabla;
 
-    @FXML private TextField txtDetalleNombre;
-    @FXML private TextArea txtDetalleDescripcion;
-    @FXML private TextField txtDetalleCapacidad;
+    @FXML
+    private TableColumn<Sala, String> colID;
+    @FXML
+    private TableColumn<Sala, String> colNombre;
+    @FXML
+    private TableColumn<Sala, String> colDescripcion;
+    @FXML
+    private TableColumn<Sala, Integer> colCapacidad;
 
-    private final ObservableList<Sala> masterData =
-            FXCollections.observableArrayList();
+    @FXML
+    private Button btnNuevaSala;
+    @FXML
+    private Button btnCerrarFormulario;
+    @FXML
+    private Button btnVolver;
+    @FXML
+    private Button btnEditar;
+    @FXML
+    private Button btnGuardarEdicion;
+    @FXML
+    private Button btnEliminar;
+    @FXML
+    private Button btnGuardarNuevo;
 
+    @FXML
+    private TextField txtNuevoNombre;
+    @FXML
+    private TextArea txtNuevaDescripcion;
+    @FXML
+    private TextField txtNuevaCapacidad;
+
+    @FXML
+    private TextField txtDetalleNombre;
+    @FXML
+    private TextArea txtDetalleDescripcion;
+    @FXML
+    private TextField txtDetalleCapacidad;
+
+    private final ObservableList<Sala> masterData = FXCollections.observableArrayList();
     private Sala salaSeleccionada;
 
     @Override
@@ -79,33 +117,72 @@ public class SalasController implements Initializable {
     }
 
     private void configurarBotones() {
-        // Cada acción llama al método correspondiente.
-        btnNuevaSala.setOnAction(event -> openForm());
-        btnCerrarFormulario.setOnAction(event -> closeForm());
-        btnGuardarNuevo.setOnAction(event -> guardarNuevaSala());
-        btnVolver.setOnAction(event -> volverAListado());
-        btnEditar.setOnAction(event -> activarEdicion());
-        btnGuardarEdicion.setOnAction(event -> guardarEdicion());
-        btnEliminar.setOnAction(event -> eliminarSalaSeleccionada());
+        btnNuevaSala.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                openForm();
+            }
+        });
 
-        tablaSalas.setOnMouseClicked(event -> {
-            Sala seleccion = tablaSalas.getSelectionModel().getSelectedItem();
+        btnCerrarFormulario.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                closeForm();
+            }
+        });
 
-            if (seleccion != null) {
-                mostrarDetalles(seleccion);
+        btnGuardarNuevo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarNuevaSala();
+            }
+        });
+
+        btnVolver.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                volverAListado();
+            }
+        });
+
+        btnEditar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                configurarCamposEdicion(true);
+            }
+        });
+
+        btnGuardarEdicion.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                guardarEdicion();
+            }
+        });
+
+        btnEliminar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                eliminarSalaSeleccionada();
+            }
+        });
+
+        tablaSalas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Sala seleccion = tablaSalas.getSelectionModel().getSelectedItem();
+
+                if (seleccion != null) {
+                    mostrarDetalles(seleccion);
+                }
             }
         });
     }
 
     private void configurarTabla() {
-        colID.setCellValueFactory(
-                new PropertyValueFactory<Sala, String>("id"));
-        colNombre.setCellValueFactory(
-                new PropertyValueFactory<Sala, String>("nombre"));
-        colDescripcion.setCellValueFactory(
-                new PropertyValueFactory<Sala, String>("descripcion"));
-        colCapacidad.setCellValueFactory(
-                new PropertyValueFactory<Sala, Integer>("capacidad"));
+        Utils.columnID(colID);
+        colNombre.setCellValueFactory(new PropertyValueFactory<Sala, String>("nombre"));
+        colDescripcion.setCellValueFactory(new PropertyValueFactory<Sala, String>("descripcion"));
+        colCapacidad.setCellValueFactory(new PropertyValueFactory<Sala, Integer>("capacidad"));
 
         colID.setReorderable(false);
         colNombre.setReorderable(false);
@@ -114,18 +191,29 @@ public class SalasController implements Initializable {
     }
 
     private void configurarBusqueda() {
-        FilteredList<Sala> filtradas = new FilteredList<>(masterData);
+        FilteredList<Sala> filtradas = new FilteredList<>(masterData, new Predicate<Sala>() {
+            @Override
+            public boolean test(Sala sala) {
+                return true;
+            }
+        });
 
-        txtBuscar.textProperty().addListener((observable, anterior, nuevo) -> {
-            String filtro = textoSeguro(nuevo).trim().toLowerCase(Locale.ROOT);
+        txtBuscar.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String anterior, String nuevo) {
+                String filtro = textoSinNulos(nuevo).trim().toLowerCase();
 
-            filtradas.setPredicate(sala ->
-                    textoSeguro(sala.getId()).toLowerCase(Locale.ROOT).contains(filtro)
-                    || textoSeguro(sala.getNombre()).toLowerCase(Locale.ROOT).contains(filtro)
-                    || textoSeguro(sala.getDescripcion()).toLowerCase(Locale.ROOT).contains(filtro)
-            );
+                filtradas.setPredicate(new Predicate<Sala>() {
+                    @Override
+                    public boolean test(Sala sala) {
+                        return textoSinNulos(sala.getId()).toLowerCase().contains(filtro)
+                                || textoSinNulos(sala.getNombre()).toLowerCase().contains(filtro)
+                                || textoSinNulos(sala.getDescripcion()).toLowerCase().contains(filtro);
+                    }
+                });
 
-            actualizarEstadoTabla();
+                actualizarEstadoTabla();
+            }
         });
 
         SortedList<Sala> ordenadas = new SortedList<>(filtradas);
@@ -133,8 +221,12 @@ public class SalasController implements Initializable {
         tablaSalas.setItems(ordenadas);
     }
 
-    private String textoSeguro(String texto) {
-        return texto == null ? "" : texto;
+    private String textoSinNulos(String texto) {
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
     }
 
     private void cargarDatos() {
@@ -143,187 +235,159 @@ public class SalasController implements Initializable {
 
         Task<List<Sala>> tarea = new Task<List<Sala>>() {
             @Override
-            protected List<Sala> call() {
-                return new SalasDAO().obtenerSalas();
+            protected List<Sala> call() throws Exception {
+                return salasDAO.obtenerSalas();
             }
         };
 
-        tarea.setOnSucceeded(event -> {
-            vistaTabla.setDisable(false);
-            masterData.setAll(tarea.getValue());
-            tablaSalas.sort();
-            actualizarEstadoTabla();
-        });
-
-        tarea.setOnFailed(event -> {
-            vistaTabla.setDisable(false);
-            lblEstadoTabla.setText("Error de conexión");
-            mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión",
-                    "No se han podido cargar las salas desde MongoDB.");
-        });
-
-        iniciarTarea(tarea);
-    }
-
-    private void guardarNuevaSala() {
-        Sala nueva = leerFormulario(
-                txtNuevoNombre.getText(),
-                txtNuevaDescripcion.getText(),
-                txtNuevaCapacidad.getText()
-        );
-
-        if (nueva == null) {
-            return;
-        }
-
-        Task<Boolean> tarea = new Task<Boolean>() {
+        tarea.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
-            protected Boolean call() {
-                return new SalasDAO().insertarSala(nueva);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            masterData.add(nueva);
-            tablaSalas.sort();
-            actualizarEstadoTabla();
-            limpiarFormularioNuevo();
-            closeForm();
-        }, "No se ha podido guardar la sala.");
-    }
-
-    private void guardarEdicion() {
-        if (salaSeleccionada == null) {
-            return;
-        }
-
-        // El objeto original solo se sustituye si MongoDB guarda los cambios.
-        Sala modificada = leerFormulario(
-                txtDetalleNombre.getText(),
-                txtDetalleDescripcion.getText(),
-                txtDetalleCapacidad.getText()
-        );
-
-        if (modificada == null) {
-            return;
-        }
-
-        modificada.setId(salaSeleccionada.getId());
-
-        Task<Boolean> tarea = new Task<Boolean>() {
-            @Override
-            protected Boolean call() {
-                return new SalasDAO().actualizarSala(modificada);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            int posicion = buscarPosicionPorId(modificada.getId());
-            if (posicion >= 0) {
-                masterData.set(posicion, modificada);
-            }
-            salaSeleccionada = modificada;
-            tablaSalas.sort();
-            actualizarEstadoTabla();
-            mostrarDetalles(modificada);
-        }, "No se ha podido actualizar la sala.");
-    }
-
-    private void eliminarSalaSeleccionada() {
-        if (salaSeleccionada == null) {
-            return;
-        }
-
-        String id = salaSeleccionada.getId();
-
-        Task<Boolean> tarea = new Task<Boolean>() {
-            @Override
-            protected Boolean call() {
-                return new SalasDAO().eliminarSala(id);
-            }
-        };
-
-        ejecutarOperacion(tarea, () -> {
-            int posicion = buscarPosicionPorId(id);
-            if (posicion >= 0) {
-                masterData.remove(posicion);
-            }
-            actualizarEstadoTabla();
-            volverAListado();
-        }, "No se ha podido eliminar la sala.");
-    }
-
-    // Ejecuta las operaciones de MongoDB sin bloquear el hilo de JavaFX.
-    private void ejecutarOperacion(Task<Boolean> tarea,
-                                   Runnable alGuardar, String mensajeError) {
-        bloquearInterfaz(true);
-
-        tarea.setOnSucceeded(event -> {
-            bloquearInterfaz(false);
-
-            if (Boolean.TRUE.equals(tarea.getValue())) {
-                alGuardar.run();
-            } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error", mensajeError);
+            public void handle(WorkerStateEvent event) {
+                vistaTabla.setDisable(false);
+                masterData.setAll(tarea.getValue());
+                tablaSalas.sort();
+                actualizarEstadoTabla();
             }
         });
 
-        tarea.setOnFailed(event -> {
-            bloquearInterfaz(false);
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", mensajeError);
+        tarea.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                vistaTabla.setDisable(false);
+                lblEstadoTabla.setText("Error de conexión");
+                mostrarAlerta(Alert.AlertType.ERROR, "Error de conexión",
+                        "No se han podido cargar las salas desde la base de datos.");
+            }
         });
 
-        iniciarTarea(tarea);
-    }
-
-    private void iniciarTarea(Task<?> tarea) {
         Thread hilo = new Thread(tarea);
         hilo.setDaemon(true);
         hilo.start();
     }
 
-    private void bloquearInterfaz(boolean bloquear) {
-        vistaTabla.setDisable(bloquear);
-        vistaDetalles.setDisable(bloquear);
-        panelFormularioNuevo.setDisable(bloquear);
+    private void guardarNuevaSala() {
+        txtNuevoNombre.getStyleClass().remove("error");
+        txtNuevaDescripcion.getStyleClass().remove("error");
+        txtNuevaCapacidad.getStyleClass().remove("error");
+
+        String mensaje = validarDatos(txtNuevoNombre, txtNuevaDescripcion, txtNuevaCapacidad);
+
+        if (mensaje == null) {
+            Sala nueva = new Sala(
+                    txtNuevoNombre.getText().trim(),
+                    txtNuevaDescripcion.getText().trim(),
+                    Integer.parseInt(txtNuevaCapacidad.getText().trim()));
+
+            if (salasDAO.insertarSala(nueva)) {
+                masterData.add(nueva);
+                tablaSalas.sort();
+                actualizarEstadoTabla();
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                        "Hubo un problema al guardar la sala en la base de datos.");
+            }
+        } else {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
+        }
     }
 
-    // Se usa tanto al crear una sala como al editarla.
-    private Sala leerFormulario(String nombre, String descripcion,
-                                String textoCapacidad) {
-        nombre = nombre.trim();
-        descripcion = descripcion.trim();
-        textoCapacidad = textoCapacidad.trim();
+    private void guardarEdicion() {
+        txtDetalleNombre.getStyleClass().remove("error");
+        txtDetalleDescripcion.getStyleClass().remove("error");
+        txtDetalleCapacidad.getStyleClass().remove("error");
 
-        if (nombre.isEmpty() || descripcion.isEmpty() || textoCapacidad.isEmpty()) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Datos incompletos",
-                    "Debes completar el nombre, la descripción y la capacidad.");
-            return null;
-        }
+        String mensaje = validarDatos(txtDetalleNombre, txtDetalleDescripcion, txtDetalleCapacidad);
 
-        try {
-            int capacidad = Integer.parseInt(textoCapacidad);
+        if (mensaje == null) {
+            if (salaSeleccionada != null) {
+                Sala modificada = new Sala(
+                        txtDetalleNombre.getText().trim(),
+                        txtDetalleDescripcion.getText().trim(),
+                        Integer.parseInt(txtDetalleCapacidad.getText().trim()));
+                modificada.setId(salaSeleccionada.getId());
 
-            if (capacidad <= 0) {
-                mostrarAlerta(Alert.AlertType.WARNING, "Capacidad incorrecta",
-                        "La capacidad debe ser mayor que cero.");
-                return null;
+                if (salasDAO.actualizarSala(modificada)) {
+                    int posicion = buscarPosicionPorId(modificada.getId());
+                    if (posicion >= 0) {
+                        masterData.set(posicion, modificada);
+                    }
+                    salaSeleccionada = modificada;
+                    tablaSalas.sort();
+                    actualizarEstadoTabla();
+                    mostrarDetalles(modificada);
+                } else {
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                            "Hubo un error al actualizar los datos en la base de datos.");
+                }
             }
-
-            return new Sala(nombre, descripcion, capacidad);
-
-        } catch (NumberFormatException e) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Capacidad incorrecta",
-                    "La capacidad debe ser un número entero, por ejemplo: 30.");
-            return null;
+        } else {
+            mostrarAlerta(Alert.AlertType.WARNING, "Datos no válidos", mensaje);
         }
+    }
+
+    private void eliminarSalaSeleccionada() {
+        if (salaSeleccionada != null) {
+            String id = salaSeleccionada.getId();
+
+            if (salasDAO.eliminarSala(id)) {
+                int posicion = buscarPosicionPorId(id);
+                if (posicion >= 0) {
+                    masterData.remove(posicion);
+                }
+                actualizarEstadoTabla();
+                volverAListado();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                        "Hubo un problema al eliminar la sala de la base de datos.");
+            }
+        }
+    }
+
+    private String validarDatos(TextField txtNombre, TextArea txtDescripcion, TextField txtCapacidad) {
+        String mensaje = null;
+        boolean hayError = false;
+
+        if (txtNombre.getText().isBlank()) {
+            txtNombre.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtDescripcion.getText().isBlank()) {
+            txtDescripcion.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtCapacidad.getText().isBlank()) {
+            txtCapacidad.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            mensaje = "Debes completar el nombre, la descripción y la capacidad.";
+        } else {
+            try {
+                int capacidad = Integer.parseInt(txtCapacidad.getText().trim());
+
+                if (capacidad <= 0) {
+                    txtCapacidad.getStyleClass().add("error");
+                    mensaje = "La capacidad debe ser mayor que cero.";
+                }
+            } catch (NumberFormatException ex) {
+                txtCapacidad.getStyleClass().add("error");
+                mensaje = "La capacidad debe ser un número entero, por ejemplo: 30.";
+            }
+        }
+
+        return mensaje;
     }
 
     private void mostrarDetalles(Sala sala) {
         salaSeleccionada = sala;
 
-        txtDetalleNombre.setText(textoSeguro(sala.getNombre()));
-        txtDetalleDescripcion.setText(textoSeguro(sala.getDescripcion()));
+        txtDetalleNombre.setText(textoSinNulos(sala.getNombre()));
+        txtDetalleDescripcion.setText(textoSinNulos(sala.getDescripcion()));
         txtDetalleCapacidad.setText(String.valueOf(sala.getCapacidad()));
 
         ocultarFormularioNuevo();
@@ -346,10 +410,6 @@ public class SalasController implements Initializable {
         salaSeleccionada = null;
     }
 
-    private void activarEdicion() {
-        configurarCamposEdicion(true);
-    }
-
     private void bloquearCamposEdicion() {
         configurarCamposEdicion(false);
     }
@@ -361,11 +421,9 @@ public class SalasController implements Initializable {
 
         String estilo;
         if (editable) {
-            estilo = "-fx-background-color: #FFFFFF; "
-                    + "-fx-border-color: #C68E17; -fx-border-radius: 4;";
+            estilo = "-fx-background-color: #FFFFFF; -fx-border-color: #C68E17; -fx-border-radius: 4;";
         } else {
-            estilo = "-fx-background-color: #EDE7D9; "
-                    + "-fx-border-color: #7A5230; -fx-border-radius: 4;";
+            estilo = "-fx-background-color: #EDE7D9; -fx-border-color: #7A5230; -fx-border-radius: 4;";
         }
 
         txtDetalleNombre.setStyle(estilo);
@@ -401,22 +459,25 @@ public class SalasController implements Initializable {
         txtNuevaCapacidad.clear();
     }
 
-    // No usamos indexOf() porque Sala.equals() compara por nombre, no por ID.
     private int buscarPosicionPorId(String id) {
-        for (int i = 0; i < masterData.size(); i++) {
+        int posicion = -1;
+        int i = 0;
+
+        while (posicion == -1 && i < masterData.size()) {
             if (id != null && id.equals(masterData.get(i).getId())) {
-                return i;
+                posicion = i;
             }
+            i++;
         }
-        return -1;
+
+        return posicion;
     }
 
     private void actualizarEstadoTabla() {
         lblEstadoTabla.setText(tablaSalas.getItems().size() + " salas");
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo,
-                               String titulo, String mensaje) {
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
