@@ -254,17 +254,16 @@ public class TrabajadorController implements Initializable {
                 filteredData.setPredicate(new Predicate<Trabajador>() {
                     @Override
                     public boolean test(Trabajador trabajador) {
-                        if (newValue == null || newValue.trim().isEmpty()) {
-                            return true;
+                        boolean coincide = true;
+
+                        if (newValue != null && !newValue.trim().isEmpty()) {
+                            String lowerCaseFilter = newValue.toLowerCase();
+                            coincide = trabajador.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)
+                                    || (trabajador.getCargo() != null
+                                    && trabajador.getCargo().toString().toLowerCase().contains(lowerCaseFilter));
                         }
-                        String lowerCaseFilter = newValue.toLowerCase();
-                        if (trabajador.getNombreCompleto().toLowerCase().contains(lowerCaseFilter)) {
-                            return true;
-                        } else if (trabajador.getCargo() != null
-                                && trabajador.getCargo().toString().toLowerCase().contains(lowerCaseFilter)) {
-                            return true;
-                        }
-                        return false;
+
+                        return coincide;
                     }
                 });
                 lblEstadoTabla.setText(filteredData.size() + " trabajadores");
@@ -343,22 +342,26 @@ public class TrabajadorController implements Initializable {
                 .split("\\s+")[0];
 
         String usuarioGenerado = "";
+        boolean disponible = false;
+        int i = 1;
 
-        for (int i = 1; i <= cleanNombre.length(); i++) {
+        while (!disponible && i <= cleanNombre.length()) {
             usuarioGenerado = cleanNombre.substring(0, i) + "." + cleanApellido;
-            if (!trabajadorDAO.existeUsuario(usuarioGenerado)) {
-                return usuarioGenerado;
+            disponible = !trabajadorDAO.existeUsuario(usuarioGenerado);
+            i++;
+        }
+
+        String resultado = usuarioGenerado;
+
+        if (!disponible) {
+            int contador = 1;
+            while (trabajadorDAO.existeUsuario(resultado)) {
+                resultado = usuarioGenerado + contador;
+                contador++;
             }
         }
 
-        int contador = 1;
-        String fallback = usuarioGenerado;
-        while (trabajadorDAO.existeUsuario(fallback)) {
-            fallback = usuarioGenerado + contador;
-            contador++;
-        }
-
-        return fallback;
+        return resultado;
     }
 
     private void guardarNuevoTrabajador() {
@@ -628,20 +631,21 @@ public class TrabajadorController implements Initializable {
                         txtDetalleDni.setText(newSelection.getDni());
                         txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
+                        String calle = "";
+                        String ciudad = "";
+                        String codigoPostal = "";
+
                         if (newSelection.getDireccion() != null) {
-                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null
-                                    ? newSelection.getDireccion().getCalle()
-                                    : "");
-                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null
-                                    ? newSelection.getDireccion().getCiudad()
-                                    : "");
-                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? ""
-                                    : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
-                        } else {
-                            txtDetalleCalle.setText("");
-                            txtDetalleCiudad.setText("");
-                            txtDetalleCP.setText("");
+                            calle = textoSinNulos(newSelection.getDireccion().getCalle());
+                            ciudad = textoSinNulos(newSelection.getDireccion().getCiudad());
+                            if (newSelection.getDireccion().getCodigoPostal() != 0) {
+                                codigoPostal = String.valueOf(newSelection.getDireccion().getCodigoPostal());
+                            }
                         }
+
+                        txtDetalleCalle.setText(calle);
+                        txtDetalleCiudad.setText(ciudad);
+                        txtDetalleCP.setText(codigoPostal);
 
                         txtDetalleSS.setText(newSelection.getNumero_ss());
                         txtDetalleIban.setText(newSelection.getIban());
@@ -739,123 +743,143 @@ public class TrabajadorController implements Initializable {
                 cmbDetalleJornada.getStyleClass().remove("error");
                 cmbDetalleRol.getStyleClass().remove("error");
 
-                boolean hayError = false;
+                String mensaje = validarDetalleTrabajador();
 
-                if (txtDetalleNombre.getText().trim().isEmpty()) {
-                    txtDetalleNombre.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleApellidos.getText().trim().isEmpty()) {
-                    txtDetalleApellidos.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleDni.getText().trim().isEmpty()) {
-                    txtDetalleDni.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleCorreo.getText().trim().isEmpty()) {
-                    txtDetalleCorreo.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleCalle.getText().trim().isEmpty()) {
-                    txtDetalleCalle.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleCiudad.getText().trim().isEmpty()) {
-                    txtDetalleCiudad.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleCP.getText().trim().isEmpty()) {
-                    txtDetalleCP.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleSS.getText().trim().isEmpty()) {
-                    txtDetalleSS.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleIban.getText().trim().isEmpty()) {
-                    txtDetalleIban.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (txtDetalleSalario.getText().trim().isEmpty()) {
-                    txtDetalleSalario.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (cmbDetalleCargo.getSelectionModel().getSelectedIndex() == -1) {
-                    cmbDetalleCargo.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (cmbDetalleJornada.getSelectionModel().getSelectedIndex() == -1) {
-                    cmbDetalleJornada.getStyleClass().add("error");
-                    hayError = true;
-                }
-                if (cmbDetalleRol.getSelectionModel().getSelectedIndex() == -1) {
-                    cmbDetalleRol.getStyleClass().add("error");
-                    hayError = true;
-                }
+                if (mensaje == null) {
+                    boolean bloquear = true;
 
-                if (hayError) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Datos incompletos");
-                    alert.setHeaderText(null);
-                    alert.setContentText("No puedes dejar en blanco los campos.");
-                    alert.showAndWait();
-                    return;
-                }
+                    if (trabajadorSeleccionado != null) {
+                        trabajadorSeleccionado.setNombre(txtDetalleNombre.getText().trim());
+                        trabajadorSeleccionado.setApellidos(txtDetalleApellidos.getText().trim());
+                        trabajadorSeleccionado.setDni(txtDetalleDni.getText().trim());
+                        trabajadorSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText().trim());
 
-                if (trabajadorSeleccionado != null) {
-                    trabajadorSeleccionado.setNombre(txtDetalleNombre.getText().trim());
-                    trabajadorSeleccionado.setApellidos(txtDetalleApellidos.getText().trim());
-                    trabajadorSeleccionado.setDni(txtDetalleDni.getText().trim());
-                    trabajadorSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText().trim());
+                        Direccion dir = trabajadorSeleccionado.getDireccion();
+                        if (dir == null) {
+                            dir = new Direccion();
+                        }
+                        dir.setCalle(txtDetalleCalle.getText().trim());
+                        dir.setCiudad(txtDetalleCiudad.getText().trim());
 
-                    Direccion dir = trabajadorSeleccionado.getDireccion();
-                    if (dir == null) {
-                        dir = new Direccion();
-                    }
-                    dir.setCalle(txtDetalleCalle.getText().trim());
-                    dir.setCiudad(txtDetalleCiudad.getText().trim());
-                    try {
-                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0
-                                : Integer.parseInt(txtDetalleCP.getText().trim()));
-                    } catch (NumberFormatException ex) {
-                        dir.setCodigoPostal(0);
-                    }
-                    trabajadorSeleccionado.setDireccion(dir);
+                        int codigoPostal = 0;
+                        try {
+                            codigoPostal = Integer.parseInt(txtDetalleCP.getText().trim());
+                        } catch (NumberFormatException ex) {
+                            codigoPostal = 0;
+                        }
+                        dir.setCodigoPostal(codigoPostal);
+                        trabajadorSeleccionado.setDireccion(dir);
 
-                    trabajadorSeleccionado.setNumero_ss(txtDetalleSS.getText().trim());
-                    trabajadorSeleccionado.setIban(txtDetalleIban.getText().trim());
-
-                    try {
+                        trabajadorSeleccionado.setNumero_ss(txtDetalleSS.getText().trim());
+                        trabajadorSeleccionado.setIban(txtDetalleIban.getText().trim());
                         trabajadorSeleccionado.setSalario(Double.valueOf(txtDetalleSalario.getText().trim()));
-                    } catch (NumberFormatException ex) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Formato incorrecto");
-                        alert.setHeaderText(null);
-                        alert.setContentText("El salario debe ser un valor numérico.");
-                        alert.showAndWait();
-                        return;
+                        trabajadorSeleccionado.setCargo(cmbDetalleCargo.getSelectionModel().getSelectedItem());
+                        trabajadorSeleccionado.setTipo_jornada(cmbDetalleJornada.getSelectionModel().getSelectedItem());
+                        trabajadorSeleccionado.setRol(cmbDetalleRol.getSelectionModel().getSelectedItem());
+
+                        if (trabajadorDAO.actualizarTrabajador(trabajadorSeleccionado)) {
+                            tablaTrabajadores.refresh();
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                            alert.showAndWait();
+                            bloquear = false;
+                        }
                     }
 
-                    trabajadorSeleccionado.setCargo(cmbDetalleCargo.getSelectionModel().getSelectedItem());
-                    trabajadorSeleccionado.setTipo_jornada(cmbDetalleJornada.getSelectionModel().getSelectedItem());
-                    trabajadorSeleccionado.setRol(cmbDetalleRol.getSelectionModel().getSelectedItem());
-
-                    if (trabajadorDAO.actualizarTrabajador(trabajadorSeleccionado)) {
-                        tablaTrabajadores.refresh();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
-                        alert.showAndWait();
-                        return;
+                    if (bloquear) {
+                        bloquearCamposEdicion();
                     }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Datos no válidos");
+                    alert.setHeaderText(null);
+                    alert.setContentText(mensaje);
+                    alert.showAndWait();
                 }
-
-                bloquearCamposEdicion();
             }
         });
+    }
+
+    private String validarDetalleTrabajador() {
+        String mensaje = null;
+        boolean hayError = false;
+
+        if (txtDetalleNombre.getText().trim().isEmpty()) {
+            txtDetalleNombre.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleApellidos.getText().trim().isEmpty()) {
+            txtDetalleApellidos.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleDni.getText().trim().isEmpty()) {
+            txtDetalleDni.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleCorreo.getText().trim().isEmpty()) {
+            txtDetalleCorreo.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleCalle.getText().trim().isEmpty()) {
+            txtDetalleCalle.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleCiudad.getText().trim().isEmpty()) {
+            txtDetalleCiudad.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleCP.getText().trim().isEmpty()) {
+            txtDetalleCP.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleSS.getText().trim().isEmpty()) {
+            txtDetalleSS.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleIban.getText().trim().isEmpty()) {
+            txtDetalleIban.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (txtDetalleSalario.getText().trim().isEmpty()) {
+            txtDetalleSalario.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbDetalleCargo.getSelectionModel().getSelectedIndex() == -1) {
+            cmbDetalleCargo.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbDetalleJornada.getSelectionModel().getSelectedIndex() == -1) {
+            cmbDetalleJornada.getStyleClass().add("error");
+            hayError = true;
+        }
+        if (cmbDetalleRol.getSelectionModel().getSelectedIndex() == -1) {
+            cmbDetalleRol.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            mensaje = "No puedes dejar en blanco los campos.";
+        } else {
+            try {
+                Double.valueOf(txtDetalleSalario.getText().trim());
+            } catch (NumberFormatException ex) {
+                txtDetalleSalario.getStyleClass().add("error");
+                mensaje = "El salario debe ser un valor numérico.";
+            }
+        }
+
+        return mensaje;
+    }
+
+    private String textoSinNulos(String texto) {
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
     }
 
     private void bloquearCamposEdicion() {

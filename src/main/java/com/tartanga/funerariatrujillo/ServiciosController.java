@@ -151,17 +151,20 @@ public class ServiciosController implements Initializable {
                 filteredData.setPredicate(new Predicate<Servicios>() {
                     @Override
                     public boolean test(Servicios servicio) {
-                        if (newValue == null || newValue.isEmpty()) {
-                            return true;
-                        }
-                        String lowerCaseFilter = newValue.toLowerCase();
-                        String id = servicio.getId() != null ? servicio.getId() : "";
-                        String nombre = servicio.getNombre() != null ? servicio.getNombre() : "";
-                        String descripcion = servicio.getDescripcion() != null ? servicio.getDescripcion() : "";
+                        boolean coincide = true;
 
-                        return id.toLowerCase().contains(lowerCaseFilter)
-                                || nombre.toLowerCase().contains(lowerCaseFilter)
-                                || descripcion.toLowerCase().contains(lowerCaseFilter);
+                        if (newValue != null && !newValue.isEmpty()) {
+                            String lowerCaseFilter = newValue.toLowerCase();
+                            String id = textoSinNulos(servicio.getId());
+                            String nombre = textoSinNulos(servicio.getNombre());
+                            String descripcion = textoSinNulos(servicio.getDescripcion());
+
+                            coincide = id.toLowerCase().contains(lowerCaseFilter)
+                                    || nombre.toLowerCase().contains(lowerCaseFilter)
+                                    || descripcion.toLowerCase().contains(lowerCaseFilter);
+                        }
+
+                        return coincide;
                     }
                 });
                 actualizarEstadoBusqueda(newValue);
@@ -269,6 +272,39 @@ public class ServiciosController implements Initializable {
         txtNuevaDescripcion.getStyleClass().remove("error");
         txtNuevoPrecio.getStyleClass().remove("error");
 
+        String mensaje = validarNuevoServicio();
+
+        if (mensaje == null) {
+            Servicios nuevoServicio = new Servicios();
+            nuevoServicio.setNombre(txtNuevoNombre.getText().trim());
+            nuevoServicio.setDescripcion(txtNuevaDescripcion.getText().trim());
+            nuevoServicio.setPrecio(convertirPrecio(txtNuevoPrecio.getText()));
+
+            if (serviciosDAO.insertarServicio(nuevoServicio)) {
+                masterData.add(nuevoServicio);
+                tablaServicios.sort();
+                actualizarEstadoBusqueda(txtBuscar.getText());
+
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al guardar el servicio en la base de datos.");
+                alert.showAndWait();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Datos no válidos");
+            alert.setHeaderText(null);
+            alert.setContentText(mensaje);
+            alert.showAndWait();
+        }
+    }
+
+    private String validarNuevoServicio() {
+        String mensaje = null;
         boolean hayError = false;
 
         if (txtNuevoNombre.getText().isBlank()) {
@@ -287,53 +323,65 @@ public class ServiciosController implements Initializable {
         }
 
         if (hayError) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Faltan datos");
-            alert.setHeaderText(null);
-            alert.setContentText("Todos los campos son obligatorios.");
-            alert.showAndWait();
-            return;
+            mensaje = "Todos los campos son obligatorios.";
+        } else {
+            mensaje = validarPrecio(txtNuevoPrecio);
         }
+
+        return mensaje;
+    }
+
+    private String validarDetalleServicio() {
+        String mensaje = null;
+        boolean hayError = false;
+
+        if (txtDetalleNombre.getText().isBlank()) {
+            txtDetalleNombre.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtDetalleDescripcion.getText().isBlank()) {
+            txtDetalleDescripcion.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (txtDetallePrecio.getText().isBlank()) {
+            txtDetallePrecio.getStyleClass().add("error");
+            hayError = true;
+        }
+
+        if (hayError) {
+            mensaje = "No puedes dejar en blanco los campos obligatorios.";
+        } else {
+            mensaje = validarPrecio(txtDetallePrecio);
+        }
+
+        return mensaje;
+    }
+
+    private String validarPrecio(TextField campoPrecio) {
+        String mensaje = null;
 
         try {
-            Double precio = convertirPrecio(txtNuevoPrecio.getText());
+            Double precio = convertirPrecio(campoPrecio.getText());
             if (precio < 0) {
-                txtNuevoPrecio.getStyleClass().add("error");
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Precio incorrecto");
-                alert.setHeaderText(null);
-                alert.setContentText("El precio no puede ser negativo.");
-                alert.showAndWait();
-                return;
-            }
-
-            Servicios nuevoServicio = new Servicios();
-            nuevoServicio.setNombre(txtNuevoNombre.getText().trim());
-            nuevoServicio.setDescripcion(txtNuevaDescripcion.getText().trim());
-            nuevoServicio.setPrecio(precio);
-
-            if (serviciosDAO.insertarServicio(nuevoServicio)) {
-                masterData.add(nuevoServicio);
-                tablaServicios.sort();
-                actualizarEstadoBusqueda(txtBuscar.getText());
-
-                limpiarFormularioNuevo();
-                closeForm();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText(null);
-                alert.setContentText("Hubo un problema al guardar el servicio en la base de datos.");
-                alert.showAndWait();
+                campoPrecio.getStyleClass().add("error");
+                mensaje = "El precio no puede ser negativo.";
             }
         } catch (NumberFormatException ex) {
-            txtNuevoPrecio.getStyleClass().add("error");
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Precio incorrecto");
-            alert.setHeaderText(null);
-            alert.setContentText("El precio debe ser un número válido, por ejemplo: 450.00.");
-            alert.showAndWait();
+            campoPrecio.getStyleClass().add("error");
+            mensaje = "El precio debe ser un número válido, por ejemplo: 450.00.";
         }
+
+        return mensaje;
+    }
+
+    private String textoSinNulos(String texto) {
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
     }
 
     private Double convertirPrecio(String texto) {
@@ -386,11 +434,14 @@ public class ServiciosController implements Initializable {
                     servicioSeleccionado = newSelection;
 
                     try {
-                        txtDetalleNombre.setText(newSelection.getNombre() != null ? newSelection.getNombre() : "");
-                        txtDetalleDescripcion
-                                .setText(newSelection.getDescripcion() != null ? newSelection.getDescripcion() : "");
-                        txtDetallePrecio.setText(
-                                newSelection.getPrecio() != null ? String.valueOf(newSelection.getPrecio()) : "");
+                        String precio = "";
+                        if (newSelection.getPrecio() != null) {
+                            precio = String.valueOf(newSelection.getPrecio());
+                        }
+
+                        txtDetalleNombre.setText(textoSinNulos(newSelection.getNombre()));
+                        txtDetalleDescripcion.setText(textoSinNulos(newSelection.getDescripcion()));
+                        txtDetallePrecio.setText(precio);
 
                         panelFormularioNuevo.setTranslateX(400);
                         panelFormularioNuevo.setVisible(false);
@@ -449,48 +500,13 @@ public class ServiciosController implements Initializable {
                 txtDetalleDescripcion.getStyleClass().remove("error");
                 txtDetallePrecio.getStyleClass().remove("error");
 
-                boolean hayError = false;
+                String mensaje = validarDetalleServicio();
 
-                if (txtDetalleNombre.getText().isBlank()) {
-                    txtDetalleNombre.getStyleClass().add("error");
-                    hayError = true;
-                }
-
-                if (txtDetalleDescripcion.getText().isBlank()) {
-                    txtDetalleDescripcion.getStyleClass().add("error");
-                    hayError = true;
-                }
-
-                if (txtDetallePrecio.getText().isBlank()) {
-                    txtDetallePrecio.getStyleClass().add("error");
-                    hayError = true;
-                }
-
-                if (hayError) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Datos incompletos");
-                    alert.setHeaderText(null);
-                    alert.setContentText("No puedes dejar en blanco los campos obligatorios.");
-                    alert.showAndWait();
-                    return;
-                }
-
-                try {
-                    Double precio = convertirPrecio(txtDetallePrecio.getText());
-                    if (precio < 0) {
-                        txtDetallePrecio.getStyleClass().add("error");
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Precio incorrecto");
-                        alert.setHeaderText(null);
-                        alert.setContentText("El precio no puede ser negativo.");
-                        alert.showAndWait();
-                        return;
-                    }
-
+                if (mensaje == null) {
                     if (servicioSeleccionado != null) {
                         servicioSeleccionado.setNombre(txtDetalleNombre.getText().trim());
                         servicioSeleccionado.setDescripcion(txtDetalleDescripcion.getText().trim());
-                        servicioSeleccionado.setPrecio(precio);
+                        servicioSeleccionado.setPrecio(convertirPrecio(txtDetallePrecio.getText()));
 
                         if (serviciosDAO.actualizarServicio(servicioSeleccionado)) {
                             tablaServicios.refresh();
@@ -504,12 +520,11 @@ public class ServiciosController implements Initializable {
                     }
 
                     bloquearCamposEdicion();
-                } catch (NumberFormatException ex) {
-                    txtDetallePrecio.getStyleClass().add("error");
+                } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Precio incorrecto");
+                    alert.setTitle("Datos no válidos");
                     alert.setHeaderText(null);
-                    alert.setContentText("El precio debe ser un número válido, por ejemplo: 450.00.");
+                    alert.setContentText(mensaje);
                     alert.showAndWait();
                 }
             }
