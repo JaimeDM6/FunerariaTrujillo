@@ -184,6 +184,7 @@ public class FeretroController implements Initializable {
     }
 
     private void configurarTabla() {
+        colID.setCellValueFactory(new PropertyValueFactory<Feretro, String>("id"));
         Utils.columnID(colID);
         colMedidas.setCellValueFactory(new PropertyValueFactory<Feretro, String>("medidas"));
         colMaterial.setCellValueFactory(new PropertyValueFactory<Feretro, String>("material"));

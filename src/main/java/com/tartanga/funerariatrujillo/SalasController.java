@@ -179,6 +179,7 @@ public class SalasController implements Initializable {
     }
 
     private void configurarTabla() {
+        colID.setCellValueFactory(new PropertyValueFactory<Sala, String>("id"));
         Utils.columnID(colID);
         colNombre.setCellValueFactory(new PropertyValueFactory<Sala, String>("nombre"));
         colDescripcion.setCellValueFactory(new PropertyValueFactory<Sala, String>("descripcion"));
