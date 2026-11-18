@@ -6,6 +6,7 @@ module com.tartanga.funerariatrujillo {
     requires org.mongodb.bson;
     requires org.mongodb.driver.core;
     requires jbcrypt;
+    requires javafx.graphics;
 
     opens com.tartanga.funerariatrujillo to javafx.fxml;
 
