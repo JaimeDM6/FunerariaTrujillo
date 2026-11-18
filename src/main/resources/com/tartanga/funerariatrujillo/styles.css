@@ -1,3 +1,9 @@
+.root {
+    -fx-font-family: "Inter 18pt";
+    -fx-font-size: 13px;
+    -fx-font-smoothing-type: gray;
+}
+
 /*** BOTONES ***/
 
 .button {
@@ -333,7 +339,7 @@
 
 .table-view .column-header .label {
     -fx-text-fill: #7A5230;
-    -fx-font-family: "Inter 18pt";
+    -fx-font-family: "Inter 18pt 18pt";
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-alignment: center-left;

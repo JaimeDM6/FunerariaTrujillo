@@ -224,7 +224,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Nombre *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevoNombre" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -233,7 +233,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Descripción *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextArea fx:id="txtNuevaDescripcion" maxWidth="1.7976931348623157E308" prefHeight="130.0" wrapText="true" />
@@ -242,7 +242,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Precio *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevoPrecio" maxWidth="1.7976931348623157E308" prefHeight="35.0" promptText="0.00" />
@@ -256,7 +256,7 @@
                     <children>
                         <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" text="Guardar servicio" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="Inter 18pt Bold" size="13.0" />
                             </font>
                         </Button>
                     </children>

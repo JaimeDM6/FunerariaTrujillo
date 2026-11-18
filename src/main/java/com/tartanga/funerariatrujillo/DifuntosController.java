@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import javafx.application.Platform;
 import javafx.scene.control.Control;
 
 public class DifuntosController implements Initializable {
@@ -266,6 +267,7 @@ public class DifuntosController implements Initializable {
         cmbNuevoMaterialUrna.getItems().setAll(difuntoDAO.obtenerMaterialesUrnas());
         cmbDetalleMaterialFeretro.getItems().setAll(cmbNuevoMaterialFeretro.getItems());
         cmbDetalleMaterialUrna.getItems().setAll(cmbNuevoMaterialUrna.getItems());
+
         clientesFiltrados = new FilteredList<>(nombresClientes, new Predicate<String>() {
             @Override
             public boolean test(String nombre) {
@@ -273,6 +275,7 @@ public class DifuntosController implements Initializable {
             }
         });
         listaClientes.setItems(clientesFiltrados);
+
         txtNuevoCliente.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -280,12 +283,35 @@ public class DifuntosController implements Initializable {
                 actualizarListaClientes();
             }
         });
+
         txtNuevoCliente.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 actualizarListaClientes();
             }
         });
+
+        ChangeListener<Boolean> focoListener = new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue && observable == txtNuevoCliente.focusedProperty()) {
+                    actualizarListaClientes();
+                } else if (!newValue) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!txtNuevoCliente.isFocused() && !listaClientes.isFocused()) {
+                                ocultarListaClientes();
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
+        txtNuevoCliente.focusedProperty().addListener(focoListener);
+        listaClientes.focusedProperty().addListener(focoListener);
+
         listaClientes.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -300,15 +326,22 @@ public class DifuntosController implements Initializable {
                         txtNuevoCliente.setText(elegido);
                     }
                     listaClientes.getSelectionModel().clearSelection();
+                    ocultarListaClientes();
                 }
             }
         });
     }
 
     private void actualizarListaClientes() {
-        boolean mostrar = !idsClientes.containsKey(txtNuevoCliente.getText().trim());
+        boolean mostrar = txtNuevoCliente.isFocused()
+                && !idsClientes.containsKey(txtNuevoCliente.getText().trim());
         listaClientes.setVisible(mostrar);
         listaClientes.setManaged(mostrar);
+    }
+
+    private void ocultarListaClientes() {
+        listaClientes.setVisible(false);
+        listaClientes.setManaged(false);
     }
 
     private void cargarClientes(List<String> clientes) {

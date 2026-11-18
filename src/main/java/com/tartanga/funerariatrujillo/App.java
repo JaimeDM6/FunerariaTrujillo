@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 
 /**
  * JavaFX App
@@ -23,6 +24,10 @@ public class App extends Application {
         stage.setTitle("Funeraria Trujillo");
         stage.getIcons().add(new Image(App.class.getResourceAsStream("images/Icon.png")));
         stage.show();
+
+        Font.loadFont(getClass().getResourceAsStream("/com/tartanga/funerariatrujillo/fonts/Inter_18pt-Regular.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/com/tartanga/funerariatrujillo/fonts/Inter_18pt-Medium.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/com/tartanga/funerariatrujillo/fonts/Inter_18pt-Bold.ttf"), 14);
     }
 
     static void setRoot(String fxml) throws IOException {

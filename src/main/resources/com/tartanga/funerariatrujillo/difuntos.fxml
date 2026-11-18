@@ -301,7 +301,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Nombre *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoNombre" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -309,7 +309,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Apellidos *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoApellidos" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -319,7 +319,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Cliente responsable *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevoCliente" maxWidth="1.7976931348623157E308" prefHeight="35.0" promptText="Escribe para buscar un cliente" />
@@ -329,7 +329,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Fecha de nacimiento *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <DatePicker fx:id="dpNuevoNacimiento" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -338,7 +338,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Fecha de fallecimiento *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <DatePicker fx:id="dpNuevoMuerte" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -347,7 +347,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Servicio" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="15.0">
@@ -359,7 +359,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Causa de muerte" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevaCausa" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -368,7 +368,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Material del féretro *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <ComboBox fx:id="cmbNuevoMaterialFeretro" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -377,7 +377,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Material de la urna" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <ComboBox fx:id="cmbNuevoMaterialUrna" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -391,7 +391,7 @@
                     <children>
                         <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" text="Guardar difunto" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="Inter 18pt Bold" size="13.0" />
                             </font>
                         </Button>
                     </children>

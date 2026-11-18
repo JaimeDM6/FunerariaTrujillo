@@ -215,7 +215,7 @@
                 <Region VBox.vgrow="ALWAYS"/>
                 <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar sala" textFill="#2e1a0e">
                     <font>
-                        <Font name="System Bold" size="13.0"/>
+                        <Font name="Inter 18pt Bold" size="13.0"/>
                     </font>
                 </Button>
             </children>

@@ -17,8 +17,8 @@
 <?import javafx.scene.text.TextFlow?>
 
 <StackPane alignment="CENTER_RIGHT" prefHeight="700" prefWidth="1000" style="-fx-background-color: #F5F0E8;" stylesheets="@styles.css"
-           xmlns="http://javafx.com/javafx/25"
-           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.ClientesController">
+    xmlns="http://javafx.com/javafx/25"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tartanga.funerariatrujillo.ClientesController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
     </padding>
@@ -286,7 +286,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Nombre *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoNombre" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -294,7 +294,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Apellidos *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoApellidos" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -305,7 +305,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="DNI *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoDni" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -313,7 +313,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Teléfono *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoTelefono" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -323,7 +323,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Correo electrónico *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevoCorreo" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -332,7 +332,7 @@
                                 <VBox spacing="5.0">
                                     <Label text="Calle *" textFill="#2e1a0e">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="Inter 18pt Bold" size="12.0" />
                                         </font>
                                     </Label>
                                     <TextField fx:id="txtNuevoCalle" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -342,7 +342,7 @@
                                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                         <Label text="Ciudad *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoCiudad" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -350,7 +350,7 @@
                                     <VBox maxWidth="105.0" minWidth="105.0" prefWidth="105.0" spacing="5.0">
                                         <Label text="Código Postal *" textFill="#2e1a0e">
                                             <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Inter 18pt Bold" size="12.0" />
                                             </font>
                                         </Label>
                                         <TextField fx:id="txtNuevoCP" maxWidth="1.7976931348623157E308" prefHeight="35.0" />
@@ -365,7 +365,7 @@
                     <children>
                         <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" text="Guardar cliente" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="Inter 18pt Bold" size="13.0" />
                             </font>
                         </Button>
                     </children>

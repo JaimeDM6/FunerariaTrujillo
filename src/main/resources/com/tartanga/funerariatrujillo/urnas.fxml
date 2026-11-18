@@ -57,7 +57,7 @@
                                                 </TextField>
                                             </children>
                                         </HBox>
-                                        <Button fx:id="btnNuevaUrna" mnemonicParsing="false" prefHeight="40.0" style="-fx-cursor: hand;" text="Nueva urna" textFill="#2e1a0e" minWidth="150.0">
+                                        <Button fx:id="btnNuevaUrna" mnemonicParsing="false" prefHeight="40.0" text="Nueva urna" textFill="#2e1a0e">
                                             <font>
                                                 <Font name="Inter 18pt Bold" size="14.0" />
                                             </font>
@@ -216,7 +216,7 @@
                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                         <Label text="Capacidad *" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="12.0"/>
+                                <Font name="Inter 18pt Bold" size="12.0"/>
                             </font>
                         </Label>
                         <TextField fx:id="txtNuevaCapacidad" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -224,7 +224,7 @@
                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                         <Label text="Material *" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="12.0"/>
+                                <Font name="Inter 18pt Bold" size="12.0"/>
                             </font>
                         </Label>
                         <TextField fx:id="txtNuevoMaterial" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -233,9 +233,9 @@
         
                 <HBox spacing="10.0">
                     <VBox prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
-                        <Label text="Precio *" textFill="#2e1a0e">
+                        <Label text="Precio (€) *" textFill="#2e1a0e">
                             <font>
-                                <Font name="System Bold" size="12.0"/>
+                                <Font name="Inter 18pt Bold" size="12.0"/>
                             </font>
                         </Label>
                         <TextField fx:id="txtNuevoPrecio" maxWidth="1.7976931348623157E308" prefHeight="35.0" prefWidth="0.0" />
@@ -246,7 +246,7 @@
 
                 <Button fx:id="btnGuardarNuevo" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="38.0" style="-fx-background-color: #C68E17; -fx-background-radius: 4; -fx-cursor: hand;" text="Guardar urna" textFill="#2e1a0e">
                     <font>
-                        <Font name="System Bold" size="13.0"/>
+                        <Font name="Inter 18pt Bold" size="13.0"/>
                     </font>
                 </Button>
             </children>

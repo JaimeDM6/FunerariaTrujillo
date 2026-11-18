@@ -45,7 +45,7 @@
                         </ImageView>
                         <Label text="Entierros para cualquier bolsillo." textFill="#5c3a1e">
                             <font>
-                                <Font name="Inter 24pt Regular" size="22.0" />
+                                <Font name="Inter 18pt Regular" size="22.0" />
                             </font>
                         </Label>
                         <Line endX="40.0" startX="-100.0" stroke="#e8a820" strokeWidth="2.0">
@@ -88,7 +88,7 @@
                             <children>
                                 <Label text="Iniciar sesión" textFill="#2e1a0e">
                                     <font>
-                                        <Font name="Inter 24pt Bold" size="26.0" />
+                                        <Font name="Inter 18pt Bold" size="26.0" />
                                     </font>
                                 </Label>
                                 <Label text="Introduce tus credenciales para acceder." textFill="#7a5230">
