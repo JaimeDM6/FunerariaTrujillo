@@ -41,7 +41,7 @@ public class MainController implements Initializable {
             sidebarController.setMainController(this);
         }
 
-        cargarVista("Clientes.fxml");
+        cargarVista("clientes.fxml");
     }
 
     /**
