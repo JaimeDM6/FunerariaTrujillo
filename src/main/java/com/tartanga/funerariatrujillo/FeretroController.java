@@ -328,6 +328,13 @@ public class FeretroController implements Initializable {
 
         String mensaje = validarDatos(txtNuevasMedidas, txtNuevoMaterial, txtNuevoPeso, txtNuevoPrecio);
 
+        if (mensaje == null && feretroDAO.existeFeretro(txtNuevasMedidas.getText().trim(),
+                txtNuevoMaterial.getText().trim(), null)) {
+            txtNuevasMedidas.getStyleClass().add("error");
+            txtNuevoMaterial.getStyleClass().add("error");
+            mensaje = "Ya existe un féretro con esas medidas y ese material.";
+        }
+
         if (mensaje == null) {
             Feretro nuevo = new Feretro(
                     txtNuevasMedidas.getText().trim(),
@@ -361,6 +368,18 @@ public class FeretroController implements Initializable {
         txtDetallePrecio.getStyleClass().remove("error");
 
         String mensaje = validarDatos(txtDetalleMedidas, txtDetalleMaterial, txtDetallePeso, txtDetallePrecio);
+
+        String idActual = null;
+        if (feretroSeleccionado != null) {
+            idActual = feretroSeleccionado.getId();
+        }
+
+        if (mensaje == null && feretroDAO.existeFeretro(txtDetalleMedidas.getText().trim(),
+                txtDetalleMaterial.getText().trim(), idActual)) {
+            txtDetalleMedidas.getStyleClass().add("error");
+            txtDetalleMaterial.getStyleClass().add("error");
+            mensaje = "Ya existe un féretro con esas medidas y ese material.";
+        }
 
         if (mensaje == null) {
             if (feretroSeleccionado != null) {

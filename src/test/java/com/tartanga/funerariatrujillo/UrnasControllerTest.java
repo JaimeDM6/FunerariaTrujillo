@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -30,6 +31,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UrnasControllerTest extends ApplicationTest {
+
+    private static boolean simularDuplicado = false;
 
     public static class MockUrnaDAO extends UrnaDAO {
 
@@ -59,6 +62,10 @@ public class UrnasControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarUrna(Urna u) {
             return true;
+        }
+
+        public boolean existeUrna(double capacidad, String material, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -229,5 +236,63 @@ public class UrnasControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener una urna menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " urnas", lblEstado.getText());
+    }
+
+    @Test
+    @Order(9)
+    public void testCreateUrnDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Urna> tabla = lookup("#tablaUrnas").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevaUrna");
+        sleep(450);
+
+        clickOn("#txtNuevaCapacidad").write("1.5");
+        clickOn("#txtNuevoMaterial").write("Prueba");
+        clickOn("#txtNuevoPrecio").write("255.45");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(10)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Urna> tabla = lookup("#tablaUrnas").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

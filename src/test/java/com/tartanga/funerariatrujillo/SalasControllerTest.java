@@ -32,6 +32,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SalasControllerTest extends ApplicationTest {
 
+    private static boolean simularDuplicado = false;
+
     public static class MockSalasDAO extends SalasDAO {
 
         @Override
@@ -60,6 +62,10 @@ public class SalasControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarSala(Sala s) {
             return true;
+        }
+
+        public boolean existeSala(String nombre, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -329,5 +335,63 @@ public class SalasControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener una sala menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " salas", lblEstado.getText());
+    }
+
+    @Test
+    @Order(13)
+    public void testCreateRoomDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Sala> tabla = lookup("#tablaSalas").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevaSala");
+        sleep(450);
+
+        clickOn("#txtNuevoNombre").write("Sala Nueva");
+        clickOn("#txtNuevaDescripcion").write("Sala recien creada");
+        clickOn("#txtNuevaCapacidad").write("30");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(14)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Sala> tabla = lookup("#tablaSalas").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

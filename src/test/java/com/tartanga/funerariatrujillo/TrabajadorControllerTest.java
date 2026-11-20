@@ -38,6 +38,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TrabajadorControllerTest extends ApplicationTest {
 
+    private static boolean simularDuplicado = false;
+
     public static class MockTrabajadorDAO extends TrabajadorDAO {
 
         @Override
@@ -76,6 +78,10 @@ public class TrabajadorControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarTrabajador(Trabajador t) {
             return true;
+        }
+
+        public boolean existeTrabajador(String dni, String idExcluido) {
+            return simularDuplicado;
         }
 
         @Override
@@ -454,5 +460,61 @@ public class TrabajadorControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un trabajador menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " trabajadores", lblEstado.getText());
+    }
+
+    @Test
+    @Order(14)
+    public void testCreateWorkerDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Trabajador> tabla = lookup("#tablaTrabajadores").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoTrabajador");
+        sleep(450);
+
+        rellenarFormularioNuevo("password123", "password123");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(15)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Trabajador> tabla = lookup("#tablaTrabajadores").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

@@ -32,6 +32,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FeretroControllerTest extends ApplicationTest {
 
+    private static boolean simularDuplicado = false;
+
     public static class MockFeretroDAO extends FeretroDAO {
 
         @Override
@@ -61,6 +63,10 @@ public class FeretroControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarFeretro(Feretro f) {
             return true;
+        }
+
+        public boolean existeFeretro(String medidas, String material, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -333,5 +339,64 @@ public class FeretroControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un féretro menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " féretros", lblEstado.getText());
+    }
+
+    @Test
+    @Order(13)
+    public void testCreateCoffinDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Feretro> tabla = lookup("#tablaFeretros").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoFeretro");
+        sleep(450);
+
+        clickOn("#txtNuevasMedidas").write("200x65x55 cm");
+        clickOn("#txtNuevoMaterial").write("Pino");
+        clickOn("#txtNuevoPeso").write("70,5");
+        clickOn("#txtNuevoPrecio").write("620.50");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(14)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Feretro> tabla = lookup("#tablaFeretros").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

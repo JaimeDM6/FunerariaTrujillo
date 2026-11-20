@@ -140,4 +140,35 @@ public class ClienteDAO {
             return false;
         }
     }
+
+    /**
+     * Comprueba si ya existe otro cliente con el mismo DNI, sin distinguir mayúsculas.
+     *
+     * @param dni DNI que se comprueba
+     * @param idExcluido identificador del registro que se ignora en la comprobación, o {@code null} si se trata de un alta
+     * @return {@code true} si existe otro cliente con ese DNI
+     */
+    public boolean existeCliente(String dni, String idExcluido) {
+        boolean existe = false;
+
+        try {
+            for (Document documento : MongoConfig.getCollection("cliente").find()) {
+                String idDocumento = "";
+                if (documento.getObjectId("_id") != null) {
+                    idDocumento = documento.getObjectId("_id").toString();
+                }
+                boolean mismoDni = documento.getString("dni") != null
+                        && documento.getString("dni").trim().equalsIgnoreCase(dni.trim());
+                boolean esOtro = !idDocumento.equals(idExcluido);
+
+                if (mismoDni && esOtro) {
+                    existe = true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al comprobar duplicados: " + e.getMessage());
+        }
+
+        return existe;
+    }
 }

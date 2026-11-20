@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -413,20 +414,69 @@ public class DifuntoDAO {
      * @return {@code true} si se eliminó algún documento
      */
     public boolean eliminarDifunto(String id) {
-        try {
-            if (!esObjectIdValido(id)) {
-                return false;
-            }
+        boolean eliminado = false;
 
-            long eliminados = MongoConfig.getCollection(COLLECTION_NAME)
-                    .deleteOne(new Document("_id", new ObjectId(id)))
-                    .getDeletedCount();
-            return eliminados > 0;
+        try {
+            if (esObjectIdValido(id)) {
+                ObjectId idDifunto = new ObjectId(id);
+
+                long eliminados = MongoConfig.getCollection(COLLECTION_NAME)
+                        .deleteOne(new Document("_id", idDifunto))
+                        .getDeletedCount();
+
+                if (eliminados > 0) {
+                    MongoConfig.getCollection("asignacion")
+                            .deleteMany(new Document("id_difunto", idDifunto));
+                    eliminado = true;
+                }
+            }
         } catch (Exception e) {
             System.err.println("Error al eliminar el difunto: " + e.getMessage());
             e.printStackTrace();
-            return false;
         }
+
+        return eliminado;
+    }
+
+    /**
+     * Comprueba si ya existe un difunto con el mismo nombre y apellidos (sin distinguir
+     * mayúsculas) y las mismas fechas de nacimiento y fallecimiento.
+     *
+     * @param nombre nombre del difunto
+     * @param apellidos apellidos del difunto
+     * @param nacimiento fecha de nacimiento
+     * @param muerte fecha de fallecimiento
+     * @param idExcluido identificador del difunto que se ignora en la comprobación, o {@code null}
+     * si se trata de un alta
+     * @return {@code true} si existe otro difunto con esos datos
+     */
+    public boolean existeDifunto(String nombre, String apellidos, Date nacimiento, Date muerte, String idExcluido) {
+        boolean existe = false;
+
+        try {
+            Document filtro = new Document("fecha_nacimiento", nacimiento)
+                    .append("fecha_muerte", muerte);
+
+            for (Document documento : MongoConfig.getCollection(COLLECTION_NAME).find(filtro)) {
+                String nombreDocumento = documento.getString("nombre");
+                String apellidosDocumento = documento.getString("apellidos");
+                ObjectId idDocumento = documento.getObjectId("_id");
+
+                boolean mismoNombre = nombreDocumento != null
+                        && nombreDocumento.trim().equalsIgnoreCase(nombre.trim());
+                boolean mismosApellidos = apellidosDocumento != null
+                        && apellidosDocumento.trim().equalsIgnoreCase(apellidos.trim());
+                boolean esOtroDifunto = idDocumento == null || !idDocumento.toString().equals(idExcluido);
+
+                if (mismoNombre && mismosApellidos && esOtroDifunto) {
+                    existe = true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al comprobar si el difunto ya existe: " + e.getMessage());
+        }
+
+        return existe;
     }
 
     /**

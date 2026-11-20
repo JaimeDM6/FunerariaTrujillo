@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -31,6 +32,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ClientesControllerTest extends ApplicationTest {
+
+    private static boolean simularDuplicado = false;
 
     public static class MockClienteDAO extends ClienteDAO {
 
@@ -63,6 +66,10 @@ public class ClientesControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarCliente(Cliente c) {
             return true;
+        }
+
+        public boolean existeCliente(String dni, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -238,5 +245,68 @@ public class ClientesControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un cliente menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " clientes", lblEstado.getText());
+    }
+
+    @Test
+    @Order(9)
+    public void testCreateClientDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoCliente");
+        sleep(450);
+
+        clickOn("#txtNuevoNombre").write("Nuevo");
+        clickOn("#txtNuevoApellidos").write("Cliente");
+        clickOn("#txtNuevoDni").write("87654321B");
+        clickOn("#txtNuevoTelefono").write("600111222");
+        clickOn("#txtNuevoCorreo").write("test@test.com");
+        clickOn("#txtNuevoCalle").write("Calle");
+        clickOn("#txtNuevoCiudad").write("Ciudad");
+        clickOn("#txtNuevoCP").write("10001");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(10)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Cliente> tabla = lookup("#tablaClientes").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

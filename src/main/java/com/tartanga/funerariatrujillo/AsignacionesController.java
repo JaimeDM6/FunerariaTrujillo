@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -47,6 +48,13 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Controlador de la vista de asignaciones. Muestra los servicios pendientes de asignar y el
+ * trabajo ya asignado, permite asignar un tanatopractor a cada servicio, muestra la carga de
+ * trabajo de cada tanatopractor y abre la ficha de servicio de una asignación.
+ *
+ * @author Aritz
+ */
 public class AsignacionesController implements Initializable {
 
     private final AsignacionesDAO asignacionDAO;
@@ -119,28 +127,59 @@ public class AsignacionesController implements Initializable {
     private ResumenAsignacion pendienteSeleccionado;
     private ResumenAsignacion asignadoSeleccionado;
 
+    /**
+     * Crea el controlador con el acceso a datos de asignaciones por defecto.
+     */
     public AsignacionesController() {
         this.asignacionDAO = new AsignacionesDAO();
     }
 
+    /**
+     * Crea el controlador con el DAO indicado. Permite sustituir el acceso a la base de datos, por
+     * ejemplo en las pruebas.
+     *
+     * @param asignacionDAO DAO que se utilizará para acceder a la base de datos
+     */
     public AsignacionesController(AsignacionesDAO asignacionDAO) {
         this.asignacionDAO = asignacionDAO;
     }
 
+    /**
+     * Establece el controlador principal, necesario para navegar a la ficha de servicio.
+     *
+     * @param mainController controlador principal de la aplicación
+     */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
 
+    /**
+     * Establece la acción que se ejecuta al abrir la ficha de una asignación. Si no se establece, la
+     * ficha se abre en la propia vista.
+     *
+     * @param onAbrirFicha acción que recibe el identificador de la asignación
+     */
     public void setOnAbrirFicha(Consumer<String> onAbrirFicha) {
         this.onAbrirFicha = onAbrirFicha;
     }
 
+    /**
+     * Agrupa los datos que se cargan en segundo plano al abrir la vista: servicios pendientes, trabajo
+     * asignado y tanatopractores.
+     */
     private static class DatosIniciales {
 
         final List<ResumenAsignacion> pendientes;
         final List<ResumenAsignacion> asignados;
         final List<TanatopractorResumen> tanatopractores;
 
+        /**
+         * Crea el conjunto de datos iniciales.
+         *
+         * @param pendientes servicios pendientes de asignar
+         * @param asignados trabajo ya asignado
+         * @param tanatopractores tanatopractores disponibles
+         */
         DatosIniciales(List<ResumenAsignacion> pendientes,
                 List<ResumenAsignacion> asignados,
                 List<TanatopractorResumen> tanatopractores) {
@@ -150,6 +189,13 @@ public class AsignacionesController implements Initializable {
         }
     }
 
+    /**
+     * Inicializa la vista: configura las tablas, el buscador y los eventos, y carga los datos de la
+     * base de datos.
+     *
+     * @param location ubicación del documento FXML; no se utiliza
+     * @param resources recursos de internacionalización; no se utilizan
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configurarTablas();
@@ -158,6 +204,10 @@ public class AsignacionesController implements Initializable {
         cargarDatos();
     }
 
+    /**
+     * Configura las columnas de las tablas de pendientes y de asignados, el formato de la fecha de
+     * llegada y el distintivo de color del estado.
+     */
     private void configurarTablas() {
         colPendDifunto.setReorderable(false);
         colPendServicio.setReorderable(false);
@@ -228,12 +278,31 @@ public class AsignacionesController implements Initializable {
         tablaAsignados.setPlaceholder(new Label("Cargando trabajo asignado..."));
     }
 
+    /**
+     * Crea las listas filtradas y ordenables de las dos tablas, de modo que se puedan ordenar
+     * pulsando en las cabeceras, y conecta el buscador para filtrarlas mientras se escribe.
+     */
     private void configurarFiltros() {
-        filteredPendientes = new FilteredList<>(masterPendientes, item -> true);
-        filteredAsignados = new FilteredList<>(masterAsignados, item -> true);
+        filteredPendientes = new FilteredList<>(masterPendientes, new Predicate<ResumenAsignacion>() {
+            @Override
+            public boolean test(ResumenAsignacion item) {
+                return true;
+            }
+        });
+        filteredAsignados = new FilteredList<>(masterAsignados, new Predicate<ResumenAsignacion>() {
+            @Override
+            public boolean test(ResumenAsignacion item) {
+                return true;
+            }
+        });
 
-        tablaPendientes.setItems(filteredPendientes);
-        tablaAsignados.setItems(filteredAsignados);
+        SortedList<ResumenAsignacion> sortedPendientes = new SortedList<>(filteredPendientes);
+        sortedPendientes.comparatorProperty().bind(tablaPendientes.comparatorProperty());
+        tablaPendientes.setItems(sortedPendientes);
+
+        SortedList<ResumenAsignacion> sortedAsignados = new SortedList<>(filteredAsignados);
+        sortedAsignados.comparatorProperty().bind(tablaAsignados.comparatorProperty());
+        tablaAsignados.setItems(sortedAsignados);
 
         txtBuscar.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -243,6 +312,10 @@ public class AsignacionesController implements Initializable {
         });
     }
 
+    /**
+     * Asigna las acciones de las tablas y de los botones: selección de filas, doble clic para abrir la
+     * ficha, confirmar la asignación y abrir la ficha.
+     */
     private void configurarEventos() {
         tablaPendientes.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ResumenAsignacion>() {
             @Override
@@ -298,6 +371,10 @@ public class AsignacionesController implements Initializable {
         });
     }
 
+    /**
+     * Carga pendientes, asignados y tanatopractores desde la base de datos en un hilo en segundo plano
+     * y actualiza las tablas al terminar. Si falla, avisa del error de conexión.
+     */
     private void cargarDatos() {
         Task<DatosIniciales> taskCarga = new Task<DatosIniciales>() {
             @Override
@@ -305,11 +382,16 @@ public class AsignacionesController implements Initializable {
                 List<ResumenAsignacion> pendientes = asignacionDAO.obtenerPendientesDeAsignar();
                 List<ResumenAsignacion> asignados = asignacionDAO.obtenerTrabajoAsignado();
                 List<TanatopractorResumen> listaTanato = asignacionDAO.obtenerTanatopractores();
-                return new DatosIniciales(
-                        pendientes != null ? pendientes : new ArrayList<>(),
-                        asignados != null ? asignados : new ArrayList<>(),
-                        listaTanato != null ? listaTanato : new ArrayList<>()
-                );
+                if (pendientes == null) {
+                    pendientes = new ArrayList<>();
+                }
+                if (asignados == null) {
+                    asignados = new ArrayList<>();
+                }
+                if (listaTanato == null) {
+                    listaTanato = new ArrayList<>();
+                }
+                return new DatosIniciales(pendientes, asignados, listaTanato);
             }
         };
 
@@ -351,23 +433,36 @@ public class AsignacionesController implements Initializable {
         hilo.start();
     }
 
+    /**
+     * Filtra las dos tablas por el texto buscado en el difunto, el código, el trabajo o el
+     * responsable, y actualiza los contadores y los mensajes de las tablas vacías.
+     *
+     * @param texto texto escrito en el buscador, que puede ser nulo
+     */
     private void aplicarFiltroBusqueda(String texto) {
-        final String filtro = texto == null ? "" : texto.trim().toLowerCase();
+        String textoFiltro = "";
+        if (texto != null) {
+            textoFiltro = texto.trim().toLowerCase();
+        }
+        final String filtro = textoFiltro;
 
         Predicate<ResumenAsignacion> predicado = new Predicate<ResumenAsignacion>() {
             @Override
             public boolean test(ResumenAsignacion item) {
-                if (filtro.isEmpty()) {
-                    return true;
+                boolean coincide = true;
+
+                if (!filtro.isEmpty()) {
+                    String difunto = textoSeguro(item.getDifuntoNombre()).toLowerCase();
+                    String codigo = textoSeguro(item.getCodigoServicio()).toLowerCase();
+                    String trabajo = textoSeguro(item.getTrabajoSolicitado()).toLowerCase();
+                    String responsable = textoSeguro(item.getResponsableDetalle()).toLowerCase();
+                    coincide = difunto.contains(filtro)
+                            || codigo.contains(filtro)
+                            || trabajo.contains(filtro)
+                            || responsable.contains(filtro);
                 }
-                String difunto = textoSeguro(item.getDifuntoNombre()).toLowerCase();
-                String codigo = textoSeguro(item.getCodigoServicio()).toLowerCase();
-                String trabajo = textoSeguro(item.getTrabajoSolicitado()).toLowerCase();
-                String responsable = textoSeguro(item.getResponsableDetalle()).toLowerCase();
-                return difunto.contains(filtro)
-                        || codigo.contains(filtro)
-                        || trabajo.contains(filtro)
-                        || responsable.contains(filtro);
+
+                return coincide;
             }
         };
 
@@ -375,19 +470,29 @@ public class AsignacionesController implements Initializable {
         filteredAsignados.setPredicate(predicado);
 
         if (filteredPendientes.isEmpty()) {
-            tablaPendientes.setPlaceholder(new Label(filtro.isEmpty()
-                    ? "No hay servicios pendientes de asignar"
-                    : "No se encontraron servicios pendientes"));
+            String mensajePendientes = "No se encontraron servicios pendientes";
+            if (filtro.isEmpty()) {
+                mensajePendientes = "No hay servicios pendientes de asignar";
+            }
+            tablaPendientes.setPlaceholder(new Label(mensajePendientes));
         }
         if (filteredAsignados.isEmpty()) {
-            tablaAsignados.setPlaceholder(new Label(filtro.isEmpty()
-                    ? "No hay trabajos asignados"
-                    : "No se encontraron trabajos asignados"));
+            String mensajeAsignados = "No se encontraron trabajos asignados";
+            if (filtro.isEmpty()) {
+                mensajeAsignados = "No hay trabajos asignados";
+            }
+            tablaAsignados.setPlaceholder(new Label(mensajeAsignados));
         }
 
         actualizarContadores();
     }
 
+    /**
+     * Muestra en el panel lateral los datos de un servicio pendiente, o el texto de que no hay ninguno
+     * seleccionado.
+     *
+     * @param item servicio pendiente seleccionado, o {@code null} si no hay ninguno
+     */
     private void mostrarPendienteEnPanel(ResumenAsignacion item) {
         if (item == null) {
             lblServicioSeleccionado.setText("Ningún servicio seleccionado");
@@ -404,59 +509,71 @@ public class AsignacionesController implements Initializable {
         }
     }
 
+    /**
+     * Asigna el servicio pendiente seleccionado al tanatopractor elegido. Si falta alguno de los dos
+     * avisa al usuario; si se guarda, pasa el servicio de pendientes a asignados.
+     */
     private void confirmarAsignacion() {
         cmbTanatopractor.getStyleClass().remove("error");
+
+        TanatopractorResumen tanatopractor = cmbTanatopractor.getValue();
 
         if (pendienteSeleccionado == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Servicio requerido",
                     "Selecciona primero un servicio pendiente de asignar.");
-            return;
-        }
-
-        TanatopractorResumen tanatopractor = cmbTanatopractor.getValue();
-        if (tanatopractor == null) {
+        } else if (tanatopractor == null) {
             if (!cmbTanatopractor.getStyleClass().contains("error")) {
                 cmbTanatopractor.getStyleClass().add("error");
             }
             mostrarAlerta(Alert.AlertType.WARNING, "Tanatopractor requerido",
                     "Debes seleccionar un tanatopractor responsable antes de confirmar.");
-            return;
-        }
-
-        ResumenAsignacion servicioAAsignar = pendienteSeleccionado;
-        if (asignacionDAO.confirmarAsignacion(servicioAAsignar, tanatopractor)) {
-            masterPendientes.remove(servicioAAsignar);
-            masterAsignados.add(0, servicioAAsignar);
-
-            cmbTanatopractor.setValue(null);
-            actualizarContadores();
-            actualizarCargaTrabajo();
-
-            if (!filteredPendientes.isEmpty()) {
-                tablaPendientes.getSelectionModel().selectFirst();
-            } else {
-                tablaPendientes.getSelectionModel().clearSelection();
-                mostrarPendienteEnPanel(null);
-            }
         } else {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error",
-                    "No se pudo guardar la asignación en la base de datos.");
+            ResumenAsignacion servicioAAsignar = pendienteSeleccionado;
+            if (asignacionDAO.confirmarAsignacion(servicioAAsignar, tanatopractor)) {
+                masterPendientes.remove(servicioAAsignar);
+                masterAsignados.add(0, servicioAAsignar);
+
+                cmbTanatopractor.setValue(null);
+                actualizarContadores();
+                actualizarCargaTrabajo();
+
+                if (!filteredPendientes.isEmpty()) {
+                    tablaPendientes.getSelectionModel().selectFirst();
+                } else {
+                    tablaPendientes.getSelectionModel().clearSelection();
+                    mostrarPendienteEnPanel(null);
+                }
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error",
+                        "No se pudo guardar la asignación en la base de datos.");
+            }
         }
     }
 
+    /**
+     * Abre la ficha del trabajo asignado seleccionado. Si no hay selección, avisa al usuario.
+     */
     private void abrirFichaSeleccionada() {
         if (asignadoSeleccionado == null) {
             mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida",
                     "Selecciona un trabajo asignado para abrir su ficha del servicio.");
-            return;
+        } else {
+            String idAsignacion = asignadoSeleccionado.getId();
+            if (onAbrirFicha != null) {
+                onAbrirFicha.accept(idAsignacion);
+            } else {
+                abrirFichaEnVista(idAsignacion);
+            }
         }
+    }
 
-        String idAsignacion = asignadoSeleccionado.getId();
-        if (onAbrirFicha != null) {
-            onAbrirFicha.accept(idAsignacion);
-            return;
-        }
-
+    /**
+     * Carga la ficha de servicio de una asignación y la muestra en lugar de esta vista, con una acción
+     * para volver a ella.
+     *
+     * @param idAsignacion identificador de la asignación
+     */
+    private void abrirFichaEnVista(String idAsignacion) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/ficha_servicio.fxml"));
             Parent vistaFicha = loader.load();
@@ -466,16 +583,19 @@ public class AsignacionesController implements Initializable {
 
             if (rootAsignaciones != null && rootAsignaciones.getParent() instanceof StackPane) {
                 StackPane contenedor = (StackPane) rootAsignaciones.getParent();
-                fichaController.setOnVolver(() -> {
-                    try {
-                        FXMLLoader asigLoader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
-                        Parent vistaAsig = asigLoader.load();
-                        AsignacionesController asigCtrl = asigLoader.getController();
-                        asigCtrl.setMainController(mainController);
-                        contenedor.getChildren().setAll(vistaAsig);
-                    } catch (IOException ex) {
-                        mostrarAlerta(Alert.AlertType.ERROR, "Error de navegación",
-                                "No se pudo volver a asignaciones: " + ex.getMessage());
+                fichaController.setOnVolver(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FXMLLoader asigLoader = new FXMLLoader(getClass().getResource("/com/tartanga/funerariatrujillo/asignaciones.fxml"));
+                            Parent vistaAsig = asigLoader.load();
+                            AsignacionesController asigCtrl = asigLoader.getController();
+                            asigCtrl.setMainController(mainController);
+                            contenedor.getChildren().setAll(vistaAsig);
+                        } catch (IOException ex) {
+                            mostrarAlerta(Alert.AlertType.ERROR, "Error de navegación",
+                                    "No se pudo volver a asignaciones: " + ex.getMessage());
+                        }
                     }
                 });
                 contenedor.getChildren().setAll(vistaFicha);
@@ -488,11 +608,18 @@ public class AsignacionesController implements Initializable {
         }
     }
 
+    /**
+     * Actualiza los contadores de servicios pendientes y de trabajo asignado según las filas visibles.
+     */
     private void actualizarContadores() {
         lblBadgePendientes.setText("● Pendiente · " + filteredPendientes.size());
         lblTituloAsignados.setText("Trabajo asignado · " + filteredAsignados.size());
     }
 
+    /**
+     * Rellena el panel de carga de trabajo con cada tanatopractor y el número de servicios que tiene
+     * en curso y asignados.
+     */
     private void actualizarCargaTrabajo() {
         vboxCargaTrabajo.getChildren().clear();
 
@@ -501,68 +628,107 @@ public class AsignacionesController implements Initializable {
             vacio.setFont(Font.font("Inter 18pt Regular", 12.0));
             vacio.setStyle("-fx-text-fill: #7a5230;");
             vboxCargaTrabajo.getChildren().add(vacio);
-            return;
-        }
+        } else {
+            for (TanatopractorResumen tanato : tanatopractores) {
+                int enCurso = 0;
+                int pendientes = 0;
 
-        for (TanatopractorResumen tanato : tanatopractores) {
-            int enCurso = 0;
-            int pendientes = 0;
-
-            for (ResumenAsignacion asig : masterAsignados) {
-                if (tanato.getId() != null && tanato.getId().equals(asig.getIdTrabajador())) {
-                    if ("En curso".equalsIgnoreCase(asig.getEstado())) {
-                        enCurso++;
-                    } else if (!"Completado".equalsIgnoreCase(asig.getEstado())) {
-                        pendientes++;
+                for (ResumenAsignacion asig : masterAsignados) {
+                    if (tanato.getId() != null && tanato.getId().equals(asig.getIdTrabajador())) {
+                        if ("En curso".equalsIgnoreCase(asig.getEstado())) {
+                            enCurso++;
+                        } else if (!"Completado".equalsIgnoreCase(asig.getEstado())) {
+                            pendientes++;
+                        }
                     }
                 }
+
+                HBox fila = new HBox(10.0);
+                fila.setAlignment(Pos.CENTER_LEFT);
+
+                Label lblNombre = new Label(tanato.getNombreCompleto());
+                lblNombre.setFont(Font.font("Inter 18pt Bold", 13.0));
+                lblNombre.setStyle("-fx-text-fill: #2e1a0e;");
+
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
+
+                Label lblResumen = new Label(construirTextoCarga(enCurso, pendientes));
+                lblResumen.setFont(Font.font("Inter 18pt Regular", 12.0));
+                lblResumen.setStyle("-fx-text-fill: #7a5230;");
+
+                fila.getChildren().addAll(lblNombre, spacer, lblResumen);
+                vboxCargaTrabajo.getChildren().add(fila);
             }
-
-            HBox fila = new HBox(10.0);
-            fila.setAlignment(Pos.CENTER_LEFT);
-
-            Label lblNombre = new Label(tanato.getNombreCompleto());
-            lblNombre.setFont(Font.font("Inter 18pt Bold", 13.0));
-            lblNombre.setStyle("-fx-text-fill: #2e1a0e;");
-
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-
-            Label lblResumen = new Label(construirTextoCarga(enCurso, pendientes));
-            lblResumen.setFont(Font.font("Inter 18pt Regular", 12.0));
-            lblResumen.setStyle("-fx-text-fill: #7a5230;");
-
-            fila.getChildren().addAll(lblNombre, spacer, lblResumen);
-            vboxCargaTrabajo.getChildren().add(fila);
         }
     }
 
+    /**
+     * Construye el texto de carga de un tanatopractor.
+     *
+     * @param enCurso servicios en curso
+     * @param pendientes servicios asignados que todavía no han empezado
+     * @return texto con la carga, o {@code Disponible} si no tiene servicios
+     */
     private String construirTextoCarga(int enCurso, int pendientes) {
-        if (enCurso == 0 && pendientes == 0) {
-            return "Disponible";
+        String resultado = "Disponible";
+
+        if (enCurso > 0 || pendientes > 0) {
+            List<String> partes = new ArrayList<>();
+            if (enCurso > 0) {
+                partes.add(enCurso + " en curso");
+            }
+            if (pendientes > 0) {
+                String sufijo = " asignados";
+                if (pendientes == 1) {
+                    sufijo = " asignado";
+                }
+                partes.add(pendientes + sufijo);
+            }
+            resultado = String.join(" · ", partes);
         }
-        List<String> partes = new ArrayList<>();
-        if (enCurso > 0) {
-            partes.add(enCurso + " en curso");
-        }
-        if (pendientes > 0) {
-            partes.add(pendientes + (pendientes == 1 ? " asignado" : " asignados"));
-        }
-        return String.join(" · ", partes);
+
+        return resultado;
     }
 
+    /**
+     * Da formato a la fecha de llegada: solo la hora si es de hoy, y fecha y hora en otro caso.
+     *
+     * @param fecha fecha de llegada
+     * @return texto de la fecha
+     */
     private String formatearFechaLlegada(Date fecha) {
         LocalDate fechaLocal = fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        String resultado = sdfFechaHora.format(fecha);
+
         if (fechaLocal.equals(LocalDate.now())) {
-            return "Hoy · " + sdfHora.format(fecha);
+            resultado = "Hoy · " + sdfHora.format(fecha);
         }
-        return sdfFechaHora.format(fecha);
+
+        return resultado;
     }
 
+    /**
+     * Convierte un texto nulo en una cadena vacía.
+     *
+     * @param texto texto original, que puede ser nulo
+     * @return el mismo texto, o una cadena vacía si era nulo
+     */
     private String textoSeguro(String texto) {
-        return texto != null ? texto : "";
+        String resultado = "";
+        if (texto != null) {
+            resultado = texto;
+        }
+        return resultado;
     }
 
+    /**
+     * Muestra una ventana de aviso y espera a que el usuario la cierre.
+     *
+     * @param tipo tipo de aviso
+     * @param titulo título de la ventana
+     * @param mensaje mensaje que se muestra
+     */
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);

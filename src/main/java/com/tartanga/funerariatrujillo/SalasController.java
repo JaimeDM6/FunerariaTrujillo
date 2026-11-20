@@ -320,6 +320,11 @@ public class SalasController implements Initializable {
 
         String mensaje = validarDatos(txtNuevoNombre, txtNuevaDescripcion, txtNuevaCapacidad);
 
+        if (mensaje == null && salasDAO.existeSala(txtNuevoNombre.getText().trim(), null)) {
+            txtNuevoNombre.getStyleClass().add("error");
+            mensaje = "Ya existe una sala con ese nombre.";
+        }
+
         if (mensaje == null) {
             Sala nueva = new Sala(
                     txtNuevoNombre.getText().trim(),
@@ -351,6 +356,16 @@ public class SalasController implements Initializable {
         txtDetalleCapacidad.getStyleClass().remove("error");
 
         String mensaje = validarDatos(txtDetalleNombre, txtDetalleDescripcion, txtDetalleCapacidad);
+
+        String idActual = null;
+        if (salaSeleccionada != null) {
+            idActual = salaSeleccionada.getId();
+        }
+
+        if (mensaje == null && salasDAO.existeSala(txtDetalleNombre.getText().trim(), idActual)) {
+            txtDetalleNombre.getStyleClass().add("error");
+            mensaje = "Ya existe una sala con ese nombre.";
+        }
 
         if (mensaje == null) {
             if (salaSeleccionada != null) {

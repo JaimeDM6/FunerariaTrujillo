@@ -40,6 +40,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DifuntosControllerTest extends ApplicationTest {
 
+    private static boolean simularDuplicado = false;
+
     public static class MockDifuntoDAO extends DifuntoDAO {
 
         @Override
@@ -112,6 +114,10 @@ public class DifuntosControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarDifunto(Difunto d) {
             return true;
+        }
+
+        public boolean existeDifunto(String nombre, String apellidos, Date nacimiento, Date muerte, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -429,5 +435,61 @@ public class DifuntosControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un difunto menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " difuntos", lblEstado.getText());
+    }
+
+    @Test
+    @Order(15)
+    public void testCreateDeceasedDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Difunto> tabla = lookup("#tablaDifuntos").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoDifunto");
+        sleep(450);
+
+        rellenarFormularioNuevo(LocalDate.of(1950, 1, 1), LocalDate.now());
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un difunto duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(16)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Difunto> tabla = lookup("#tablaDifuntos").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

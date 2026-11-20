@@ -143,4 +143,35 @@ public class SalasDAO {
 
         return eliminado;
     }
+
+    /**
+     * Comprueba si ya existe otra sala con el mismo nombre, sin distinguir mayúsculas.
+     *
+     * @param nombre nombre que se comprueba
+     * @param idExcluido identificador del registro que se ignora en la comprobación, o {@code null} si se trata de un alta
+     * @return {@code true} si existe otra sala con ese nombre
+     */
+    public boolean existeSala(String nombre, String idExcluido) {
+        boolean existe = false;
+
+        try {
+            for (Document documento : MongoConfig.getCollection(COLLECTION_NAME).find()) {
+                String idDocumento = "";
+                if (documento.getObjectId("_id") != null) {
+                    idDocumento = documento.getObjectId("_id").toString();
+                }
+                boolean mismoNombre = documento.getString("nombre") != null
+                        && documento.getString("nombre").trim().equalsIgnoreCase(nombre.trim());
+                boolean esOtro = !idDocumento.equals(idExcluido);
+
+                if (mismoNombre && esOtro) {
+                    existe = true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al comprobar duplicados: " + e.getMessage());
+        }
+
+        return existe;
+    }
 }

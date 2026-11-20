@@ -87,6 +87,16 @@
           <useModulePath>false</useModulePath>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.11.2</version>
+        <configuration>
+          <show>private</show>
+          <author>true</author>
+          <encoding>UTF-8</encoding>
+          <doclint>none</doclint>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

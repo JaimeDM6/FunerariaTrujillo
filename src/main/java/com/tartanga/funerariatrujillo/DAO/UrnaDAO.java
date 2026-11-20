@@ -129,4 +129,39 @@ public class UrnaDAO {
             return false;
         }
     }
+
+    /**
+     * Comprueba si ya existe otra urna con la misma capacidad y el mismo material, sin distinguir mayúsculas.
+     *
+     * @param capacidad capacidad en litros
+     * @param material material de la urna
+     * @param idExcluido identificador del registro que se ignora en la comprobación, o {@code null} si se trata de un alta
+     * @return {@code true} si existe otra urna con esos datos
+     */
+    public boolean existeUrna(double capacidad, String material, String idExcluido) {
+        boolean existe = false;
+
+        try {
+            for (Document documento : MongoConfig.getCollection("urna").find()) {
+                String idDocumento = "";
+                if (documento.getObjectId("_id") != null) {
+                    idDocumento = documento.getObjectId("_id").toString();
+                }
+                Object capacidadDocumento = documento.get("capacidad");
+                boolean mismaCapacidad = capacidadDocumento instanceof Number
+                        && ((Number) capacidadDocumento).doubleValue() == capacidad;
+                boolean mismoMaterial = documento.getString("material") != null
+                        && documento.getString("material").trim().equalsIgnoreCase(material.trim());
+                boolean esOtro = !idDocumento.equals(idExcluido);
+
+                if (mismaCapacidad && mismoMaterial && esOtro) {
+                    existe = true;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al comprobar duplicados: " + e.getMessage());
+        }
+
+        return existe;
+    }
 }

@@ -371,6 +371,11 @@ public class ServiciosController implements Initializable {
             mensaje = "Todos los campos son obligatorios.";
         } else {
             mensaje = validarPrecio(txtNuevoPrecio);
+
+            if (mensaje == null && serviciosDAO.existeServicio(txtNuevoNombre.getText().trim(), null)) {
+                txtNuevoNombre.getStyleClass().add("error");
+                mensaje = "Ya existe un servicio con ese nombre.";
+            }
         }
 
         return mensaje;
@@ -404,6 +409,16 @@ public class ServiciosController implements Initializable {
             mensaje = "No puedes dejar en blanco los campos obligatorios.";
         } else {
             mensaje = validarPrecio(txtDetallePrecio);
+
+            String idActual = null;
+            if (servicioSeleccionado != null) {
+                idActual = servicioSeleccionado.getId();
+            }
+
+            if (mensaje == null && serviciosDAO.existeServicio(txtDetalleNombre.getText().trim(), idActual)) {
+                txtDetalleNombre.getStyleClass().add("error");
+                mensaje = "Ya existe un servicio con ese nombre.";
+            }
         }
 
         return mensaje;

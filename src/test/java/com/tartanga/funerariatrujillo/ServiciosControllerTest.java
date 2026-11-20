@@ -32,6 +32,8 @@ import static org.testfx.matcher.control.TextInputControlMatchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiciosControllerTest extends ApplicationTest {
 
+    private static boolean simularDuplicado = false;
+
     public static class MockServiciosDAO extends ServiciosDAO {
 
         @Override
@@ -60,6 +62,10 @@ public class ServiciosControllerTest extends ApplicationTest {
         @Override
         public boolean actualizarServicio(Servicios s) {
             return true;
+        }
+
+        public boolean existeServicio(String nombre, String idExcluido) {
+            return simularDuplicado;
         }
     }
 
@@ -309,5 +315,63 @@ public class ServiciosControllerTest extends ApplicationTest {
         assertEquals(initialSize - 1, tabla.getItems().size(), "La tabla debe tener un servicio menos.");
         Label lblEstado = lookup("#lblEstadoTabla").queryAs(Label.class);
         assertEquals((initialSize - 1) + " servicios", lblEstado.getText());
+    }
+
+    @Test
+    @Order(12)
+    public void testCreateServiceDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Servicios> tabla = lookup("#tablaServicios").queryTableView();
+        int initialSize = tabla.getItems().size();
+
+        clickOn("#btnNuevoServicio");
+        sleep(450);
+
+        clickOn("#txtNuevoNombre").write("Nuevo");
+        clickOn("#txtNuevaDescripcion").write("Servicio nuevo");
+        clickOn("#txtNuevoPrecio").write("255.45");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarNuevo");
+            push(KeyCode.ENTER);
+
+            assertEquals(initialSize, tabla.getItems().size(), "Un registro duplicado no debe añadirse a la tabla.");
+            verifyThat("#panelFormularioNuevo", isVisible());
+        } finally {
+            simularDuplicado = false;
+        }
+
+        clickOn("#btnCerrarFormulario");
+        sleep(450);
+    }
+
+    @Test
+    @Order(13)
+    public void testEditDuplicate() {
+        WaitForAsyncUtils.waitForFxEvents();
+        TableView<Servicios> tabla = lookup("#tablaServicios").queryTableView();
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                tabla.getSelectionModel().select(0);
+            }
+        });
+        WaitForAsyncUtils.waitForFxEvents();
+
+        clickOn(tabla);
+        clickOn("#btnEditar");
+
+        simularDuplicado = true;
+        try {
+            clickOn("#btnGuardarEdicion");
+            push(KeyCode.ENTER);
+
+            verifyThat("#btnGuardarEdicion", isVisible());
+            verifyThat("#btnEditar", isInvisible());
+        } finally {
+            simularDuplicado = false;
+        }
     }
 }

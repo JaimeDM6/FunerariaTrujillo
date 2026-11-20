@@ -559,6 +559,9 @@ public class TrabajadorController implements Initializable {
         } else if (!Utils.cpValido(txtNuevoCP.getText().trim())) {
             txtNuevoCP.getStyleClass().add("error");
             mensaje = "El código postal debe tener 5 números.";
+        } else if (trabajadorDAO.existeTrabajador(txtNuevoDni.getText().trim(), null)) {
+            txtNuevoDni.getStyleClass().add("error");
+            mensaje = "Ya existe un trabajador con ese DNI.";
         } else {
             try {
                 Double.valueOf(txtNuevoSalario.getText().trim());
@@ -948,6 +951,16 @@ public class TrabajadorController implements Initializable {
             } catch (NumberFormatException ex) {
                 txtDetalleSalario.getStyleClass().add("error");
                 mensaje = "El salario debe ser un valor numérico.";
+            }
+
+            String idActual = null;
+            if (trabajadorSeleccionado != null) {
+                idActual = trabajadorSeleccionado.getId();
+            }
+
+            if (mensaje == null && trabajadorDAO.existeTrabajador(txtDetalleDni.getText().trim(), idActual)) {
+                txtDetalleDni.getStyleClass().add("error");
+                mensaje = "Ya existe un trabajador con ese DNI.";
             }
         }
 

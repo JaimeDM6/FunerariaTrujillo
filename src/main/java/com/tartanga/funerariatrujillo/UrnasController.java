@@ -309,32 +309,44 @@ public class UrnasController implements Initializable {
             hayError = true;
         }
 
+        String mensaje = null;
+        String titulo = "Faltan datos";
+
         if (hayError) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Faltan datos");
-            alert.setHeaderText(null);
-            alert.setContentText("Todos los campos son obligatorios.");
-            alert.showAndWait();
-            return;
+            mensaje = "Todos los campos son obligatorios.";
+        } else if (urnaDAO.existeUrna(Double.parseDouble(txtNuevaCapacidad.getText().trim()),
+                txtNuevoMaterial.getText().trim(), null)) {
+            txtNuevaCapacidad.getStyleClass().add("error");
+            txtNuevoMaterial.getStyleClass().add("error");
+            titulo = "Datos no válidos";
+            mensaje = "Ya existe una urna con esa capacidad y ese material.";
         }
 
-        Urna nuevaUrna = new Urna();
-        nuevaUrna.setCapacidad(Double.valueOf(txtNuevaCapacidad.getText().trim()));
-        nuevaUrna.setMaterial(txtNuevoMaterial.getText().trim());
-        nuevaUrna.setPrecio(Double.valueOf(txtNuevoPrecio.getText().trim()));
+        if (mensaje == null) {
+            Urna nuevaUrna = new Urna();
+            nuevaUrna.setCapacidad(Double.valueOf(txtNuevaCapacidad.getText().trim()));
+            nuevaUrna.setMaterial(txtNuevoMaterial.getText().trim());
+            nuevaUrna.setPrecio(Double.valueOf(txtNuevoPrecio.getText().trim()));
 
-        if (urnaDAO.insertarUrna(nuevaUrna)) {
-            masterData.add(nuevaUrna);
-            tablaUrnas.sort();
-            lblEstadoTabla.setText(masterData.size() + " urnas");
+            if (urnaDAO.insertarUrna(nuevaUrna)) {
+                masterData.add(nuevaUrna);
+                tablaUrnas.sort();
+                lblEstadoTabla.setText(masterData.size() + " urnas");
 
-            limpiarFormularioNuevo();
-            closeForm();
+                limpiarFormularioNuevo();
+                closeForm();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText("Hubo un problema al guardar la urna en la base de datos.");
+                alert.showAndWait();
+            }
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(titulo);
             alert.setHeaderText(null);
-            alert.setContentText("Hubo un problema al guardar la urna en la base de datos.");
+            alert.setContentText(mensaje);
             alert.showAndWait();
         }
     }
@@ -486,32 +498,51 @@ public class UrnasController implements Initializable {
                     hayError = true;
                 }
 
+                String mensaje = null;
+                String titulo = "Datos incompletos";
+
                 if (hayError) {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Datos incompletos");
-                    alert.setHeaderText(null);
-                    alert.setContentText("No puedes dejar en blanco los campos.");
-                    alert.showAndWait();
-                    return;
-                }
+                    mensaje = "No puedes dejar en blanco los campos.";
+                } else {
+                    String idActual = null;
+                    if (urnaSeleccionada != null) {
+                        idActual = urnaSeleccionada.getId();
+                    }
 
-                if (urnaSeleccionada != null) {
-                    urnaSeleccionada.setCapacidad(Double.valueOf(txtDetalleCapacidad.getText()));
-                    urnaSeleccionada.setMaterial(txtDetalleMaterial.getText());
-                    urnaSeleccionada.setPrecio(Double.valueOf(txtDetallePrecio.getText()));
-
-                    if (urnaDAO.actualizarUrna(urnaSeleccionada)) {
-                        tablaUrnas.refresh();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
-                        alert.showAndWait();
+                    if (urnaDAO.existeUrna(Double.parseDouble(txtDetalleCapacidad.getText().trim()),
+                            txtDetalleMaterial.getText().trim(), idActual)) {
+                        txtDetalleCapacidad.getStyleClass().add("error");
+                        txtDetalleMaterial.getStyleClass().add("error");
+                        titulo = "Datos no válidos";
+                        mensaje = "Ya existe una urna con esa capacidad y ese material.";
                     }
                 }
 
-                bloquearCamposEdicion();
+                if (mensaje == null) {
+                    if (urnaSeleccionada != null) {
+                        urnaSeleccionada.setCapacidad(Double.valueOf(txtDetalleCapacidad.getText()));
+                        urnaSeleccionada.setMaterial(txtDetalleMaterial.getText());
+                        urnaSeleccionada.setPrecio(Double.valueOf(txtDetallePrecio.getText()));
+
+                        if (urnaDAO.actualizarUrna(urnaSeleccionada)) {
+                            tablaUrnas.refresh();
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                            alert.showAndWait();
+                        }
+                    }
+
+                    bloquearCamposEdicion();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle(titulo);
+                    alert.setHeaderText(null);
+                    alert.setContentText(mensaje);
+                    alert.showAndWait();
+                }
             }
         });
     }

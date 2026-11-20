@@ -396,6 +396,9 @@ public class ClientesController implements Initializable {
         } else if (!Utils.cpValido(txtNuevoCP.getText().trim())) {
             txtNuevoCP.getStyleClass().add("error");
             mensaje = "El código postal debe tener 5 números.";
+        } else if (clienteDAO.existeCliente(txtNuevoDni.getText().trim(), null)) {
+            txtNuevoDni.getStyleClass().add("error");
+            mensaje = "Ya existe un cliente con ese DNI.";
         }
 
         return mensaje;
@@ -475,14 +478,21 @@ public class ClientesController implements Initializable {
                         txtDetalleCorreo.setText(newSelection.getCorreo_electronico());
 
                         if (newSelection.getDireccion() != null) {
-                            txtDetalleCalle.setText(newSelection.getDireccion().getCalle() != null
-                                    ? newSelection.getDireccion().getCalle()
-                                    : "");
-                            txtDetalleCiudad.setText(newSelection.getDireccion().getCiudad() != null
-                                    ? newSelection.getDireccion().getCiudad()
-                                    : "");
-                            txtDetalleCP.setText(newSelection.getDireccion().getCodigoPostal() == 0 ? ""
-                                    : String.valueOf(newSelection.getDireccion().getCodigoPostal()));
+                            String calle = "";
+                            if (newSelection.getDireccion().getCalle() != null) {
+                                calle = newSelection.getDireccion().getCalle();
+                            }
+                            String ciudad = "";
+                            if (newSelection.getDireccion().getCiudad() != null) {
+                                ciudad = newSelection.getDireccion().getCiudad();
+                            }
+                            String codigoPostal = "";
+                            if (newSelection.getDireccion().getCodigoPostal() != 0) {
+                                codigoPostal = String.valueOf(newSelection.getDireccion().getCodigoPostal());
+                            }
+                            txtDetalleCalle.setText(calle);
+                            txtDetalleCiudad.setText(ciudad);
+                            txtDetalleCP.setText(codigoPostal);
                         } else {
                             txtDetalleCalle.setText("");
                             txtDetalleCiudad.setText("");
@@ -608,48 +618,66 @@ public class ClientesController implements Initializable {
                     hayError = true;
                 }
 
+                String mensaje = null;
+                String titulo = "Datos incompletos";
+
                 if (hayError) {
+                    mensaje = "No puedes dejar en blanco los campos.";
+                } else {
+                    String idActual = null;
+                    if (clienteSeleccionado != null) {
+                        idActual = clienteSeleccionado.getId();
+                    }
+
+                    if (clienteDAO.existeCliente(txtDetalleDni.getText().trim(), idActual)) {
+                        txtDetalleDni.getStyleClass().add("error");
+                        titulo = "Datos no válidos";
+                        mensaje = "Ya existe un cliente con ese DNI.";
+                    }
+                }
+
+                if (mensaje == null) {
+                    if (clienteSeleccionado != null) {
+                        clienteSeleccionado.setNombre(txtDetalleNombre.getText());
+                        clienteSeleccionado.setApellidos(txtDetalleApellidos.getText());
+                        clienteSeleccionado.setDni(txtDetalleDni.getText());
+                        clienteSeleccionado.setTelefono(txtDetalleTelefono.getText());
+                        clienteSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText());
+
+                        Direccion dir = clienteSeleccionado.getDireccion();
+                        if (dir == null) {
+                            dir = new Direccion();
+                        }
+                        dir.setCalle(txtDetalleCalle.getText().trim());
+                        dir.setCiudad(txtDetalleCiudad.getText().trim());
+                        int codigoPostal = 0;
+                        try {
+                            codigoPostal = Integer.parseInt(txtDetalleCP.getText().trim());
+                        } catch (NumberFormatException ex) {
+                            codigoPostal = 0;
+                        }
+                        dir.setCodigoPostal(codigoPostal);
+                        clienteSeleccionado.setDireccion(dir);
+
+                        if (clienteDAO.actualizarCliente(clienteSeleccionado)) {
+                            tablaClientes.refresh();
+                        } else {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
+                            alert.showAndWait();
+                        }
+                    }
+
+                    bloquearCamposEdicion();
+                } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Datos incompletos");
+                    alert.setTitle(titulo);
                     alert.setHeaderText(null);
-                    alert.setContentText("No puedes dejar en blanco los campos.");
+                    alert.setContentText(mensaje);
                     alert.showAndWait();
-                    return;
                 }
-
-                if (clienteSeleccionado != null) {
-                    clienteSeleccionado.setNombre(txtDetalleNombre.getText());
-                    clienteSeleccionado.setApellidos(txtDetalleApellidos.getText());
-                    clienteSeleccionado.setDni(txtDetalleDni.getText());
-                    clienteSeleccionado.setTelefono(txtDetalleTelefono.getText());
-                    clienteSeleccionado.setCorreo_electronico(txtDetalleCorreo.getText());
-
-                    Direccion dir = clienteSeleccionado.getDireccion();
-                    if (dir == null) {
-                        dir = new Direccion();
-                    }
-                    dir.setCalle(txtDetalleCalle.getText().trim());
-                    dir.setCiudad(txtDetalleCiudad.getText().trim());
-                    try {
-                        dir.setCodigoPostal(txtDetalleCP.getText().trim().isEmpty() ? 0
-                                : Integer.parseInt(txtDetalleCP.getText().trim()));
-                    } catch (NumberFormatException ex) {
-                        dir.setCodigoPostal(0);
-                    }
-                    clienteSeleccionado.setDireccion(dir);
-
-                    if (clienteDAO.actualizarCliente(clienteSeleccionado)) {
-                        tablaClientes.refresh();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText(null);
-                        alert.setContentText("Hubo un error al actualizar los datos en la base de datos.");
-                        alert.showAndWait();
-                    }
-                }
-
-                bloquearCamposEdicion();
             }
         });
     }

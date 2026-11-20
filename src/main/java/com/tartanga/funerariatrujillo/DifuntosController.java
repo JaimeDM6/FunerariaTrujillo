@@ -602,6 +602,17 @@ public class DifuntosController implements Initializable {
             mensaje = "Los campos obligatorios no pueden estar vacíos.";
         } else {
             mensaje = validarFechas(dpNuevoNacimiento.getValue(), dpNuevoMuerte.getValue());
+
+            if (mensaje == null && difuntoDAO.existeDifunto(
+                    txtNuevoNombre.getText().trim(),
+                    txtNuevoApellidos.getText().trim(),
+                    convertirAFecha(dpNuevoNacimiento.getValue()),
+                    convertirAFecha(dpNuevoMuerte.getValue()),
+                    null)) {
+                txtNuevoNombre.getStyleClass().add("error");
+                txtNuevoApellidos.getStyleClass().add("error");
+                mensaje = "Ya existe un difunto con esos datos.";
+            }
         }
 
         return mensaje;
@@ -739,6 +750,17 @@ public class DifuntosController implements Initializable {
             mensaje = "No puedes dejar en blanco los campos obligatorios.";
         } else {
             mensaje = validarFechas(dpDetalleNacimiento.getValue(), dpDetalleMuerte.getValue());
+
+            if (mensaje == null && difuntoDAO.existeDifunto(
+                    txtDetalleNombre.getText().trim(),
+                    txtDetalleApellidos.getText().trim(),
+                    convertirAFecha(dpDetalleNacimiento.getValue()),
+                    convertirAFecha(dpDetalleMuerte.getValue()),
+                    difuntoSeleccionado.getId())) {
+                txtDetalleNombre.getStyleClass().add("error");
+                txtDetalleApellidos.getStyleClass().add("error");
+                mensaje = "Ya existe un difunto con esos datos.";
+            }
         }
 
         return mensaje;
